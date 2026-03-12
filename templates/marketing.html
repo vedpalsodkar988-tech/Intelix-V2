@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketing Campaign - Intelix</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Arial, sans-serif;
+            background: #0F0F0F;
+            color: #FFFFFF;
+            min-height: 100vh;
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 24px 80px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15, 15, 15, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            color: #FFFFFF;
+            letter-spacing: -1px;
+        }
+
+        .nav-right {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .nav-right a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 15px;
+            transition: color 0.3s;
+        }
+
+        .nav-right a:hover {
+            color: #FFFFFF;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 120px 40px 80px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            font-weight: 900;
+            margin-bottom: 12px;
+            letter-spacing: -2px;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #6366F1 0%, #A855F7 50%, #EC4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .idea-summary {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 50px;
+        }
+
+        .idea-summary h3 {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .idea-summary p {
+            font-size: 17px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .posts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 28px;
+            margin-bottom: 50px;
+        }
+
+        .post-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 32px;
+            transition: all 0.3s;
+        }
+
+        .post-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(99, 102, 241, 0.3);
+            transform: translateY(-4px);
+        }
+
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .post-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #6366F1;
+        }
+
+        .post-badge {
+            background: rgba(99, 102, 241, 0.2);
+            color: #A855F7;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .post-content {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            line-height: 1.7;
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.9);
+            white-space: pre-wrap;
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-copy {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #FFFFFF;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-copy:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .hidden-textarea {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .connect-section {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .connect-section h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .connect-section p {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 32px;
+            font-size: 16px;
+        }
+
+        .connect-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-connect {
+            position: relative;
+            background: #FFFFFF;
+            color: #0F0F0F;
+            padding: 16px 32px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border: none;
+            cursor: not-allowed;
+            opacity: 0.6;
+            transition: all 0.3s;
+        }
+
+        .btn-connect:hover {
+            opacity: 0.8;
+        }
+
+        .btn-twitter {
+            background: #1DA1F2;
+            color: #FFFFFF;
+        }
+
+        .btn-connect::after {
+            content: "Coming Soon!";
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-8px);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .btn-connect:hover::after {
+            opacity: 1;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .back-link a {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            font-size: 15px;
+        }
+
+        .back-link a:hover {
+            color: #FFFFFF;
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 20px 24px;
+            }
+
+            .container {
+                padding: 100px 24px 60px;
+            }
+
+            .header h1 {
+                font-size: 36px;
+            }
+
+            .posts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">Intelix</div>
+        <div class="nav-right">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/logout">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header">
+            <h1>Your <span class="gradient-text">Marketing Posts</span></h1>
+            <p>AI-generated posts ready to validate your idea with real people</p>
+        </div>
+
+        {% if posts %}
+        <div class="idea-summary">
+            <h3>YOUR IDEA:</h3>
+            <p>{{ idea }}</p>
+        </div>
+
+        <div class="posts-grid">
+            <div class="post-card">
+                <div class="post-header">
+                    <span class="post-title">{{ posts.post1.title }}</span>
+                    <span class="post-badge">LinkedIn</span>
+                </div>
+                <div class="post-content">{{ posts.post1.content }}</div>
+                <div class="post-actions">
+                    <button class="btn-copy" onclick="copyToClipboard('post1')">
+                        📋 Copy Post
+                    </button>
+                    <textarea id="post1" class="hidden-textarea">{{ posts.post1.content }}</textarea>
+                </div>
+            </div>
+
+            <div class="post-card">
+                <div class="post-header">
+                    <span class="post-title">{{ posts.post2.title }}</span>
+                    <span class="post-badge">Twitter</span>
+                </div>
+                <div class="post-content">{{ posts.post2.content }}</div>
+                <div class="post-actions">
+                    <button class="btn-copy" onclick="copyToClipboard('post2')">
+                        📋 Copy Post
+                    </button>
+                    <textarea id="post2" class="hidden-textarea">{{ posts.post2.content }}</textarea>
+                </div>
+            </div>
+
+            <div class="post-card">
+                <div class="post-header">
+                    <span class="post-title">{{ posts.post3.title }}</span>
+                    <span class="post-badge">Both</span>
+                </div>
+                <div class="post-content">{{ posts.post3.content }}</div>
+                <div class="post-actions">
+                    <button class="btn-copy" onclick="copyToClipboard('post3')">
+                        📋 Copy Post
+                    </button>
+                    <textarea id="post3" class="hidden-textarea">{{ posts.post3.content }}</textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="connect-section">
+            <h2>🚀 Ready to Launch?</h2>
+            <p>Connect your accounts to automatically post and track validation</p>
+            <div class="connect-buttons">
+                <button class="btn-connect">
+                    💼 Connect LinkedIn
+                </button>
+                <button class="btn-connect btn-twitter">
+                    🐦 Connect Twitter
+                </button>
+            </div>
+        </div>
+
+        {% else %}
+        <div style="text-align: center; padding: 80px 20px; color: rgba(255, 255, 255, 0.4);">
+            <p>No posts generated yet. Go back to analysis to generate posts!</p>
+        </div>
+        {% endif %}
+
+        <div class="back-link">
+            <a href="/dashboard">← Back to Dashboard</a>
+        </div>
+    </div>
+
+    <script>
+        function copyToClipboard(elementId) {
+            var copyText = document.getElementById(elementId);
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+            document.execCommand("copy");
+            alert('Post copied to clipboard! 📋');
+        }
+    </script>
+</body>
+</html>
