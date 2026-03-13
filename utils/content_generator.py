@@ -1,77 +1,42 @@
 import anthropic
 import os
-from dotenv import load_dotenv
 import json
 
-load_dotenv()
+ANTHROPIC_API_KEY = os.getenv('ANTHROPIC_API_KEY')
 
-def generate_marketing_posts(idea, analysis):
-    """
-    Generate viral social media posts for the business idea
-    Returns 3 different post variations
-    """
+def generate_marketing_posts(idea_text, analysis):
+    """Generate 3 marketing posts for social validation"""
     
-    client = anthropic.Anthropic(api_key=os.getenv('ANTHROPIC_API_KEY'))
+    client = anthropic.Anthropic(
+        api_key=ANTHROPIC_API_KEY
+    )
     
-    prompt = f"""You are a viral content creator. Create 3 different social media posts to validate this business idea:
+    prompt = f"""Based on this business idea and analysis, create 3 different social media posts for validation testing:
 
-BUSINESS IDEA: {idea}
+Business Idea: {idea_text}
 
-ANALYSIS SUMMARY:
-- Target Audience: {analysis.get('target_audience', 'Not specified')}
-- Main Strengths: {', '.join(analysis.get('strengths', [])[:3])}
+Analysis Summary:
+- Target Audience: {analysis['target_audience']}
+- Key Strengths: {', '.join(analysis['strengths'][:2])}
 
-Create 3 DIFFERENT posts with these styles:
-
-POST 1: Personal Story Approach
-- Start with a personal frustration/experience
-- Use casual, authentic language
-- Include specific numbers if relevant
-- Ask a direct question to audience
-- Be humble, not salesy
-- 150-200 words
-
-POST 2: Problem/Solution Hook
-- Start with the problem
-- Present the solution idea
-- Include call to action for feedback
-- Use emojis strategically
-- 120-150 words
-
-POST 3: Poll/Engagement Style
-- Pose a question or poll
-- Make it interactive
-- Short and punchy
-- Easy to respond to
-- 80-120 words
-
-CRITICAL RULES:
-- Sound HUMAN, not corporate
-- NO generic startup jargon
-- Be vulnerable and authentic
-- Ask for honest feedback
-- Make it conversational
-
-Return ONLY valid JSON:
+Create 3 posts in JSON format:
 {{
     "post1": {{
-        "title": "Personal Story",
-        "content": "the actual post text here",
-        "hook": "opening line"
+        "title": "Personal Story Post",
+        "content": "A personal, relatable post (LinkedIn style, 150-200 words) that shares a problem story and hints at the solution. Sound human, not salesy."
     }},
     "post2": {{
-        "title": "Problem/Solution",
-        "content": "the actual post text here",
-        "hook": "opening line"
+        "title": "Problem/Solution Post",
+        "content": "A direct problem/solution post (Twitter style, 200-250 chars) that's punchy and creates curiosity."
     }},
     "post3": {{
-        "title": "Quick Poll",
-        "content": "the actual post text here",
-        "hook": "opening line"
+        "title": "Quick Poll Post",
+        "content": "An engaging poll or question (both platforms, 100-150 words) that gets people to comment their pain points."
     }}
 }}
-"""
-    
+
+Make posts sound HUMAN, not like AI. Use casual language, real emotions, and authentic storytelling. Return ONLY JSON."""
+
     message = client.messages.create(
         model="claude-sonnet-4-20250514",
         max_tokens=1500,
@@ -80,16 +45,9 @@ Return ONLY valid JSON:
         ]
     )
     
-    # Extract response
     response_text = message.content[0].text
     
-    # Remove markdown code blocks if present
-    if "```json" in response_text:
-        response_text = response_text.split("```json")[1].split("```")[0]
-    elif "```" in response_text:
-        response_text = response_text.split("```")[1].split("```")[0]
-    
-    # Parse JSON
-    posts = json.loads(response_text.strip())
+    # Parse JSON response
+    posts = json.loads(response_text)
     
     return posts
