@@ -1,48 +1,34 @@
 import anthropic
 import os
-from dotenv import load_dotenv
 import json
 
-load_dotenv()
+ANTHROPIC_API_KEY = os.getenv('ANTHROPIC_API_KEY')
 
-def analyze_business_idea(idea):
-    """
-    Analyze business idea using Claude AI
-    Returns detailed analysis
-    """
+def analyze_business_idea(idea_text):
+    """Analyze business idea using Claude API"""
     
-    client = anthropic.Anthropic(api_key=os.getenv('ANTHROPIC_API_KEY'))
+    client = anthropic.Anthropic(
+        api_key=ANTHROPIC_API_KEY
+    )
     
-    prompt = f"""Analyze this business idea in extreme detail:
+    prompt = f"""Analyze this business idea and provide a structured analysis:
 
-IDEA: {idea}
+Business Idea: {idea_text}
 
-Provide a comprehensive analysis with:
-
-1. STRENGTHS (list 5-7 specific strengths)
-2. WEAKNESSES (list 5-7 specific weaknesses and risks)
-3. MARKET SIZE (give detailed estimate - small/medium/large and why)
-4. TARGET AUDIENCE (be very specific - age, demographics, behaviors)
-5. COMPETITION (who are the competitors and how to differentiate)
-6. REVENUE POTENTIAL (realistic revenue model and estimates)
-7. EXECUTION DIFFICULTY (technical, time, resources needed)
-8. KEY RISKS (what could go wrong)
-
-Be brutally honest. Give specific, actionable insights.
-
-Return ONLY a valid JSON object with these exact keys (no markdown, no extra text):
+Provide your analysis in the following JSON format:
 {{
-    "strengths": ["strength1", "strength2", ...],
-    "weaknesses": ["weakness1", "weakness2", ...],
-    "market_size": "detailed market size analysis",
-    "target_audience": "detailed target audience description",
-    "competition": "competition analysis",
-    "revenue_potential": "revenue model and potential",
-    "execution_difficulty": "difficulty analysis",
-    "key_risks": ["risk1", "risk2", ...]
+    "market_size": "Brief description of market size and opportunity (2-3 sentences)",
+    "target_audience": "Description of ideal customers (2-3 sentences)",
+    "strengths": ["strength 1", "strength 2", "strength 3"],
+    "weaknesses": ["weakness 1", "weakness 2", "weakness 3"],
+    "competition": "Analysis of competitive landscape (2-3 sentences)",
+    "revenue_potential": "Revenue model and potential (2-3 sentences)",
+    "execution_difficulty": "How hard is it to execute? (2-3 sentences)",
+    "key_risks": ["risk 1", "risk 2", "risk 3"]
 }}
-"""
-    
+
+Return ONLY the JSON, no additional text."""
+
     message = client.messages.create(
         model="claude-sonnet-4-20250514",
         max_tokens=2000,
@@ -51,16 +37,9 @@ Return ONLY a valid JSON object with these exact keys (no markdown, no extra tex
         ]
     )
     
-    # Extract response
     response_text = message.content[0].text
     
-    # Parse JSON from response
-    # Remove markdown code blocks if present
-    if "```json" in response_text:
-        response_text = response_text.split("```json")[1].split("```")[0]
-    elif "```" in response_text:
-        response_text = response_text.split("```")[1].split("```")[0]
-    
-    analysis = json.loads(response_text.strip())
+    # Parse JSON response
+    analysis = json.loads(response_text)
     
     return analysis
