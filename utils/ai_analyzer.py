@@ -1,3 +1,4 @@
+# Updated version - no proxies argument
 import anthropic
 import os
 import json
