@@ -1,6 +1,7 @@
 import anthropic
 import os
 import json
+import re
 
 ANTHROPIC_API_KEY = os.getenv('ANTHROPIC_API_KEY')
 
@@ -35,7 +36,7 @@ Create 3 posts in JSON format:
     }}
 }}
 
-Make posts sound HUMAN, not like AI. Use casual language, real emotions, and authentic storytelling. Return ONLY JSON."""
+Make posts sound HUMAN, not like AI. Use casual language, real emotions, and authentic storytelling. Return ONLY JSON, no other text."""
 
     message = client.messages.create(
         model="claude-sonnet-4-20250514",
@@ -47,7 +48,15 @@ Make posts sound HUMAN, not like AI. Use casual language, real emotions, and aut
     
     response_text = message.content[0].text
     
+    # Clean response - remove markdown code blocks if present
+    response_text = response_text.strip()
+    if response_text.startswith('```'):
+        # Remove ```json or ``` from start
+        response_text = re.sub(r'^```(?:json)?\s*', '', response_text)
+        # Remove ``` from end
+        response_text = re.sub(r'\s*```$', '', response_text)
+    
     # Parse JSON response
-    posts = json.loads(response_text)
+    posts = json.loads(response_text.strip())
     
     return posts
