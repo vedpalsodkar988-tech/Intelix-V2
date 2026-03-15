@@ -2,6 +2,7 @@
 import anthropic
 import os
 import json
+import re
 
 ANTHROPIC_API_KEY = os.getenv('ANTHROPIC_API_KEY')
 
@@ -40,7 +41,15 @@ Return ONLY the JSON, no additional text."""
     
     response_text = message.content[0].text
     
+    # Clean response - remove markdown code blocks if present
+    response_text = response_text.strip()
+    if response_text.startswith('```'):
+        # Remove ```json or ``` from start
+        response_text = re.sub(r'^```(?:json)?\s*', '', response_text)
+        # Remove ``` from end
+        response_text = re.sub(r'\s*```$', '', response_text)
+    
     # Parse JSON response
-    analysis = json.loads(response_text)
+    analysis = json.loads(response_text.strip())
     
     return analysis
