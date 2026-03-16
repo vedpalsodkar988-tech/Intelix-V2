@@ -7,12 +7,16 @@ from functools import wraps
 import json
 from datetime import datetime
 import pytz
+import secrets
 
 # Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY')
+
+# Import OAuth handlers
+from utils.oauth_handler import *
 
 # Database connection helper
 def get_db_connection():
@@ -175,7 +179,7 @@ def analyze():
 def marketing():
     """Marketing campaign setup"""
     if request.method == 'POST':
-        # Get idea and analysis from session (not from form)
+        # Get idea and analysis from session
         idea = session.get('current_idea')
         analysis = session.get('current_analysis')
         
@@ -190,7 +194,18 @@ def marketing():
         except Exception as e:
             return f"Error generating posts: {str(e)}"
         
-        return render_template('marketing.html', posts=posts, idea=idea)
+        # Get connection status and post count
+        linkedin_connected = is_platform_connected(session['user_id'], 'linkedin')
+        twitter_connected = is_platform_connected(session['user_id'], 'twitter')
+        posts_used = get_posts_this_month(session['user_id'])
+        
+        return render_template('marketing.html', 
+                             posts=posts, 
+                             idea=idea,
+                             linkedin_connected=linkedin_connected,
+                             twitter_connected=twitter_connected,
+                             posts_used=posts_used,
+                             posts_limit=5)
     
     return render_template('marketing.html')
 
@@ -227,11 +242,17 @@ def settings():
     # Convert created_at to IST
     created_at_ist = convert_to_ist(user[2])
     
+    # Get connection status
+    linkedin_connected = is_platform_connected(session['user_id'], 'linkedin')
+    twitter_connected = is_platform_connected(session['user_id'], 'twitter')
+    
     user_data = {
         'username': user[0],
         'email': user[1],
         'created_at': created_at_ist,
-        'validation_count': validation_count
+        'validation_count': validation_count,
+        'linkedin_connected': linkedin_connected,
+        'twitter_connected': twitter_connected
     }
     
     return render_template('settings.html', user=user_data)
@@ -281,6 +302,12 @@ def delete_account():
     # Delete all validations
     cursor.execute("DELETE FROM validations WHERE user_id = %s", (user_id,))
     
+    # Delete all posts
+    cursor.execute("DELETE FROM posts WHERE user_id = %s", (user_id,))
+    
+    # Delete all OAuth tokens
+    cursor.execute("DELETE FROM oauth_tokens WHERE user_id = %s", (user_id,))
+    
     # Delete user
     cursor.execute("DELETE FROM users WHERE id = %s", (user_id,))
     
@@ -319,6 +346,117 @@ def validations():
     ]
     
     return render_template('validations.html', validations=validations_data)
+
+# ========== OAUTH ROUTES ==========
+
+@app.route('/oauth/linkedin')
+@login_required
+def oauth_linkedin():
+    """Initiate LinkedIn OAuth"""
+    state = secrets.token_urlsafe(32)
+    session['oauth_state'] = state
+    auth_url = get_linkedin_auth_url(state)
+    return redirect(auth_url)
+
+@app.route('/oauth/linkedin/callback')
+@login_required
+def oauth_linkedin_callback():
+    """Handle LinkedIn OAuth callback"""
+    code = request.args.get('code')
+    state = request.args.get('state')
+    
+    # Verify state
+    if state != session.get('oauth_state'):
+        return "Invalid state parameter", 400
+    
+    try:
+        # Exchange code for token
+        token_data = exchange_linkedin_code(code)
+        
+        # Save token
+        save_linkedin_token(session['user_id'], token_data)
+        
+        return redirect(url_for('settings') + '?success=linkedin')
+    except Exception as e:
+        return redirect(url_for('settings') + '?error=linkedin')
+
+@app.route('/oauth/twitter')
+@login_required
+def oauth_twitter():
+    """Initiate Twitter OAuth"""
+    state = secrets.token_urlsafe(32)
+    session['oauth_state'] = state
+    auth_url = get_twitter_auth_url(state)
+    return redirect(auth_url)
+
+@app.route('/oauth/twitter/callback')
+@login_required
+def oauth_twitter_callback():
+    """Handle Twitter OAuth callback"""
+    code = request.args.get('code')
+    state = request.args.get('state')
+    
+    # Verify state
+    if state != session.get('oauth_state'):
+        return "Invalid state parameter", 400
+    
+    try:
+        # Exchange code for token
+        token_data = exchange_twitter_code(code)
+        
+        # Save token
+        save_twitter_token(session['user_id'], token_data)
+        
+        return redirect(url_for('settings') + '?success=twitter')
+    except Exception as e:
+        return redirect(url_for('settings') + '?error=twitter')
+
+# ========== POSTING ROUTES ==========
+
+@app.route('/post/linkedin', methods=['POST'])
+@login_required
+def post_linkedin_route():
+    """Post to LinkedIn"""
+    content = request.form.get('content')
+    
+    # Check post limit
+    posts_count = get_posts_this_month(session['user_id'])
+    if posts_count >= 5:
+        return jsonify({'error': 'Monthly post limit reached (5/5). Upgrade to Pro for unlimited posts!'}), 403
+    
+    try:
+        post_to_linkedin(session['user_id'], content)
+        return jsonify({'success': True, 'posts_remaining': 5 - posts_count - 1})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+@app.route('/post/twitter', methods=['POST'])
+@login_required
+def post_twitter_route():
+    """Post to Twitter"""
+    content = request.form.get('content')
+    
+    # Check post limit
+    posts_count = get_posts_this_month(session['user_id'])
+    if posts_count >= 5:
+        return jsonify({'error': 'Monthly post limit reached (5/5). Upgrade to Pro for unlimited posts!'}), 403
+    
+    try:
+        post_to_twitter(session['user_id'], content)
+        return jsonify({'success': True, 'posts_remaining': 5 - posts_count - 1})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+@app.route('/api/connection-status')
+@login_required
+def connection_status():
+    """Check platform connection status"""
+    return jsonify({
+        'linkedin': is_platform_connected(session['user_id'], 'linkedin'),
+        'twitter': is_platform_connected(session['user_id'], 'twitter'),
+        'posts_used': get_posts_this_month(session['user_id']),
+        'posts_limit': 5
+    })
 
 @app.route('/logout')
 def logout():
