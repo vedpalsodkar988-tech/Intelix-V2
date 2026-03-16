@@ -26,7 +26,7 @@ def get_linkedin_auth_url(state):
         'client_id': LINKEDIN_CLIENT_ID,
         'redirect_uri': LINKEDIN_REDIRECT_URI,
         'state': state,
-        'scope': 'openid profile email w_member_social'
+        'scope': 'profile email w_member_social'
     }
     return f"https://www.linkedin.com/oauth/v2/authorization?{urlencode(params)}"
 
