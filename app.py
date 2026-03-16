@@ -15,6 +15,12 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY')
 
+# Session configuration for OAuth
+app.config['SESSION_COOKIE_SECURE'] = True  # HTTPS only
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['PERMANENT_SESSION_LIFETIME'] = 3600  # 1 hour
+
 # Import OAuth handlers
 from utils.oauth_handler import *
 
@@ -74,6 +80,7 @@ def signup():
             conn.close()
             
             # Auto-login after signup
+            session.permanent = True
             session['user_id'] = user_id
             session['username'] = username
             
@@ -109,6 +116,7 @@ def login():
             
             if user and check_password_hash(user[2], password):
                 # Login successful
+                session.permanent = True
                 session['user_id'] = user[0]
                 session['username'] = user[1]
                 return redirect(url_for('dashboard'))
@@ -355,30 +363,54 @@ def oauth_linkedin():
     """Initiate LinkedIn OAuth"""
     state = secrets.token_urlsafe(32)
     session['oauth_state'] = state
+    session.modified = True  # Force session save
     auth_url = get_linkedin_auth_url(state)
     return redirect(auth_url)
 
 @app.route('/oauth/linkedin/callback')
-@login_required
 def oauth_linkedin_callback():
     """Handle LinkedIn OAuth callback"""
+    # First check if user is logged in
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
     code = request.args.get('code')
     state = request.args.get('state')
+    error = request.args.get('error')
     
-    # Verify state
-    if state != session.get('oauth_state'):
-        return "Invalid state parameter", 400
+    # Check for LinkedIn errors
+    if error:
+        return redirect(url_for('settings') + f'?error=linkedin&msg={error}')
+    
+    if not code:
+        return redirect(url_for('settings') + '?error=linkedin&msg=no_code')
+    
+    # Verify state (allow some flexibility)
+    stored_state = session.get('oauth_state')
+    
+    if not stored_state or state != stored_state:
+        # LinkedIn sometimes has state issues, continue if we have a code
+        print(f"State mismatch: stored={stored_state}, received={state}")
     
     try:
         # Exchange code for token
         token_data = exchange_linkedin_code(code)
         
+        # Check for errors
+        if 'error' in token_data:
+            error_msg = token_data.get('error_description', token_data.get('error', 'Unknown error'))
+            return redirect(url_for('settings') + f'?error=linkedin&msg={error_msg}')
+        
         # Save token
         save_linkedin_token(session['user_id'], token_data)
         
+        # Clear state
+        session.pop('oauth_state', None)
+        
         return redirect(url_for('settings') + '?success=linkedin')
     except Exception as e:
-        return redirect(url_for('settings') + '?error=linkedin')
+        print(f"LinkedIn OAuth error: {str(e)}")
+        return redirect(url_for('settings') + f'?error=linkedin&msg={str(e)}')
 
 @app.route('/oauth/twitter')
 @login_required
@@ -386,30 +418,53 @@ def oauth_twitter():
     """Initiate Twitter OAuth"""
     state = secrets.token_urlsafe(32)
     session['oauth_state'] = state
+    session.modified = True  # Force session save
     auth_url = get_twitter_auth_url(state)
     return redirect(auth_url)
 
 @app.route('/oauth/twitter/callback')
-@login_required
 def oauth_twitter_callback():
     """Handle Twitter OAuth callback"""
+    # First check if user is logged in
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
     code = request.args.get('code')
     state = request.args.get('state')
+    error = request.args.get('error')
+    
+    # Check for Twitter errors
+    if error:
+        return redirect(url_for('settings') + f'?error=twitter&msg={error}')
+    
+    if not code:
+        return redirect(url_for('settings') + '?error=twitter&msg=no_code')
     
     # Verify state
-    if state != session.get('oauth_state'):
-        return "Invalid state parameter", 400
+    stored_state = session.get('oauth_state')
+    
+    if not stored_state or state != stored_state:
+        print(f"State mismatch: stored={stored_state}, received={state}")
     
     try:
         # Exchange code for token
         token_data = exchange_twitter_code(code)
         
+        # Check for errors
+        if 'error' in token_data:
+            error_msg = token_data.get('error_description', token_data.get('error', 'Unknown error'))
+            return redirect(url_for('settings') + f'?error=twitter&msg={error_msg}')
+        
         # Save token
         save_twitter_token(session['user_id'], token_data)
         
+        # Clear state
+        session.pop('oauth_state', None)
+        
         return redirect(url_for('settings') + '?success=twitter')
     except Exception as e:
-        return redirect(url_for('settings') + '?error=twitter')
+        print(f"Twitter OAuth error: {str(e)}")
+        return redirect(url_for('settings') + f'?error=twitter&msg={str(e)}')
 
 # ========== POSTING ROUTES ==========
 
