@@ -89,7 +89,7 @@ def get_linkedin_token(user_id):
     return result[0] if result else None
 
 def post_to_linkedin(user_id, content):
-    """Post content to LinkedIn - Personal Profile"""
+    """Post content to LinkedIn - Personal Profile with Debug"""
     access_token = get_linkedin_token(user_id)
     if not access_token:
         raise Exception("LinkedIn not connected")
@@ -100,16 +100,22 @@ def post_to_linkedin(user_id, content):
         'X-Restli-Protocol-Version': '2.0.0'
     }
     
-    # Get LinkedIn ID using userinfo endpoint (works with OpenID)
+    # Get LinkedIn ID using userinfo endpoint
     try:
         profile_response = requests.get(
             'https://api.linkedin.com/v2/userinfo',
             headers={'Authorization': f'Bearer {access_token}'}
         )
         
+        print(f"[LINKEDIN DEBUG] Profile Response Status: {profile_response.status_code}")
+        print(f"[LINKEDIN DEBUG] Profile Response Body: {profile_response.text}")
+        
         if profile_response.status_code == 200:
             profile_data = profile_response.json()
             person_id = profile_data.get('sub')
+            
+            print(f"[LINKEDIN DEBUG] Person ID: {person_id}")
+            print(f"[LINKEDIN DEBUG] Full Profile Data: {profile_data}")
             
             if person_id:
                 # Create post with the person URN
@@ -129,11 +135,16 @@ def post_to_linkedin(user_id, content):
                     }
                 }
                 
+                print(f"[LINKEDIN DEBUG] Posting with data: {post_data}")
+                
                 response = requests.post(
                     'https://api.linkedin.com/v2/ugcPosts',
                     headers=headers,
                     json=post_data
                 )
+                
+                print(f"[LINKEDIN DEBUG] Post Response Status: {response.status_code}")
+                print(f"[LINKEDIN DEBUG] Post Response Body: {response.text}")
                 
                 if response.status_code == 201:
                     save_post(user_id, 'linkedin', 'success', content)
@@ -143,9 +154,10 @@ def post_to_linkedin(user_id, content):
             else:
                 raise Exception("Could not get person ID from profile")
         else:
-            raise Exception(f"Profile fetch failed: {profile_response.text}")
+            raise Exception(f"Profile fetch failed (status {profile_response.status_code}): {profile_response.text}")
             
     except Exception as e:
+        print(f"[LINKEDIN DEBUG] Exception occurred: {str(e)}")
         raise Exception(f"LinkedIn error: {str(e)}")
 
 # ========== TWITTER OAUTH ==========
@@ -233,7 +245,7 @@ def get_twitter_token(user_id):
     return result[0] if result else None
 
 def post_to_twitter(user_id, content):
-    """Post content to Twitter"""
+    """Post content to Twitter with Debug"""
     access_token = get_twitter_token(user_id)
     if not access_token:
         raise Exception("Twitter not connected")
@@ -249,11 +261,17 @@ def post_to_twitter(user_id, content):
     
     post_data = {'text': content}
     
+    print(f"[TWITTER DEBUG] Posting with access_token: {access_token[:20]}...")
+    print(f"[TWITTER DEBUG] Content length: {len(content)}")
+    
     response = requests.post(
         'https://api.twitter.com/2/tweets',
         headers=headers,
         json=post_data
     )
+    
+    print(f"[TWITTER DEBUG] Response Status: {response.status_code}")
+    print(f"[TWITTER DEBUG] Response Body: {response.text}")
     
     if response.status_code == 201:
         post_id = response.json()['data']['id']
