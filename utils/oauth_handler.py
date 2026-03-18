@@ -3,6 +3,7 @@ import requests
 from datetime import datetime, timedelta
 import psycopg2
 from urllib.parse import urlencode
+import base64
 
 # LinkedIn OAuth config
 LINKEDIN_CLIENT_ID = os.getenv('LINKEDIN_CLIENT_ID')
@@ -13,6 +14,8 @@ LINKEDIN_REDIRECT_URI = os.getenv('LINKEDIN_REDIRECT_URI')
 TWITTER_CLIENT_ID = os.getenv('TWITTER_CLIENT_ID')
 TWITTER_CLIENT_SECRET = os.getenv('TWITTER_CLIENT_SECRET')
 TWITTER_REDIRECT_URI = os.getenv('TWITTER_REDIRECT_URI')
+TWITTER_CONSUMER_KEY = os.getenv('TWITTER_CONSUMER_KEY')
+TWITTER_CONSUMER_SECRET = os.getenv('TWITTER_CONSUMER_SECRET')
 
 def get_db_connection():
     return psycopg2.connect(os.getenv('DATABASE_URL'))
@@ -86,20 +89,20 @@ def get_linkedin_token(user_id):
     return result[0] if result else None
 
 def post_to_linkedin(user_id, content):
-    """Post content to LinkedIn"""
+    """Post content to LinkedIn - Simplified approach"""
     access_token = get_linkedin_token(user_id)
     if not access_token:
         raise Exception("LinkedIn not connected")
     
-    # Get user profile ID
-    headers = {'Authorization': f'Bearer {access_token}'}
-    profile_response = requests.get('https://api.linkedin.com/v2/userinfo', headers=headers)
-    profile_data = profile_response.json()
-    person_urn = profile_data.get('sub')
+    headers = {
+        'Authorization': f'Bearer {access_token}',
+        'Content-Type': 'application/json',
+        'X-Restli-Protocol-Version': '2.0.0'
+    }
     
-    # Create post
+    # Use simplified share endpoint
     post_data = {
-        "author": f"urn:li:person:{person_urn}",
+        "author": "urn:li:person:CURRENT",  # Special keyword for current user
         "lifecycleState": "PUBLISHED",
         "specificContent": {
             "com.linkedin.ugc.ShareContent": {
@@ -114,9 +117,6 @@ def post_to_linkedin(user_id, content):
         }
     }
     
-    headers['Content-Type'] = 'application/json'
-    headers['X-Restli-Protocol-Version'] = '2.0.0'
-    
     response = requests.post(
         'https://api.linkedin.com/v2/ugcPosts',
         headers=headers,
@@ -124,10 +124,35 @@ def post_to_linkedin(user_id, content):
     )
     
     if response.status_code == 201:
-        save_post(user_id, 'linkedin', response.json().get('id'), content)
+        post_id = response.json().get('id', 'success')
+        save_post(user_id, 'linkedin', post_id, content)
         return True
     else:
-        raise Exception(f"LinkedIn posting failed: {response.text}")
+        # If that fails, try the REST API share endpoint
+        share_data = {
+            "content": {
+                "contentEntities": [],
+                "title": "Post from Intelix"
+            },
+            "distribution": {
+                "linkedInDistributionTarget": {}
+            },
+            "text": {
+                "text": content
+            }
+        }
+        
+        response = requests.post(
+            'https://api.linkedin.com/v2/shares',
+            headers=headers,
+            json=share_data
+        )
+        
+        if response.status_code in [200, 201]:
+            save_post(user_id, 'linkedin', 'success', content)
+            return True
+        else:
+            raise Exception(f"LinkedIn posting failed: {response.text}")
 
 # ========== TWITTER OAUTH ==========
 
@@ -154,10 +179,19 @@ def exchange_twitter_code(code):
         'code_verifier': 'challenge'
     }
     
+    # Create Basic Auth header
+    credentials = f"{TWITTER_CLIENT_ID}:{TWITTER_CLIENT_SECRET}"
+    encoded_credentials = base64.b64encode(credentials.encode()).decode()
+    
+    headers = {
+        'Authorization': f'Basic {encoded_credentials}',
+        'Content-Type': 'application/x-www-form-urlencoded'
+    }
+    
     response = requests.post(
         'https://api.twitter.com/2/oauth2/token',
         data=data,
-        auth=(TWITTER_CLIENT_ID, TWITTER_CLIENT_SECRET)
+        headers=headers
     )
     
     return response.json()
@@ -215,6 +249,10 @@ def post_to_twitter(user_id, content):
         'Content-Type': 'application/json'
     }
     
+    # Truncate if over 280 characters
+    if len(content) > 280:
+        content = content[:277] + "..."
+    
     post_data = {'text': content}
     
     response = requests.post(
@@ -224,7 +262,8 @@ def post_to_twitter(user_id, content):
     )
     
     if response.status_code == 201:
-        save_post(user_id, 'twitter', response.json()['data']['id'], content)
+        post_id = response.json()['data']['id']
+        save_post(user_id, 'twitter', post_id, content)
         return True
     else:
         raise Exception(f"Twitter posting failed: {response.text}")
