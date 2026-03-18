@@ -29,7 +29,7 @@ def get_linkedin_auth_url(state):
         'client_id': LINKEDIN_CLIENT_ID,
         'redirect_uri': LINKEDIN_REDIRECT_URI,
         'state': state,
-        'scope': 'profile email w_member_social'
+        'scope': 'openid profile email w_member_social'
     }
     return f"https://www.linkedin.com/oauth/v2/authorization?{urlencode(params)}"
 
@@ -89,59 +89,61 @@ def get_linkedin_token(user_id):
     return result[0] if result else None
 
 def post_to_linkedin(user_id, content):
-    """Post content to LinkedIn"""
+    """Post content to LinkedIn - Personal Profile"""
     access_token = get_linkedin_token(user_id)
     if not access_token:
         raise Exception("LinkedIn not connected")
     
     headers = {
         'Authorization': f'Bearer {access_token}',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'X-Restli-Protocol-Version': '2.0.0'
     }
     
-    # First, get the user's LinkedIn profile ID
+    # Get LinkedIn ID using userinfo endpoint (works with OpenID)
     try:
-        # Try method 1: /v2/userinfo
-        profile_response = requests.get('https://api.linkedin.com/v2/userinfo', headers=headers)
+        profile_response = requests.get(
+            'https://api.linkedin.com/v2/userinfo',
+            headers={'Authorization': f'Bearer {access_token}'}
+        )
+        
         if profile_response.status_code == 200:
             profile_data = profile_response.json()
             person_id = profile_data.get('sub')
-        else:
-            # Try method 2: /v2/me
-            profile_response = requests.get('https://api.linkedin.com/v2/me', headers=headers)
-            if profile_response.status_code == 200:
-                profile_data = profile_response.json()
-                person_id = profile_data.get('id')
+            
+            if person_id:
+                # Create post with the person URN
+                post_data = {
+                    "author": f"urn:li:person:{person_id}",
+                    "lifecycleState": "PUBLISHED",
+                    "specificContent": {
+                        "com.linkedin.ugc.ShareContent": {
+                            "shareCommentary": {
+                                "text": content
+                            },
+                            "shareMediaCategory": "NONE"
+                        }
+                    },
+                    "visibility": {
+                        "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC"
+                    }
+                }
+                
+                response = requests.post(
+                    'https://api.linkedin.com/v2/ugcPosts',
+                    headers=headers,
+                    json=post_data
+                )
+                
+                if response.status_code == 201:
+                    save_post(user_id, 'linkedin', 'success', content)
+                    return True
+                else:
+                    raise Exception(f"Post creation failed: {response.text}")
             else:
-                raise Exception(f"Cannot get profile: {profile_response.text}")
-        
-        if not person_id:
-            raise Exception("Could not retrieve LinkedIn user ID")
-        
-        # Create the post using the simpler shares endpoint
-        share_data = {
-            "owner": f"urn:li:person:{person_id}",
-            "text": {
-                "text": content
-            },
-            "distribution": {
-                "linkedInDistributionTarget": {}
-            }
-        }
-        
-        headers['X-Restli-Protocol-Version'] = '2.0.0'
-        
-        response = requests.post(
-            'https://api.linkedin.com/v2/shares',
-            headers=headers,
-            json=share_data
-        )
-        
-        if response.status_code in [200, 201]:
-            save_post(user_id, 'linkedin', 'success', content)
-            return True
+                raise Exception("Could not get person ID from profile")
         else:
-            raise Exception(f"LinkedIn posting failed: {response.text}")
+            raise Exception(f"Profile fetch failed: {profile_response.text}")
             
     except Exception as e:
         raise Exception(f"LinkedIn error: {str(e)}")
@@ -258,7 +260,6 @@ def post_to_twitter(user_id, content):
         save_post(user_id, 'twitter', post_id, content)
         return True
     else:
-        # Try to refresh token if expired
         raise Exception(f"Twitter posting failed: {response.text}")
 
 # ========== UTILITY FUNCTIONS ==========
