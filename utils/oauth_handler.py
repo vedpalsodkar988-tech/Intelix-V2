@@ -89,58 +89,47 @@ def get_linkedin_token(user_id):
     return result[0] if result else None
 
 def post_to_linkedin(user_id, content):
-    """Post content to LinkedIn - Simplified approach"""
+    """Post content to LinkedIn"""
     access_token = get_linkedin_token(user_id)
     if not access_token:
         raise Exception("LinkedIn not connected")
     
     headers = {
         'Authorization': f'Bearer {access_token}',
-        'Content-Type': 'application/json',
-        'X-Restli-Protocol-Version': '2.0.0'
+        'Content-Type': 'application/json'
     }
     
-    # Use simplified share endpoint
-    post_data = {
-        "author": "urn:li:person:CURRENT",  # Special keyword for current user
-        "lifecycleState": "PUBLISHED",
-        "specificContent": {
-            "com.linkedin.ugc.ShareContent": {
-                "shareCommentary": {
-                    "text": content
-                },
-                "shareMediaCategory": "NONE"
-            }
-        },
-        "visibility": {
-            "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC"
-        }
-    }
-    
-    response = requests.post(
-        'https://api.linkedin.com/v2/ugcPosts',
-        headers=headers,
-        json=post_data
-    )
-    
-    if response.status_code == 201:
-        post_id = response.json().get('id', 'success')
-        save_post(user_id, 'linkedin', post_id, content)
-        return True
-    else:
-        # If that fails, try the REST API share endpoint
+    # First, get the user's LinkedIn profile ID
+    try:
+        # Try method 1: /v2/userinfo
+        profile_response = requests.get('https://api.linkedin.com/v2/userinfo', headers=headers)
+        if profile_response.status_code == 200:
+            profile_data = profile_response.json()
+            person_id = profile_data.get('sub')
+        else:
+            # Try method 2: /v2/me
+            profile_response = requests.get('https://api.linkedin.com/v2/me', headers=headers)
+            if profile_response.status_code == 200:
+                profile_data = profile_response.json()
+                person_id = profile_data.get('id')
+            else:
+                raise Exception(f"Cannot get profile: {profile_response.text}")
+        
+        if not person_id:
+            raise Exception("Could not retrieve LinkedIn user ID")
+        
+        # Create the post using the simpler shares endpoint
         share_data = {
-            "content": {
-                "contentEntities": [],
-                "title": "Post from Intelix"
+            "owner": f"urn:li:person:{person_id}",
+            "text": {
+                "text": content
             },
             "distribution": {
                 "linkedInDistributionTarget": {}
-            },
-            "text": {
-                "text": content
             }
         }
+        
+        headers['X-Restli-Protocol-Version'] = '2.0.0'
         
         response = requests.post(
             'https://api.linkedin.com/v2/shares',
@@ -153,6 +142,9 @@ def post_to_linkedin(user_id, content):
             return True
         else:
             raise Exception(f"LinkedIn posting failed: {response.text}")
+            
+    except Exception as e:
+        raise Exception(f"LinkedIn error: {str(e)}")
 
 # ========== TWITTER OAUTH ==========
 
@@ -244,14 +236,14 @@ def post_to_twitter(user_id, content):
     if not access_token:
         raise Exception("Twitter not connected")
     
+    # Truncate if over 280 characters
+    if len(content) > 280:
+        content = content[:277] + "..."
+    
     headers = {
         'Authorization': f'Bearer {access_token}',
         'Content-Type': 'application/json'
     }
-    
-    # Truncate if over 280 characters
-    if len(content) > 280:
-        content = content[:277] + "..."
     
     post_data = {'text': content}
     
@@ -266,6 +258,7 @@ def post_to_twitter(user_id, content):
         save_post(user_id, 'twitter', post_id, content)
         return True
     else:
+        # Try to refresh token if expired
         raise Exception(f"Twitter posting failed: {response.text}")
 
 # ========== UTILITY FUNCTIONS ==========
