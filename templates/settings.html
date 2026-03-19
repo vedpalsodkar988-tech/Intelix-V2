@@ -396,21 +396,9 @@
         </div>
         {% endif %}
 
-        {% if request.args.get('success') == 'twitter' %}
-        <div class="success-message">
-            ✓ Twitter connected successfully!
-        </div>
-        {% endif %}
-
         {% if request.args.get('success') == 'linkedin_disconnected' %}
         <div class="success-message">
             ✓ LinkedIn disconnected successfully!
-        </div>
-        {% endif %}
-
-        {% if request.args.get('success') == 'twitter_disconnected' %}
-        <div class="success-message">
-            ✓ Twitter disconnected successfully!
         </div>
         {% endif %}
 
@@ -467,7 +455,7 @@
             <div class="section">
                 <h3>Connected Accounts</h3>
                 <p style="color: rgba(255, 255, 255, 0.6); margin-bottom: 24px; font-size: 14px;">
-                    Connect your social media accounts to post your AI-generated content
+                    Connect your LinkedIn account to auto-post your AI-generated content
                 </p>
 
                 <!-- LinkedIn -->
@@ -490,29 +478,6 @@
                     </div>
                     {% else %}
                     <a href="/oauth/linkedin" class="btn-connect">Connect</a>
-                    {% endif %}
-                </div>
-
-                <!-- Twitter -->
-                <div class="connected-account {% if user.twitter_connected %}connected{% endif %}">
-                    <div class="account-info">
-                        <span class="account-icon">🐦</span>
-                        <div class="account-status">
-                            <span class="account-name">Twitter</span>
-                            <span class="account-state {% if user.twitter_connected %}connected{% endif %}">
-                                {% if user.twitter_connected %}Connected{% else %}Not connected{% endif %}
-                            </span>
-                        </div>
-                    </div>
-                    {% if user.twitter_connected %}
-                    <div style="display: flex; gap: 8px;">
-                        <a href="/oauth/twitter" class="btn-connect" style="background: rgba(255, 255, 255, 0.1);">Reconnect</a>
-                        <form action="/oauth/disconnect/twitter" method="POST" style="display: inline;">
-                            <button type="submit" class="btn-connect" style="background: rgba(239, 68, 68, 0.2); color: #EF4444;">Disconnect</button>
-                        </form>
-                    </div>
-                    {% else %}
-                    <a href="/oauth/twitter" class="btn-connect">Connect</a>
                     {% endif %}
                 </div>
             </div>
