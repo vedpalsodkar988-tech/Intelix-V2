@@ -266,22 +266,12 @@
             cursor: pointer;
             transition: all 0.3s;
             text-decoration: none;
+            display: inline-block;
         }
 
         .btn-connect:hover {
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
-        }
-
-        .btn-connect.connected {
-            background: rgba(255, 255, 255, 0.1);
-            color: #22C55E;
-            cursor: default;
-        }
-
-        .btn-connect.connected:hover {
-            transform: none;
-            box-shadow: none;
         }
 
         .success-message {
@@ -412,6 +402,18 @@
         </div>
         {% endif %}
 
+        {% if request.args.get('success') == 'linkedin_disconnected' %}
+        <div class="success-message">
+            ✓ LinkedIn disconnected successfully!
+        </div>
+        {% endif %}
+
+        {% if request.args.get('success') == 'twitter_disconnected' %}
+        <div class="success-message">
+            ✓ Twitter disconnected successfully!
+        </div>
+        {% endif %}
+
         <div class="tabs">
             <button class="tab active" onclick="switchTab('profile')">Profile</button>
             <button class="tab" onclick="switchTab('password')">Password</button>
@@ -480,7 +482,12 @@
                         </div>
                     </div>
                     {% if user.linkedin_connected %}
-                    <span class="btn-connect connected">✓ Connected</span>
+                    <div style="display: flex; gap: 8px;">
+                        <a href="/oauth/linkedin" class="btn-connect" style="background: rgba(255, 255, 255, 0.1);">Reconnect</a>
+                        <form action="/oauth/disconnect/linkedin" method="POST" style="display: inline;">
+                            <button type="submit" class="btn-connect" style="background: rgba(239, 68, 68, 0.2); color: #EF4444;">Disconnect</button>
+                        </form>
+                    </div>
                     {% else %}
                     <a href="/oauth/linkedin" class="btn-connect">Connect</a>
                     {% endif %}
@@ -498,7 +505,12 @@
                         </div>
                     </div>
                     {% if user.twitter_connected %}
-                    <span class="btn-connect connected">✓ Connected</span>
+                    <div style="display: flex; gap: 8px;">
+                        <a href="/oauth/twitter" class="btn-connect" style="background: rgba(255, 255, 255, 0.1);">Reconnect</a>
+                        <form action="/oauth/disconnect/twitter" method="POST" style="display: inline;">
+                            <button type="submit" class="btn-connect" style="background: rgba(239, 68, 68, 0.2); color: #EF4444;">Disconnect</button>
+                        </form>
+                    </div>
                     {% else %}
                     <a href="/oauth/twitter" class="btn-connect">Connect</a>
                     {% endif %}
@@ -534,7 +546,6 @@
 
     <script>
         function switchTab(tabName) {
-            // Hide all tabs
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
             });
@@ -542,7 +553,6 @@
                 tab.classList.remove('active');
             });
 
-            // Show selected tab
             document.getElementById(tabName + '-tab').classList.add('active');
             event.target.classList.add('active');
         }
