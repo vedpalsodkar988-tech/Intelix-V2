@@ -203,30 +203,47 @@ def validations():
 @login_required
 def view_validation(validation_id):
     """View a specific validation and generate fresh posts"""
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
-    cursor.execute(
-        "SELECT id, idea_text, analysis, created_at FROM validations WHERE id = %s AND user_id = %s",
-        (validation_id, session['user_id'])
-    )
-    validation = cursor.fetchone()
-    
-    cursor.close()
-    conn.close()
-    
-    if not validation:
-        return "Validation not found", 404
-    
-    analysis = json.loads(validation[2])
-    
-    session['current_idea'] = validation[1]
-    session['current_analysis'] = analysis
-    
-    return render_template('analysis.html', 
-                         analysis=analysis, 
-                         idea=validation[1],
-                         from_history=True)
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute(
+            "SELECT id, idea_text, analysis, created_at FROM validations WHERE id = %s AND user_id = %s",
+            (validation_id, session['user_id'])
+        )
+        validation = cursor.fetchone()
+        
+        cursor.close()
+        conn.close()
+        
+        if not validation:
+            return "Validation not found", 404
+        
+        # Handle both dict and string types for analysis
+        analysis_data = validation[2]
+        if isinstance(analysis_data, dict):
+            # Already a dict, use as-is
+            analysis = analysis_data
+        elif isinstance(analysis_data, str):
+            # String, parse it
+            analysis = json.loads(analysis_data)
+        else:
+            # Unknown type, try to convert
+            analysis = json.loads(str(analysis_data))
+        
+        # Store in session for marketing page
+        session['current_idea'] = validation[1]
+        session['current_analysis'] = analysis
+        
+        return render_template('analysis.html', 
+                             analysis=analysis, 
+                             idea=validation[1],
+                             from_history=True)
+    except Exception as e:
+        print(f"Error in view_validation: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return f"Error loading validation: {str(e)}", 500
 
 @app.route('/marketing', methods=['GET', 'POST'])
 @login_required
