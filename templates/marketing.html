@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Settings - Intelix</title>
+    <title>Marketing Campaign - Intelix</title>
     <style>
         * {
             margin: 0;
@@ -12,7 +12,7 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Arial, sans-serif;
             background: #0F0F0F;
             color: #FFFFFF;
             min-height: 100vh;
@@ -57,294 +57,284 @@
         }
 
         .container {
-            max-width: 900px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 120px 40px 80px;
         }
 
         .header {
-            margin-bottom: 40px;
+            text-align: center;
+            margin-bottom: 60px;
         }
 
         .header h1 {
-            font-size: 36px;
+            font-size: 48px;
             font-weight: 900;
-            margin-bottom: 8px;
-            letter-spacing: -1px;
+            margin-bottom: 12px;
+            letter-spacing: -2px;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #6366F1 0%, #A855F7 50%, #EC4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .header p {
+            font-size: 18px;
             color: rgba(255, 255, 255, 0.6);
+        }
+
+        .idea-summary {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 50px;
+        }
+
+        .idea-summary h3 {
             font-size: 16px;
-        }
-
-        .tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 32px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .tab {
-            padding: 12px 24px;
-            background: none;
-            border: none;
             color: rgba(255, 255, 255, 0.6);
-            font-size: 15px;
+            margin-bottom: 12px;
             font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            border-bottom: 2px solid transparent;
         }
 
-        .tab:hover {
-            color: #FFFFFF;
+        .idea-summary p {
+            font-size: 17px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.9);
         }
 
-        .tab.active {
-            color: #FFFFFF;
-            border-bottom-color: #6366F1;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .section {
+        .website-field {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
-            padding: 32px;
-            margin-bottom: 24px;
+            padding: 24px;
+            margin-bottom: 40px;
         }
 
-        .section h3 {
-            font-size: 18px;
-            margin-bottom: 20px;
-            color: #FFFFFF;
-        }
-
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 16px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .info-row:last-child {
-            border-bottom: none;
-        }
-
-        .info-label {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 14px;
-        }
-
-        .info-value {
-            color: #FFFFFF;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
+        .website-field label {
             display: block;
-            color: rgba(255, 255, 255, 0.8);
             font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
             margin-bottom: 8px;
         }
 
-        .form-group input {
+        .website-field input {
             width: 100%;
             padding: 12px 16px;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 8px;
             color: #FFFFFF;
-            font-size: 14px;
+            font-size: 15px;
         }
 
-        .form-group input:focus {
+        .website-field input:focus {
             outline: none;
             border-color: #6366F1;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #6366F1 0%, #A855F7 100%);
-            color: white;
-            padding: 12px 24px;
-            border: none;
+        .website-field p {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 8px;
+        }
+
+        .posts-counter {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 12px;
+            padding: 16px 24px;
+            margin-bottom: 40px;
+            text-align: center;
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .posts-counter strong {
+            color: #6366F1;
+            font-size: 18px;
+        }
+
+        .posts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 28px;
+            margin-bottom: 50px;
+        }
+
+        .post-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 32px;
+            transition: all 0.3s;
+        }
+
+        .post-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(99, 102, 241, 0.3);
+            transform: translateY(-4px);
+        }
+
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .post-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #6366F1;
+        }
+
+        .post-badge {
+            background: rgba(99, 102, 241, 0.2);
+            color: #A855F7;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .post-content {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            line-height: 1.7;
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.9);
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn-copy, .btn-post {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px;
             border-radius: 8px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
 
-        .btn-primary:hover {
+        .btn-copy {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #FFFFFF;
+        }
+
+        .btn-copy:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-post {
+            background: linear-gradient(135deg, #6366F1 0%, #A855F7 100%);
+            color: white;
+        }
+
+        .btn-post:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
         }
 
-        .btn-danger {
-            background: #EF4444;
-            color: white;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-danger:hover {
-            background: #DC2626;
-        }
-
-        .connected-account {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            margin-bottom: 12px;
-        }
-
-        .connected-account.connected {
-            border-color: rgba(34, 197, 94, 0.3);
-            background: rgba(34, 197, 94, 0.05);
-        }
-
-        .account-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .account-icon {
-            font-size: 24px;
-        }
-
-        .account-status {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .account-name {
-            font-size: 15px;
-            font-weight: 600;
-            color: #FFFFFF;
-        }
-
-        .account-state {
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .account-state.connected {
-            color: #22C55E;
+        .btn-post:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         .btn-connect {
-            padding: 8px 16px;
-            background: #FFFFFF;
-            color: #0F0F0F;
-            border: none;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #EF4444;
             text-decoration: none;
-            display: inline-block;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            flex: 1;
+            min-width: 120px;
         }
 
         .btn-connect:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .hidden-textarea {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .success-message, .error-message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-top: 12px;
+            font-size: 13px;
+            display: none;
         }
 
         .success-message {
             background: rgba(34, 197, 94, 0.1);
             border: 1px solid rgba(34, 197, 94, 0.3);
             color: #22C55E;
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 14px;
         }
 
         .error-message {
             background: rgba(239, 68, 68, 0.1);
             border: 1px solid rgba(239, 68, 68, 0.3);
             color: #EF4444;
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 14px;
         }
 
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
+        .back-link {
+            text-align: center;
+            margin-top: 40px;
         }
 
-        .modal.active {
-            display: flex;
+        .back-link a {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            font-size: 15px;
         }
 
-        .modal-content {
-            background: #1A1A1A;
-            border-radius: 16px;
-            padding: 32px;
-            max-width: 400px;
-            width: 90%;
-        }
-
-        .modal-content h3 {
-            margin-bottom: 16px;
-            font-size: 20px;
-        }
-
-        .modal-content p {
-            color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 24px;
-            line-height: 1.6;
-        }
-
-        .modal-buttons {
-            display: flex;
-            gap: 12px;
-        }
-
-        .btn-secondary {
-            flex: 1;
-            padding: 12px 24px;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            border-radius: 8px;
+        .back-link a:hover {
             color: #FFFFFF;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         @media (max-width: 768px) {
@@ -357,7 +347,11 @@
             }
 
             .header h1 {
-                font-size: 28px;
+                font-size: 36px;
+            }
+
+            .posts-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -368,166 +362,214 @@
         <div class="nav-right">
             <a href="/dashboard">Dashboard</a>
             <a href="/validations">History</a>
+            <a href="/settings">Settings</a>
             <a href="/logout">Logout</a>
         </div>
     </nav>
 
     <div class="container">
         <div class="header">
-            <h1>Settings</h1>
-            <p>Manage your account and preferences</p>
+            <h1>Your <span class="gradient-text">Marketing Posts</span></h1>
+            <p>AI-generated posts ready to validate your idea</p>
         </div>
 
-        {% if request.args.get('success') == 'password' %}
-        <div class="success-message">
-            ✓ Password updated successfully!
-        </div>
-        {% endif %}
-
-        {% if request.args.get('error') == 'password' %}
-        <div class="error-message">
-            ✗ Current password is incorrect
-        </div>
-        {% endif %}
-
-        {% if request.args.get('success') == 'linkedin' %}
-        <div class="success-message">
-            ✓ LinkedIn connected successfully!
-        </div>
-        {% endif %}
-
-        {% if request.args.get('success') == 'linkedin_disconnected' %}
-        <div class="success-message">
-            ✓ LinkedIn disconnected successfully!
-        </div>
-        {% endif %}
-
-        <div class="tabs">
-            <button class="tab active" onclick="switchTab('profile')">Profile</button>
-            <button class="tab" onclick="switchTab('password')">Password</button>
-            <button class="tab" onclick="switchTab('accounts')">Connected Accounts</button>
-            <button class="tab" onclick="switchTab('danger')">Danger Zone</button>
+        {% if posts %}
+        <div class="idea-summary">
+            <h3>YOUR IDEA:</h3>
+            <p>{{ idea }}</p>
         </div>
 
-        <!-- Profile Tab -->
-        <div id="profile-tab" class="tab-content active">
-            <div class="section">
-                <h3>Profile Information</h3>
-                <div class="info-row">
-                    <span class="info-label">Username</span>
-                    <span class="info-value">{{ user.username }}</span>
+        <div class="website-field">
+            <label for="website">Website (Optional)</label>
+            <input type="text" id="website" placeholder="https://yourwebsite.com">
+            <p>Add your website URL to include it in your posts</p>
+        </div>
+
+        <div class="posts-counter">
+            Posts used this month: <strong>{{ posts_used }}/{{ posts_limit }}</strong>
+        </div>
+
+        <div class="posts-grid">
+            <!-- Post 1 -->
+            <div class="post-card">
+                <div class="post-header">
+                    <span class="post-title">{{ posts.post1.title }}</span>
+                    <span class="post-badge">LinkedIn</span>
                 </div>
-                <div class="info-row">
-                    <span class="info-label">Email</span>
-                    <span class="info-value">{{ user.email }}</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Member Since</span>
-                    <span class="info-value">{{ user.created_at.strftime('%B %d, %Y') }}</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Ideas Validated</span>
-                    <span class="info-value">{{ user.validation_count }}</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Password Tab -->
-        <div id="password-tab" class="tab-content">
-            <div class="section">
-                <h3>Change Password</h3>
-                <form action="/settings/password" method="POST">
-                    <div class="form-group">
-                        <label>Current Password</label>
-                        <input type="password" name="current_password" required>
-                    </div>
-                    <div class="form-group">
-                        <label>New Password</label>
-                        <input type="password" name="new_password" required minlength="6">
-                    </div>
-                    <button type="submit" class="btn-primary">Update Password</button>
-                </form>
-            </div>
-        </div>
-
-        <!-- Connected Accounts Tab -->
-        <div id="accounts-tab" class="tab-content">
-            <div class="section">
-                <h3>Connected Accounts</h3>
-                <p style="color: rgba(255, 255, 255, 0.6); margin-bottom: 24px; font-size: 14px;">
-                    Connect your LinkedIn account to auto-post your AI-generated content
-                </p>
-
-                <!-- LinkedIn -->
-                <div class="connected-account {% if user.linkedin_connected %}connected{% endif %}">
-                    <div class="account-info">
-                        <span class="account-icon">💼</span>
-                        <div class="account-status">
-                            <span class="account-name">LinkedIn</span>
-                            <span class="account-state {% if user.linkedin_connected %}connected{% endif %}">
-                                {% if user.linkedin_connected %}Connected{% else %}Not connected{% endif %}
-                            </span>
-                        </div>
-                    </div>
-                    {% if user.linkedin_connected %}
-                    <div style="display: flex; gap: 8px;">
-                        <a href="/oauth/linkedin" class="btn-connect" style="background: rgba(255, 255, 255, 0.1);">Reconnect</a>
-                        <form action="/oauth/disconnect/linkedin" method="POST" style="display: inline;">
-                            <button type="submit" class="btn-connect" style="background: rgba(239, 68, 68, 0.2); color: #EF4444;">Disconnect</button>
-                        </form>
-                    </div>
+                <div class="post-content" id="preview-post1">{{ posts.post1.content }}</div>
+                <div class="post-actions">
+                    <button class="btn-copy" onclick="copyToClipboard('post1')">
+                        📋 Copy
+                    </button>
+                    {% if linkedin_connected %}
+                    <button class="btn-post" onclick="postToLinkedIn('post1', this)" {% if posts_used >= posts_limit %}disabled{% endif %}>
+                        <span class="post-text">📱 Post to LinkedIn</span>
+                    </button>
                     {% else %}
-                    <a href="/oauth/linkedin" class="btn-connect">Connect</a>
+                    <a href="/settings" class="btn-connect">
+                        🔗 Connect LinkedIn
+                    </a>
                     {% endif %}
+                    <textarea id="post1" class="hidden-textarea">{{ posts.post1.content }}</textarea>
                 </div>
+                <div class="success-message" id="success-post1"></div>
+                <div class="error-message" id="error-post1"></div>
+            </div>
+
+            <!-- Post 2 -->
+            <div class="post-card">
+                <div class="post-header">
+                    <span class="post-title">{{ posts.post2.title }}</span>
+                    <span class="post-badge">LinkedIn</span>
+                </div>
+                <div class="post-content" id="preview-post2">{{ posts.post2.content }}</div>
+                <div class="post-actions">
+                    <button class="btn-copy" onclick="copyToClipboard('post2')">
+                        📋 Copy
+                    </button>
+                    {% if linkedin_connected %}
+                    <button class="btn-post" onclick="postToLinkedIn('post2', this)" {% if posts_used >= posts_limit %}disabled{% endif %}>
+                        <span class="post-text">📱 Post to LinkedIn</span>
+                    </button>
+                    {% else %}
+                    <a href="/settings" class="btn-connect">
+                        🔗 Connect LinkedIn
+                    </a>
+                    {% endif %}
+                    <textarea id="post2" class="hidden-textarea">{{ posts.post2.content }}</textarea>
+                </div>
+                <div class="success-message" id="success-post2"></div>
+                <div class="error-message" id="error-post2"></div>
+            </div>
+
+            <!-- Post 3 -->
+            <div class="post-card">
+                <div class="post-header">
+                    <span class="post-title">{{ posts.post3.title }}</span>
+                    <span class="post-badge">LinkedIn</span>
+                </div>
+                <div class="post-content" id="preview-post3">{{ posts.post3.content }}</div>
+                <div class="post-actions">
+                    <button class="btn-copy" onclick="copyToClipboard('post3')">
+                        📋 Copy
+                    </button>
+                    {% if linkedin_connected %}
+                    <button class="btn-post" onclick="postToLinkedIn('post3', this)" {% if posts_used >= posts_limit %}disabled{% endif %}>
+                        <span class="post-text">📱 Post to LinkedIn</span>
+                    </button>
+                    {% else %}
+                    <a href="/settings" class="btn-connect">
+                        🔗 Connect LinkedIn
+                    </a>
+                    {% endif %}
+                    <textarea id="post3" class="hidden-textarea">{{ posts.post3.content }}</textarea>
+                </div>
+                <div class="success-message" id="success-post3"></div>
+                <div class="error-message" id="error-post3"></div>
             </div>
         </div>
 
-        <!-- Danger Zone Tab -->
-        <div id="danger-tab" class="tab-content">
-            <div class="section">
-                <h3>Delete Account</h3>
-                <p style="color: rgba(255, 255, 255, 0.6); margin-bottom: 20px; font-size: 14px;">
-                    Once you delete your account, there is no going back. This will permanently delete all your data.
-                </p>
-                <button onclick="showDeleteModal()" class="btn-danger">Delete Account</button>
-            </div>
+        {% else %}
+        <div style="text-align: center; padding: 80px 20px; color: rgba(255, 255, 255, 0.4);">
+            <p>No posts generated yet. Go back to analysis to generate posts!</p>
         </div>
-    </div>
+        {% endif %}
 
-    <!-- Delete Confirmation Modal -->
-    <div id="deleteModal" class="modal">
-        <div class="modal-content">
-            <h3>Delete Account?</h3>
-            <p>This action cannot be undone. All your data, ideas, and settings will be permanently deleted.</p>
-            <div class="modal-buttons">
-                <button class="btn-secondary" onclick="hideDeleteModal()">Cancel</button>
-                <form action="/settings/delete" method="POST" style="flex: 1;">
-                    <button type="submit" class="btn-danger" style="width: 100%;">Delete Forever</button>
-                </form>
-            </div>
+        <div class="back-link">
+            <a href="/validations">← Back to History</a>
         </div>
     </div>
 
     <script>
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
+        // Update post preview when website is added
+        document.getElementById('website').addEventListener('input', function() {
+            const website = this.value.trim();
+            updatePostPreviews(website);
+        });
 
-            document.getElementById(tabName + '-tab').classList.add('active');
-            event.target.classList.add('active');
+        function updatePostPreviews(website) {
+            ['post1', 'post2', 'post3'].forEach(postId => {
+                const textarea = document.getElementById(postId);
+                const preview = document.getElementById('preview-' + postId);
+                let content = textarea.value;
+                
+                // Remove existing website if any
+                content = content.replace(/\n\n🌐 .*$/, '');
+                
+                // Add new website if provided
+                if (website) {
+                    content += `\n\n🌐 ${website}`;
+                }
+                
+                preview.textContent = content;
+                textarea.value = content;
+            });
         }
 
-        function showDeleteModal() {
-            document.getElementById('deleteModal').classList.add('active');
+        function copyToClipboard(elementId) {
+            const copyText = document.getElementById(elementId);
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+            document.execCommand("copy");
+            
+            const successDiv = document.getElementById('success-' + elementId);
+            successDiv.textContent = '✓ Copied to clipboard!';
+            successDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                successDiv.style.display = 'none';
+            }, 3000);
         }
 
-        function hideDeleteModal() {
-            document.getElementById('deleteModal').classList.remove('active');
+        async function postToLinkedIn(postId, button) {
+            const content = document.getElementById(postId).value;
+            const originalHTML = button.innerHTML;
+            
+            button.disabled = true;
+            button.innerHTML = '<span class="spinner"></span> Posting...';
+            
+            try {
+                const response = await fetch('/post/linkedin', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'content=' + encodeURIComponent(content)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    const successDiv = document.getElementById('success-' + postId);
+                    successDiv.textContent = `✓ Posted to LinkedIn! (${data.posts_remaining} posts remaining)`;
+                    successDiv.style.display = 'block';
+                    
+                    updateCounter();
+                    
+                    setTimeout(() => {
+                        successDiv.style.display = 'none';
+                    }, 5000);
+                } else {
+                    throw new Error(data.error || 'Posting failed');
+                }
+            } catch (error) {
+                const errorDiv = document.getElementById('error-' + postId);
+                errorDiv.textContent = '✗ ' + error.message;
+                errorDiv.style.display = 'block';
+                
+                setTimeout(() => {
+                    errorDiv.style.display = 'none';
+                }, 5000);
+            } finally {
+                button.disabled = false;
+                button.innerHTML = originalHTML;
+            }
+        }
+
+        function updateCounter() {
+            setTimeout(() => {
+                location.reload();
+            }, 2000);
         }
     </script>
 </body>
