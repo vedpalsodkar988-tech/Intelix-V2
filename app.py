@@ -363,14 +363,13 @@ def oauth_linkedin():
     """Initiate LinkedIn OAuth"""
     state = secrets.token_urlsafe(32)
     session['oauth_state'] = state
-    session.modified = True  # Force session save
+    session.modified = True
     auth_url = get_linkedin_auth_url(state)
     return redirect(auth_url)
 
 @app.route('/oauth/linkedin/callback')
 def oauth_linkedin_callback():
     """Handle LinkedIn OAuth callback"""
-    # First check if user is logged in
     if 'user_id' not in session:
         return redirect(url_for('login'))
     
@@ -378,33 +377,26 @@ def oauth_linkedin_callback():
     state = request.args.get('state')
     error = request.args.get('error')
     
-    # Check for LinkedIn errors
     if error:
         return redirect(url_for('settings') + f'?error=linkedin&msg={error}')
     
     if not code:
         return redirect(url_for('settings') + '?error=linkedin&msg=no_code')
     
-    # Verify state (allow some flexibility)
     stored_state = session.get('oauth_state')
     
     if not stored_state or state != stored_state:
-        # LinkedIn sometimes has state issues, continue if we have a code
         print(f"State mismatch: stored={stored_state}, received={state}")
     
     try:
-        # Exchange code for token
         token_data = exchange_linkedin_code(code)
         
-        # Check for errors
         if 'error' in token_data:
             error_msg = token_data.get('error_description', token_data.get('error', 'Unknown error'))
             return redirect(url_for('settings') + f'?error=linkedin&msg={error_msg}')
         
-        # Save token
         save_linkedin_token(session['user_id'], token_data)
         
-        # Clear state
         session.pop('oauth_state', None)
         
         return redirect(url_for('settings') + '?success=linkedin')
@@ -418,14 +410,13 @@ def oauth_twitter():
     """Initiate Twitter OAuth"""
     state = secrets.token_urlsafe(32)
     session['oauth_state'] = state
-    session.modified = True  # Force session save
+    session.modified = True
     auth_url = get_twitter_auth_url(state)
     return redirect(auth_url)
 
 @app.route('/oauth/twitter/callback')
 def oauth_twitter_callback():
     """Handle Twitter OAuth callback"""
-    # First check if user is logged in
     if 'user_id' not in session:
         return redirect(url_for('login'))
     
@@ -433,38 +424,70 @@ def oauth_twitter_callback():
     state = request.args.get('state')
     error = request.args.get('error')
     
-    # Check for Twitter errors
     if error:
         return redirect(url_for('settings') + f'?error=twitter&msg={error}')
     
     if not code:
         return redirect(url_for('settings') + '?error=twitter&msg=no_code')
     
-    # Verify state
     stored_state = session.get('oauth_state')
     
     if not stored_state or state != stored_state:
         print(f"State mismatch: stored={stored_state}, received={state}")
     
     try:
-        # Exchange code for token
         token_data = exchange_twitter_code(code)
         
-        # Check for errors
         if 'error' in token_data:
             error_msg = token_data.get('error_description', token_data.get('error', 'Unknown error'))
             return redirect(url_for('settings') + f'?error=twitter&msg={error_msg}')
         
-        # Save token
         save_twitter_token(session['user_id'], token_data)
         
-        # Clear state
         session.pop('oauth_state', None)
         
         return redirect(url_for('settings') + '?success=twitter')
     except Exception as e:
         print(f"Twitter OAuth error: {str(e)}")
         return redirect(url_for('settings') + f'?error=twitter&msg={str(e)}')
+
+# ========== DISCONNECT ROUTES ==========
+
+@app.route('/oauth/disconnect/linkedin', methods=['POST'])
+@login_required
+def disconnect_linkedin():
+    """Disconnect LinkedIn account"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute("""
+        DELETE FROM oauth_tokens 
+        WHERE user_id = %s AND platform = 'linkedin'
+    """, (session['user_id'],))
+    
+    conn.commit()
+    cursor.close()
+    conn.close()
+    
+    return redirect(url_for('settings') + '?success=linkedin_disconnected')
+
+@app.route('/oauth/disconnect/twitter', methods=['POST'])
+@login_required
+def disconnect_twitter():
+    """Disconnect Twitter account"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute("""
+        DELETE FROM oauth_tokens 
+        WHERE user_id = %s AND platform = 'twitter'
+    """, (session['user_id'],))
+    
+    conn.commit()
+    cursor.close()
+    conn.close()
+    
+    return redirect(url_for('settings') + '?success=twitter_disconnected')
 
 # ========== POSTING ROUTES ==========
 
