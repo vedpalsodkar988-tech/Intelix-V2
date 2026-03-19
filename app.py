@@ -16,10 +16,10 @@ app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY')
 
 # Session configuration for OAuth
-app.config['SESSION_COOKIE_SECURE'] = True  # HTTPS only
+app.config['SESSION_COOKIE_SECURE'] = True
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-app.config['PERMANENT_SESSION_LIFETIME'] = 3600  # 1 hour
+app.config['PERMANENT_SESSION_LIFETIME'] = 3600
 
 # Import OAuth handlers
 from utils.oauth_handler import *
@@ -61,14 +61,12 @@ def signup():
         email = request.form.get('email')
         password = request.form.get('password')
         
-        # Hash password
         hashed_password = generate_password_hash(password)
         
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
             
-            # Insert user
             cursor.execute(
                 "INSERT INTO users (username, email, password) VALUES (%s, %s, %s) RETURNING id",
                 (username, email, hashed_password)
@@ -79,7 +77,6 @@ def signup():
             cursor.close()
             conn.close()
             
-            # Auto-login after signup
             session.permanent = True
             session['user_id'] = user_id
             session['username'] = username
@@ -104,7 +101,6 @@ def login():
             conn = get_db_connection()
             cursor = conn.cursor()
             
-            # Get user
             cursor.execute(
                 "SELECT id, username, password FROM users WHERE email = %s",
                 (email,)
@@ -115,7 +111,6 @@ def login():
             conn.close()
             
             if user and check_password_hash(user[2], password):
-                # Login successful
                 session.permanent = True
                 session['user_id'] = user[0]
                 session['username'] = user[1]
@@ -131,8 +126,7 @@ def login():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    """Main validator dashboard (protected)"""
-    # Get user stats
+    """Main validator dashboard"""
     conn = get_db_connection()
     cursor = conn.cursor()
     
@@ -150,17 +144,14 @@ def dashboard():
 @app.route('/analyze', methods=['POST'])
 @login_required
 def analyze():
-    """Analyze business idea with real AI"""
+    """Analyze business idea with AI"""
     idea = request.form.get('idea')
     
-    # Import the analyzer
     from utils.ai_analyzer import analyze_business_idea
     
-    # Get real AI analysis
     try:
         analysis = analyze_business_idea(idea)
         
-        # Save to database
         conn = get_db_connection()
         cursor = conn.cursor()
         
@@ -173,160 +164,13 @@ def analyze():
         cursor.close()
         conn.close()
         
-        # Store in session for marketing page
         session['current_idea'] = idea
         session['current_analysis'] = analysis
         
     except Exception as e:
         return f"Error analyzing idea: {str(e)}"
     
-    return render_template('analysis.html', analysis=analysis, idea=idea)
-
-@app.route('/marketing', methods=['GET', 'POST'])
-@login_required
-def marketing():
-    """Marketing campaign setup"""
-    if request.method == 'POST':
-        # Get idea and analysis from session
-        idea = session.get('current_idea')
-        analysis = session.get('current_analysis')
-        
-        if not idea or not analysis:
-            return redirect(url_for('dashboard'))
-        
-        # Generate marketing posts
-        from utils.content_generator import generate_marketing_posts
-        
-        try:
-            posts = generate_marketing_posts(idea, analysis)
-        except Exception as e:
-            return f"Error generating posts: {str(e)}"
-        
-        # Get connection status and post count
-        linkedin_connected = is_platform_connected(session['user_id'], 'linkedin')
-        twitter_connected = is_platform_connected(session['user_id'], 'twitter')
-        posts_used = get_posts_this_month(session['user_id'])
-        
-        return render_template('marketing.html', 
-                             posts=posts, 
-                             idea=idea,
-                             linkedin_connected=linkedin_connected,
-                             twitter_connected=twitter_connected,
-                             posts_used=posts_used,
-                             posts_limit=5)
-    
-    return render_template('marketing.html')
-
-@app.route('/results')
-@login_required
-def results():
-    """Validation results"""
-    return render_template('results.html')
-
-@app.route('/settings')
-@login_required
-def settings():
-    """User settings page"""
-    # Get user info from database
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
-    cursor.execute(
-        "SELECT username, email, created_at FROM users WHERE id = %s",
-        (session['user_id'],)
-    )
-    user = cursor.fetchone()
-    
-    # Get validation count
-    cursor.execute(
-        "SELECT COUNT(*) FROM validations WHERE user_id = %s",
-        (session['user_id'],)
-    )
-    validation_count = cursor.fetchone()[0]
-    
-    cursor.close()
-    conn.close()
-    
-    # Convert created_at to IST
-    created_at_ist = convert_to_ist(user[2])
-    
-    # Get connection status
-    linkedin_connected = is_platform_connected(session['user_id'], 'linkedin')
-    twitter_connected = is_platform_connected(session['user_id'], 'twitter')
-    
-    user_data = {
-        'username': user[0],
-        'email': user[1],
-        'created_at': created_at_ist,
-        'validation_count': validation_count,
-        'linkedin_connected': linkedin_connected,
-        'twitter_connected': twitter_connected
-    }
-    
-    return render_template('settings.html', user=user_data)
-
-@app.route('/settings/password', methods=['POST'])
-@login_required
-def change_password():
-    """Change user password"""
-    current_password = request.form.get('current_password')
-    new_password = request.form.get('new_password')
-    
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
-    # Get current password hash
-    cursor.execute(
-        "SELECT password FROM users WHERE id = %s",
-        (session['user_id'],)
-    )
-    user = cursor.fetchone()
-    
-    if user and check_password_hash(user[0], current_password):
-        # Update password
-        new_hash = generate_password_hash(new_password)
-        cursor.execute(
-            "UPDATE users SET password = %s WHERE id = %s",
-            (new_hash, session['user_id'])
-        )
-        conn.commit()
-        cursor.close()
-        conn.close()
-        return redirect(url_for('settings') + '?success=password')
-    else:
-        cursor.close()
-        conn.close()
-        return redirect(url_for('settings') + '?error=password')
-
-@app.route('/settings/delete', methods=['POST'])
-@login_required
-def delete_account():
-    """Delete user account and all data"""
-    user_id = session['user_id']
-    
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
-    # Delete all validations
-    cursor.execute("DELETE FROM validations WHERE user_id = %s", (user_id,))
-    
-    # Delete all posts
-    cursor.execute("DELETE FROM posts WHERE user_id = %s", (user_id,))
-    
-    # Delete all OAuth tokens
-    cursor.execute("DELETE FROM oauth_tokens WHERE user_id = %s", (user_id,))
-    
-    # Delete user
-    cursor.execute("DELETE FROM users WHERE id = %s", (user_id,))
-    
-    conn.commit()
-    cursor.close()
-    conn.close()
-    
-    # Clear session
-    session.clear()
-    
-    return redirect(url_for('index'))
+    return render_template('analysis.html', analysis=analysis, idea=idea, from_history=False)
 
 @app.route('/validations')
 @login_required
@@ -354,6 +198,160 @@ def validations():
     ]
     
     return render_template('validations.html', validations=validations_data)
+
+@app.route('/validation/<int:validation_id>')
+@login_required
+def view_validation(validation_id):
+    """View a specific validation and generate fresh posts"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute(
+        "SELECT id, idea_text, analysis, created_at FROM validations WHERE id = %s AND user_id = %s",
+        (validation_id, session['user_id'])
+    )
+    validation = cursor.fetchone()
+    
+    cursor.close()
+    conn.close()
+    
+    if not validation:
+        return "Validation not found", 404
+    
+    analysis = json.loads(validation[2])
+    
+    session['current_idea'] = validation[1]
+    session['current_analysis'] = analysis
+    
+    return render_template('analysis.html', 
+                         analysis=analysis, 
+                         idea=validation[1],
+                         from_history=True)
+
+@app.route('/marketing', methods=['GET', 'POST'])
+@login_required
+def marketing():
+    """Marketing campaign setup"""
+    if request.method == 'POST':
+        idea = session.get('current_idea')
+        analysis = session.get('current_analysis')
+        
+        if not idea or not analysis:
+            return redirect(url_for('dashboard'))
+        
+        from utils.content_generator import generate_marketing_posts
+        
+        try:
+            posts = generate_marketing_posts(idea, analysis)
+        except Exception as e:
+            return f"Error generating posts: {str(e)}"
+        
+        linkedin_connected = is_platform_connected(session['user_id'], 'linkedin')
+        posts_used = get_posts_this_month(session['user_id'])
+        
+        return render_template('marketing.html', 
+                             posts=posts, 
+                             idea=idea,
+                             linkedin_connected=linkedin_connected,
+                             posts_used=posts_used,
+                             posts_limit=5)
+    
+    return render_template('marketing.html')
+
+@app.route('/results')
+@login_required
+def results():
+    """Validation results"""
+    return render_template('results.html')
+
+@app.route('/settings')
+@login_required
+def settings():
+    """User settings page"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute(
+        "SELECT username, email, created_at FROM users WHERE id = %s",
+        (session['user_id'],)
+    )
+    user = cursor.fetchone()
+    
+    cursor.execute(
+        "SELECT COUNT(*) FROM validations WHERE user_id = %s",
+        (session['user_id'],)
+    )
+    validation_count = cursor.fetchone()[0]
+    
+    cursor.close()
+    conn.close()
+    
+    created_at_ist = convert_to_ist(user[2])
+    
+    linkedin_connected = is_platform_connected(session['user_id'], 'linkedin')
+    
+    user_data = {
+        'username': user[0],
+        'email': user[1],
+        'created_at': created_at_ist,
+        'validation_count': validation_count,
+        'linkedin_connected': linkedin_connected
+    }
+    
+    return render_template('settings.html', user=user_data)
+
+@app.route('/settings/password', methods=['POST'])
+@login_required
+def change_password():
+    """Change user password"""
+    current_password = request.form.get('current_password')
+    new_password = request.form.get('new_password')
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute(
+        "SELECT password FROM users WHERE id = %s",
+        (session['user_id'],)
+    )
+    user = cursor.fetchone()
+    
+    if user and check_password_hash(user[0], current_password):
+        new_hash = generate_password_hash(new_password)
+        cursor.execute(
+            "UPDATE users SET password = %s WHERE id = %s",
+            (new_hash, session['user_id'])
+        )
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return redirect(url_for('settings') + '?success=password')
+    else:
+        cursor.close()
+        conn.close()
+        return redirect(url_for('settings') + '?error=password')
+
+@app.route('/settings/delete', methods=['POST'])
+@login_required
+def delete_account():
+    """Delete user account and all data"""
+    user_id = session['user_id']
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute("DELETE FROM validations WHERE user_id = %s", (user_id,))
+    cursor.execute("DELETE FROM posts WHERE user_id = %s", (user_id,))
+    cursor.execute("DELETE FROM oauth_tokens WHERE user_id = %s", (user_id,))
+    cursor.execute("DELETE FROM users WHERE id = %s", (user_id,))
+    
+    conn.commit()
+    cursor.close()
+    conn.close()
+    
+    session.clear()
+    
+    return redirect(url_for('index'))
 
 # ========== OAUTH ROUTES ==========
 
@@ -404,55 +402,6 @@ def oauth_linkedin_callback():
         print(f"LinkedIn OAuth error: {str(e)}")
         return redirect(url_for('settings') + f'?error=linkedin&msg={str(e)}')
 
-@app.route('/oauth/twitter')
-@login_required
-def oauth_twitter():
-    """Initiate Twitter OAuth"""
-    state = secrets.token_urlsafe(32)
-    session['oauth_state'] = state
-    session.modified = True
-    auth_url = get_twitter_auth_url(state)
-    return redirect(auth_url)
-
-@app.route('/oauth/twitter/callback')
-def oauth_twitter_callback():
-    """Handle Twitter OAuth callback"""
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
-    
-    code = request.args.get('code')
-    state = request.args.get('state')
-    error = request.args.get('error')
-    
-    if error:
-        return redirect(url_for('settings') + f'?error=twitter&msg={error}')
-    
-    if not code:
-        return redirect(url_for('settings') + '?error=twitter&msg=no_code')
-    
-    stored_state = session.get('oauth_state')
-    
-    if not stored_state or state != stored_state:
-        print(f"State mismatch: stored={stored_state}, received={state}")
-    
-    try:
-        token_data = exchange_twitter_code(code)
-        
-        if 'error' in token_data:
-            error_msg = token_data.get('error_description', token_data.get('error', 'Unknown error'))
-            return redirect(url_for('settings') + f'?error=twitter&msg={error_msg}')
-        
-        save_twitter_token(session['user_id'], token_data)
-        
-        session.pop('oauth_state', None)
-        
-        return redirect(url_for('settings') + '?success=twitter')
-    except Exception as e:
-        print(f"Twitter OAuth error: {str(e)}")
-        return redirect(url_for('settings') + f'?error=twitter&msg={str(e)}')
-
-# ========== DISCONNECT ROUTES ==========
-
 @app.route('/oauth/disconnect/linkedin', methods=['POST'])
 @login_required
 def disconnect_linkedin():
@@ -471,24 +420,6 @@ def disconnect_linkedin():
     
     return redirect(url_for('settings') + '?success=linkedin_disconnected')
 
-@app.route('/oauth/disconnect/twitter', methods=['POST'])
-@login_required
-def disconnect_twitter():
-    """Disconnect Twitter account"""
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
-    cursor.execute("""
-        DELETE FROM oauth_tokens 
-        WHERE user_id = %s AND platform = 'twitter'
-    """, (session['user_id'],))
-    
-    conn.commit()
-    cursor.close()
-    conn.close()
-    
-    return redirect(url_for('settings') + '?success=twitter_disconnected')
-
 # ========== POSTING ROUTES ==========
 
 @app.route('/post/linkedin', methods=['POST'])
@@ -497,7 +428,6 @@ def post_linkedin_route():
     """Post to LinkedIn"""
     content = request.form.get('content')
     
-    # Check post limit
     posts_count = get_posts_this_month(session['user_id'])
     if posts_count >= 5:
         return jsonify({'error': 'Monthly post limit reached (5/5). Upgrade to Pro for unlimited posts!'}), 403
@@ -508,30 +438,12 @@ def post_linkedin_route():
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 
-@app.route('/post/twitter', methods=['POST'])
-@login_required
-def post_twitter_route():
-    """Post to Twitter"""
-    content = request.form.get('content')
-    
-    # Check post limit
-    posts_count = get_posts_this_month(session['user_id'])
-    if posts_count >= 5:
-        return jsonify({'error': 'Monthly post limit reached (5/5). Upgrade to Pro for unlimited posts!'}), 403
-    
-    try:
-        post_to_twitter(session['user_id'], content)
-        return jsonify({'success': True, 'posts_remaining': 5 - posts_count - 1})
-    except Exception as e:
-        return jsonify({'error': str(e)}), 400
-
 @app.route('/api/connection-status')
 @login_required
 def connection_status():
     """Check platform connection status"""
     return jsonify({
         'linkedin': is_platform_connected(session['user_id'], 'linkedin'),
-        'twitter': is_platform_connected(session['user_id'], 'twitter'),
         'posts_used': get_posts_this_month(session['user_id']),
         'posts_limit': 5
     })
@@ -545,12 +457,10 @@ def logout():
 # Error handlers
 @app.errorhandler(404)
 def page_not_found(e):
-    """404 error page"""
     return render_template('404.html'), 404
 
 @app.errorhandler(500)
 def internal_error(e):
-    """500 error page"""
     return render_template('500.html'), 500
 
 # ========== RUN APP ==========
