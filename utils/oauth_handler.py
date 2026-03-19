@@ -47,64 +47,17 @@ def exchange_linkedin_code(code):
     return response.json()
 
 def save_linkedin_token(user_id, token_data):
-    """Save LinkedIn token to database"""
+    """Save LinkedIn token and try to get person ID"""
     conn = get_db_connection()
     cursor = conn.cursor()
     
     expires_at = datetime.now() + timedelta(seconds=token_data.get('expires_in', 5184000))
+    access_token = token_data['access_token']
     
-    cursor.execute("""
-        INSERT INTO oauth_tokens (user_id, platform, access_token, refresh_token, expires_at)
-        VALUES (%s, %s, %s, %s, %s)
-        ON CONFLICT (user_id, platform) 
-        DO UPDATE SET access_token = %s, refresh_token = %s, expires_at = %s
-    """, (
-        user_id, 'linkedin', 
-        token_data['access_token'], 
-        token_data.get('refresh_token'),
-        expires_at,
-        token_data['access_token'],
-        token_data.get('refresh_token'),
-        expires_at
-    ))
-    
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-def get_linkedin_token(user_id):
-    """Get LinkedIn token from database"""
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
-    cursor.execute("""
-        SELECT access_token FROM oauth_tokens 
-        WHERE user_id = %s AND platform = 'linkedin'
-    """, (user_id,))
-    
-    result = cursor.fetchone()
-    cursor.close()
-    conn.close()
-    
-    return result[0] if result else None
-
-def post_to_linkedin(user_id, content):
-    """Post content to LinkedIn - Try multiple methods"""
-    access_token = get_linkedin_token(user_id)
-    if not access_token:
-        raise Exception("LinkedIn not connected")
-    
-    headers = {
-        'Authorization': f'Bearer {access_token}',
-        'Content-Type': 'application/json',
-        'X-Restli-Protocol-Version': '2.0.0'
-    }
-    
+    # Try to get person ID during OAuth
     person_id = None
-    
-    # METHOD 1: Try userinfo endpoint
     try:
-        print("[LINKEDIN DEBUG] Trying Method 1: /v2/userinfo")
+        # Try userinfo endpoint
         profile_response = requests.get(
             'https://api.linkedin.com/v2/userinfo',
             headers={'Authorization': f'Bearer {access_token}'}
@@ -112,100 +65,104 @@ def post_to_linkedin(user_id, content):
         if profile_response.status_code == 200:
             profile_data = profile_response.json()
             person_id = profile_data.get('sub')
-            print(f"[LINKEDIN DEBUG] Method 1 SUCCESS - Person ID: {person_id}")
-    except Exception as e:
-        print(f"[LINKEDIN DEBUG] Method 1 failed: {str(e)}")
+            print(f"[OAUTH] Got person ID from userinfo: {person_id}")
+    except:
+        pass
     
-    # METHOD 2: Try /me endpoint
-    if not person_id:
-        try:
-            print("[LINKEDIN DEBUG] Trying Method 2: /v2/me")
-            profile_response = requests.get(
-                'https://api.linkedin.com/v2/me',
-                headers={'Authorization': f'Bearer {access_token}'}
-            )
-            if profile_response.status_code == 200:
-                profile_data = profile_response.json()
-                person_id = profile_data.get('id')
-                print(f"[LINKEDIN DEBUG] Method 2 SUCCESS - Person ID: {person_id}")
-        except Exception as e:
-            print(f"[LINKEDIN DEBUG] Method 2 failed: {str(e)}")
+    # Save token with person_id
+    cursor.execute("""
+        INSERT INTO oauth_tokens (user_id, platform, access_token, refresh_token, expires_at, person_id)
+        VALUES (%s, %s, %s, %s, %s, %s)
+        ON CONFLICT (user_id, platform) 
+        DO UPDATE SET access_token = %s, refresh_token = %s, expires_at = %s, person_id = %s
+    """, (
+        user_id, 'linkedin', 
+        access_token, 
+        token_data.get('refresh_token'),
+        expires_at,
+        person_id,
+        access_token,
+        token_data.get('refresh_token'),
+        expires_at,
+        person_id
+    ))
     
-    # METHOD 3: Try posting WITHOUT getting person ID first
-    # Use the shares endpoint which doesn't require person URN
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+def get_linkedin_token_and_id(user_id):
+    """Get LinkedIn token and person ID from database"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute("""
+        SELECT access_token, person_id FROM oauth_tokens 
+        WHERE user_id = %s AND platform = 'linkedin'
+    """, (user_id,))
+    
+    result = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    
+    if result:
+        return result[0], result[1]  # access_token, person_id
+    return None, None
+
+def get_linkedin_token(user_id):
+    """Get LinkedIn token from database"""
+    token, _ = get_linkedin_token_and_id(user_id)
+    return token
+
+def post_to_linkedin(user_id, content):
+    """Post content to LinkedIn using stored person ID"""
+    access_token, person_id = get_linkedin_token_and_id(user_id)
+    
+    if not access_token:
+        raise Exception("LinkedIn not connected")
+    
     if not person_id:
-        print("[LINKEDIN DEBUG] Trying Method 3: /v2/shares (no person ID required)")
-        try:
-            share_data = {
-                "content": {
-                    "contentEntities": [],
-                    "title": ""
-                },
-                "distribution": {
-                    "linkedInDistributionTarget": {}
-                },
-                "text": {
+        raise Exception("LinkedIn person ID not found. Please reconnect your LinkedIn account in Settings.")
+    
+    headers = {
+        'Authorization': f'Bearer {access_token}',
+        'Content-Type': 'application/json',
+        'X-Restli-Protocol-Version': '2.0.0'
+    }
+    
+    print(f"[LINKEDIN] Posting with person ID: {person_id}")
+    
+    # Use UGC Posts API
+    post_data = {
+        "author": f"urn:li:person:{person_id}",
+        "lifecycleState": "PUBLISHED",
+        "specificContent": {
+            "com.linkedin.ugc.ShareContent": {
+                "shareCommentary": {
                     "text": content
-                }
-            }
-            
-            response = requests.post(
-                'https://api.linkedin.com/v2/shares',
-                headers=headers,
-                json=share_data
-            )
-            
-            print(f"[LINKEDIN DEBUG] Shares API Response Status: {response.status_code}")
-            print(f"[LINKEDIN DEBUG] Shares API Response Body: {response.text}")
-            
-            if response.status_code in [200, 201]:
-                save_post(user_id, 'linkedin', 'success', content)
-                return True
-            else:
-                raise Exception(f"Shares API failed: {response.text}")
-        except Exception as e:
-            print(f"[LINKEDIN DEBUG] Method 3 failed: {str(e)}")
-            raise Exception(f"LinkedIn posting failed. Your app may need additional permissions. Error: {str(e)}")
-    
-    # If we got person_id from Method 1 or 2, use UGC Posts API
-    if person_id:
-        try:
-            print(f"[LINKEDIN DEBUG] Using UGC Posts API with person ID: {person_id}")
-            post_data = {
-                "author": f"urn:li:person:{person_id}",
-                "lifecycleState": "PUBLISHED",
-                "specificContent": {
-                    "com.linkedin.ugc.ShareContent": {
-                        "shareCommentary": {
-                            "text": content
-                        },
-                        "shareMediaCategory": "NONE"
-                    }
                 },
-                "visibility": {
-                    "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC"
-                }
+                "shareMediaCategory": "NONE"
             }
-            
-            response = requests.post(
-                'https://api.linkedin.com/v2/ugcPosts',
-                headers=headers,
-                json=post_data
-            )
-            
-            print(f"[LINKEDIN DEBUG] UGC Post Response Status: {response.status_code}")
-            print(f"[LINKEDIN DEBUG] UGC Post Response Body: {response.text}")
-            
-            if response.status_code == 201:
-                save_post(user_id, 'linkedin', 'success', content)
-                return True
-            else:
-                raise Exception(f"UGC Post creation failed: {response.text}")
-        except Exception as e:
-            print(f"[LINKEDIN DEBUG] UGC Post failed: {str(e)}")
-            raise Exception(f"LinkedIn error: {str(e)}")
+        },
+        "visibility": {
+            "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC"
+        }
+    }
     
-    raise Exception("All LinkedIn posting methods failed")
+    response = requests.post(
+        'https://api.linkedin.com/v2/ugcPosts',
+        headers=headers,
+        json=post_data
+    )
+    
+    print(f"[LINKEDIN] Response Status: {response.status_code}")
+    print(f"[LINKEDIN] Response Body: {response.text}")
+    
+    if response.status_code == 201:
+        save_post(user_id, 'linkedin', 'success', content)
+        return True
+    else:
+        raise Exception(f"LinkedIn posting failed: {response.text}")
 
 # ========== TWITTER OAUTH ==========
 
@@ -292,7 +249,7 @@ def get_twitter_token(user_id):
     return result[0] if result else None
 
 def post_to_twitter(user_id, content):
-    """Post content to Twitter with Debug"""
+    """Post content to Twitter"""
     access_token = get_twitter_token(user_id)
     if not access_token:
         raise Exception("Twitter not connected")
@@ -308,8 +265,7 @@ def post_to_twitter(user_id, content):
     
     post_data = {'text': content}
     
-    print(f"[TWITTER DEBUG] Posting with access_token: {access_token[:20]}...")
-    print(f"[TWITTER DEBUG] Content length: {len(content)}")
+    print(f"[TWITTER] Posting tweet (length: {len(content)})")
     
     response = requests.post(
         'https://api.twitter.com/2/tweets',
@@ -317,8 +273,8 @@ def post_to_twitter(user_id, content):
         json=post_data
     )
     
-    print(f"[TWITTER DEBUG] Response Status: {response.status_code}")
-    print(f"[TWITTER DEBUG] Response Body: {response.text}")
+    print(f"[TWITTER] Response Status: {response.status_code}")
+    print(f"[TWITTER] Response Body: {response.text}")
     
     if response.status_code == 201:
         post_id = response.json()['data']['id']
