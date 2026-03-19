@@ -12,13 +12,12 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
             background: #0F0F0F;
             color: #FFFFFF;
             min-height: 100vh;
         }
 
-        /* Navigation */
         nav {
             position: fixed;
             top: 0;
@@ -57,30 +56,21 @@
             color: #FFFFFF;
         }
 
-        /* Container */
         .container {
             max-width: 1000px;
             margin: 0 auto;
             padding: 120px 40px 80px;
         }
 
-        /* Header */
         .header {
             margin-bottom: 40px;
         }
 
         .header h1 {
-            font-size: 42px;
+            font-size: 36px;
             font-weight: 900;
             margin-bottom: 8px;
-            letter-spacing: -2px;
-        }
-
-        .gradient-text {
-            background: linear-gradient(135deg, #6366F1 0%, #A855F7 50%, #EC4899 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            letter-spacing: -1px;
         }
 
         .header p {
@@ -88,8 +78,7 @@
             font-size: 16px;
         }
 
-        /* Validation List */
-        .validation-list {
+        .validations-list {
             display: grid;
             gap: 20px;
         }
@@ -97,63 +86,83 @@
         .validation-card {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 14px;
-            padding: 28px;
+            border-radius: 12px;
+            padding: 24px;
             transition: all 0.3s;
             cursor: pointer;
+            text-decoration: none;
+            display: block;
         }
 
         .validation-card:hover {
             background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(99, 102, 241, 0.3);
+            border-color: rgba(99, 102, 241, 0.5);
             transform: translateY(-2px);
+        }
+
+        .validation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 12px;
+        }
+
+        .validation-idea {
+            font-size: 17px;
+            font-weight: 600;
+            color: #FFFFFF;
+            line-height: 1.5;
+            flex: 1;
         }
 
         .validation-date {
             font-size: 13px;
             color: rgba(255, 255, 255, 0.5);
-            margin-bottom: 12px;
+            margin-top: 4px;
         }
 
-        .validation-idea {
-            font-size: 16px;
-            line-height: 1.6;
-            color: rgba(255, 255, 255, 0.9);
+        .validation-action {
+            background: linear-gradient(135deg, #6366F1 0%, #A855F7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 14px;
+            font-weight: 600;
+            white-space: nowrap;
+            margin-left: 20px;
         }
 
-        /* Empty State */
         .empty-state {
             text-align: center;
             padding: 80px 20px;
+            color: rgba(255, 255, 255, 0.4);
         }
 
-        .empty-icon {
-            font-size: 64px;
-            margin-bottom: 20px;
-            opacity: 0.3;
+        .empty-state h3 {
+            font-size: 20px;
+            margin-bottom: 12px;
         }
 
-        .empty-text {
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 16px;
+        .empty-state p {
+            font-size: 15px;
             margin-bottom: 24px;
         }
 
         .btn-primary {
             display: inline-block;
-            background: #6366F1;
+            background: linear-gradient(135deg, #6366F1 0%, #A855F7 100%);
             color: white;
-            padding: 14px 28px;
-            border-radius: 10px;
+            padding: 12px 32px;
+            border-radius: 8px;
             text-decoration: none;
-            font-weight: 700;
             font-size: 15px;
+            font-weight: 600;
             transition: all 0.3s;
         }
 
         .btn-primary:hover {
-            background: #5558E3;
             transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
         }
 
         @media (max-width: 768px) {
@@ -166,13 +175,21 @@
             }
 
             .header h1 {
-                font-size: 32px;
+                font-size: 28px;
+            }
+
+            .validation-header {
+                flex-direction: column;
+            }
+
+            .validation-action {
+                margin-left: 0;
+                margin-top: 12px;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Navigation -->
     <nav>
         <div class="logo">Intelix</div>
         <div class="nav-right">
@@ -182,33 +199,30 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
     <div class="container">
-        <!-- Header -->
         <div class="header">
-            <h1>Validation <span class="gradient-text">History</span></h1>
-            <p>All your previously validated ideas</p>
+            <h1>Validation History</h1>
+            <p>Review your past ideas and generate fresh content</p>
         </div>
 
         {% if validations %}
-        <!-- Validation List -->
-        <div class="validation-list">
+        <div class="validations-list">
             {% for validation in validations %}
-            <div class="validation-card">
-                <div class="validation-date">
-                    {{ validation.date.strftime('%B %d, %Y at %I:%M %p') }}
+            <a href="/validation/{{ validation.id }}" class="validation-card">
+                <div class="validation-header">
+                    <div style="flex: 1;">
+                        <div class="validation-idea">{{ validation.idea }}</div>
+                        <div class="validation-date">Analyzed on {{ validation.date.strftime('%B %d, %Y at %I:%M %p') }}</div>
+                    </div>
+                    <div class="validation-action">View & Generate Posts →</div>
                 </div>
-                <div class="validation-idea">
-                    {{ validation.idea }}
-                </div>
-            </div>
+            </a>
             {% endfor %}
         </div>
         {% else %}
-        <!-- Empty State -->
         <div class="empty-state">
-            <div class="empty-icon">📭</div>
-            <div class="empty-text">No validations yet. Start by analyzing your first idea!</div>
+            <h3>No validations yet</h3>
+            <p>Start validating your business ideas to see them here</p>
             <a href="/dashboard" class="btn-primary">Validate Your First Idea</a>
         </div>
         {% endif %}
