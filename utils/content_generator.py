@@ -5,12 +5,22 @@ import re
 
 client = Anthropic(api_key=os.getenv('ANTHROPIC_API_KEY'))
 
-def generate_marketing_posts(idea, analysis):
+def generate_marketing_posts(idea, analysis, business_name=None):
     """Generate 3 diverse marketing posts for LinkedIn validation"""
+    
+    # Determine how to refer to the solution
+    if business_name and business_name.strip():
+        solution_ref = f'"{business_name}"'
+        solution_type = "named product"
+    else:
+        solution_ref = '"this solution"'
+        solution_type = "generic reference"
     
     prompt = f"""You are a marketing expert creating LinkedIn posts to validate a business idea.
 
 BUSINESS IDEA: {idea}
+
+BUSINESS/PRODUCT NAME: {business_name if business_name else "NOT PROVIDED - Use generic terms like 'this solution', 'the app', 'my product', etc."}
 
 ANALYSIS INSIGHTS:
 - Target Market: {analysis.get('target_market', 'N/A')}
@@ -19,7 +29,7 @@ ANALYSIS INSIGHTS:
 
 Create 3 DIFFERENT LinkedIn posts that:
 1. PRESENT THE PROBLEM the idea solves
-2. INTRODUCE THE SOLUTION (the business idea) naturally
+2. INTRODUCE THE SOLUTION using {solution_ref} (the business idea)
 3. INCLUDE A CLEAR CALL-TO-ACTION (visit website, DM for early access, comment interest, etc.)
 4. Make it PROMOTIONAL but authentic and engaging
 5. Each post should have a DIFFERENT angle/approach
@@ -29,7 +39,7 @@ POST GUIDELINES:
 - Use natural, conversational tone
 - Include relevant emojis (2-4 per post)
 - End with clear call-to-action
-- Make it clear this is YOUR product/service/solution
+- Use {solution_ref} when mentioning the product/solution
 - Add line breaks for readability
 - Don't just describe the problem - SELL THE SOLUTION
 
@@ -41,7 +51,7 @@ Post 3: Question/Hook → Problem validation → Solution reveal → CTA
 IMPORTANT: 
 - Don't just ask questions without mentioning the solution
 - Each post should clearly introduce the business idea as the answer
-- Include phrases like "I'm building...", "We're launching...", "Introducing..."
+- Include phrases like "I'm building {solution_ref}", "We're launching {solution_ref}", "Introducing {solution_ref}"
 - End with action-oriented CTAs like:
   * "Interested? Drop a comment or DM me!"
   * "Early access starting soon - comment 'interested' below!"
