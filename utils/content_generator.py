@@ -1,62 +1,96 @@
-import anthropic
 import os
+from anthropic import Anthropic
 import json
 import re
 
-ANTHROPIC_API_KEY = os.getenv('ANTHROPIC_API_KEY')
+client = Anthropic(api_key=os.getenv('ANTHROPIC_API_KEY'))
 
-def generate_marketing_posts(idea_text, analysis):
-    """Generate 3 marketing posts for social validation"""
+def generate_marketing_posts(idea, analysis):
+    """Generate 3 diverse marketing posts for LinkedIn validation"""
     
-    client = anthropic.Anthropic(
-        api_key=ANTHROPIC_API_KEY
-    )
-    
-    prompt = f"""Based on this business idea and analysis, create 3 different social media posts for validation testing:
+    prompt = f"""You are a marketing expert creating LinkedIn posts to validate a business idea.
 
-Business Idea: {idea_text}
+BUSINESS IDEA: {idea}
 
-Analysis Summary:
-- Target Audience: {analysis['target_audience']}
-- Key Strengths: {', '.join(analysis['strengths'][:2])}
+ANALYSIS INSIGHTS:
+- Target Market: {analysis.get('target_market', 'N/A')}
+- Strengths: {analysis.get('strengths', 'N/A')}
+- Viability Score: {analysis.get('viability_score', 'N/A')}/10
 
-Create 3 posts in JSON format:
+Create 3 DIFFERENT LinkedIn posts that:
+1. PRESENT THE PROBLEM the idea solves
+2. INTRODUCE THE SOLUTION (the business idea) naturally
+3. INCLUDE A CLEAR CALL-TO-ACTION (visit website, DM for early access, comment interest, etc.)
+4. Make it PROMOTIONAL but authentic and engaging
+5. Each post should have a DIFFERENT angle/approach
+
+POST GUIDELINES:
+- Keep each post 150-250 words
+- Use natural, conversational tone
+- Include relevant emojis (2-4 per post)
+- End with clear call-to-action
+- Make it clear this is YOUR product/service/solution
+- Add line breaks for readability
+- Don't just describe the problem - SELL THE SOLUTION
+
+POST TYPES (use different angles):
+Post 1: Personal story → Problem → Solution → CTA
+Post 2: Problem statement → Solution intro → Benefits → CTA  
+Post 3: Question/Hook → Problem validation → Solution reveal → CTA
+
+IMPORTANT: 
+- Don't just ask questions without mentioning the solution
+- Each post should clearly introduce the business idea as the answer
+- Include phrases like "I'm building...", "We're launching...", "Introducing..."
+- End with action-oriented CTAs like:
+  * "Interested? Drop a comment or DM me!"
+  * "Early access starting soon - comment 'interested' below!"
+  * "Building this now - want to be a beta tester?"
+  * "Link in comments / DM for early access"
+
+Return your response as a JSON object with this EXACT structure:
 {{
     "post1": {{
         "title": "Personal Story Post",
-        "content": "A personal, relatable post (LinkedIn style, 150-200 words) that shares a problem story and hints at the solution. Sound human, not salesy."
+        "content": "Your first post content here..."
     }},
     "post2": {{
-        "title": "Problem/Solution Post",
-        "content": "A direct problem/solution post (Twitter style, 200-250 chars) that's punchy and creates curiosity."
+        "title": "Problem-Solution Post",
+        "content": "Your second post content here..."
     }},
     "post3": {{
-        "title": "Quick Poll Post",
-        "content": "An engaging poll or question (both platforms, 100-150 words) that gets people to comment their pain points."
+        "title": "Engagement Hook Post",
+        "content": "Your third post content here..."
     }}
 }}
 
-Make posts sound HUMAN, not like AI. Use casual language, real emotions, and authentic storytelling. Return ONLY JSON, no other text."""
+CRITICAL: Return ONLY the JSON object, nothing else. No markdown, no code blocks, no explanations."""
 
-    message = client.messages.create(
-        model="claude-sonnet-4-20250514",
-        max_tokens=1500,
-        messages=[
-            {"role": "user", "content": prompt}
-        ]
-    )
-    
-    response_text = message.content[0].text
-    
-    # Clean response - remove markdown code blocks if present
-    response_text = response_text.strip()
-    if response_text.startswith('```'):
-        # Remove ```json or ``` from start
-        response_text = re.sub(r'^```(?:json)?\s*', '', response_text)
-        # Remove ``` from end
-        response_text = re.sub(r'\s*```$', '', response_text)
-    
-    # Parse JSON response
-    posts = json.loads(response_text.strip())
-    
-    return posts
+    try:
+        message = client.messages.create(
+            model="claude-sonnet-4-20250514",
+            max_tokens=2000,
+            messages=[
+                {"role": "user", "content": prompt}
+            ]
+        )
+        
+        response_text = message.content[0].text
+        
+        # Clean up response
+        response_text = response_text.strip()
+        if response_text.startswith('```'):
+            response_text = re.sub(r'^```(?:json)?\s*', '', response_text)
+            response_text = re.sub(r'\s*```$', '', response_text)
+        
+        posts = json.loads(response_text)
+        
+        return posts
+        
+    except json.JSONDecodeError as e:
+        print(f"JSON parsing error: {str(e)}")
+        print(f"Response was: {response_text}")
+        raise Exception("Failed to parse AI response")
+    except Exception as e:
+        print(f"Error generating posts: {str(e)}")
+        raise
