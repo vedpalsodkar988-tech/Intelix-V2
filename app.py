@@ -222,13 +222,10 @@ def view_validation(validation_id):
         # Handle both dict and string types for analysis
         analysis_data = validation[2]
         if isinstance(analysis_data, dict):
-            # Already a dict, use as-is
             analysis = analysis_data
         elif isinstance(analysis_data, str):
-            # String, parse it
             analysis = json.loads(analysis_data)
         else:
-            # Unknown type, try to convert
             analysis = json.loads(str(analysis_data))
         
         # Store in session for marketing page
@@ -248,7 +245,7 @@ def view_validation(validation_id):
 @app.route('/marketing', methods=['GET', 'POST'])
 @login_required
 def marketing():
-    """Marketing campaign setup"""
+    """Marketing campaign setup - ALWAYS generates fresh posts"""
     if request.method == 'POST':
         idea = session.get('current_idea')
         analysis = session.get('current_analysis')
@@ -259,6 +256,7 @@ def marketing():
         from utils.content_generator import generate_marketing_posts
         
         try:
+            # ALWAYS generate fresh posts - never use cached ones
             posts = generate_marketing_posts(idea, analysis)
         except Exception as e:
             return f"Error generating posts: {str(e)}"
