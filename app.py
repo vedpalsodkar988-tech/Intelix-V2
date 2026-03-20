@@ -146,6 +146,7 @@ def dashboard():
 def analyze():
     """Analyze business idea with AI"""
     idea = request.form.get('idea')
+    business_name = request.form.get('business_name', '').strip()
     
     from utils.ai_analyzer import analyze_business_idea
     
@@ -156,8 +157,8 @@ def analyze():
         cursor = conn.cursor()
         
         cursor.execute(
-            "INSERT INTO validations (user_id, idea_text, analysis) VALUES (%s, %s, %s)",
-            (session['user_id'], idea, json.dumps(analysis))
+            "INSERT INTO validations (user_id, idea_text, business_name, analysis) VALUES (%s, %s, %s, %s)",
+            (session['user_id'], idea, business_name if business_name else None, json.dumps(analysis))
         )
         
         conn.commit()
@@ -165,6 +166,7 @@ def analyze():
         conn.close()
         
         session['current_idea'] = idea
+        session['current_business_name'] = business_name if business_name else None
         session['current_analysis'] = analysis
         
     except Exception as e:
@@ -208,7 +210,7 @@ def view_validation(validation_id):
         cursor = conn.cursor()
         
         cursor.execute(
-            "SELECT id, idea_text, analysis, created_at FROM validations WHERE id = %s AND user_id = %s",
+            "SELECT id, idea_text, business_name, analysis, created_at FROM validations WHERE id = %s AND user_id = %s",
             (validation_id, session['user_id'])
         )
         validation = cursor.fetchone()
@@ -220,7 +222,7 @@ def view_validation(validation_id):
             return "Validation not found", 404
         
         # Handle both dict and string types for analysis
-        analysis_data = validation[2]
+        analysis_data = validation[3]
         if isinstance(analysis_data, dict):
             analysis = analysis_data
         elif isinstance(analysis_data, str):
@@ -230,6 +232,7 @@ def view_validation(validation_id):
         
         # Store in session for marketing page
         session['current_idea'] = validation[1]
+        session['current_business_name'] = validation[2]
         session['current_analysis'] = analysis
         
         return render_template('analysis.html', 
@@ -248,6 +251,7 @@ def marketing():
     """Marketing campaign setup - ALWAYS generates fresh posts"""
     if request.method == 'POST':
         idea = session.get('current_idea')
+        business_name = session.get('current_business_name')
         analysis = session.get('current_analysis')
         
         if not idea or not analysis:
@@ -256,8 +260,8 @@ def marketing():
         from utils.content_generator import generate_marketing_posts
         
         try:
-            # ALWAYS generate fresh posts - never use cached ones
-            posts = generate_marketing_posts(idea, analysis)
+            # ALWAYS generate fresh posts with business name
+            posts = generate_marketing_posts(idea, analysis, business_name)
         except Exception as e:
             return f"Error generating posts: {str(e)}"
         
