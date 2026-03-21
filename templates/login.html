@@ -18,7 +18,6 @@
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -28,7 +27,6 @@
             justify-content: center;
             padding: 20px;
         }
-
         .container {
             background: white;
             border-radius: 20px;
@@ -37,27 +35,22 @@
             width: 100%;
             padding: 50px 40px;
         }
-
         .header {
             text-align: center;
             margin-bottom: 40px;
         }
-
         .header h1 {
             font-size: 32px;
             color: #333;
             margin-bottom: 10px;
         }
-
         .header p {
             color: #666;
             font-size: 16px;
         }
-
         .form-group {
             margin-bottom: 20px;
         }
-
         .form-group label {
             display: block;
             color: #333;
@@ -65,7 +58,6 @@
             margin-bottom: 8px;
             font-size: 14px;
         }
-
         .form-group input {
             width: 100%;
             padding: 14px;
@@ -74,32 +66,10 @@
             font-size: 15px;
             transition: border-color 0.3s;
         }
-
         .form-group input:focus {
             outline: none;
             border-color: #667eea;
         }
-
-        .remember-me {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 25px;
-        }
-
-        .remember-me input[type="checkbox"] {
-            width: auto;
-            cursor: pointer;
-        }
-
-        .remember-me label {
-            font-size: 14px;
-            color: #666;
-            cursor: pointer;
-            margin: 0;
-            font-weight: 400;
-        }
-
         .btn-login {
             width: 100%;
             padding: 15px;
@@ -111,41 +81,35 @@
             font-weight: 600;
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
         }
-
         .btn-login:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
         }
-
         .divider {
             text-align: center;
             margin: 25px 0;
             color: #999;
             font-size: 14px;
         }
-
         .signup-link {
             text-align: center;
             color: #666;
             font-size: 14px;
         }
-
         .signup-link a {
             color: #667eea;
             text-decoration: none;
             font-weight: 600;
         }
-
         .signup-link a:hover {
             text-decoration: underline;
         }
-
         @media (max-width: 600px) {
             .container {
                 padding: 30px 25px;
             }
-
             .header h1 {
                 font-size: 26px;
             }
@@ -158,28 +122,18 @@
             <h1>Welcome Back! 👋</h1>
             <p>Login to validate your ideas</p>
         </div>
-
         <form action="/login" method="POST">
             <div class="form-group">
                 <label for="email">Email Address</label>
                 <input type="email" id="email" name="email" required>
             </div>
-
             <div class="form-group">
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" required>
             </div>
-
-            <div class="remember-me">
-                <input type="checkbox" id="remember_me" name="remember_me" value="yes">
-                <label for="remember_me">Keep me logged in for 30 days</label>
-            </div>
-
             <button type="submit" class="btn-login">Login</button>
         </form>
-
         <div class="divider">───────  OR  ───────</div>
-
         <div class="signup-link">
             Don't have an account? <a href="/signup">Sign up free</a>
         </div>
