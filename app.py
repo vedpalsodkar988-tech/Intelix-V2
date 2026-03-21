@@ -15,11 +15,11 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY')
 
-# Session configuration for OAuth
+# Session configuration - PERMANENT LOGIN FOREVER
 app.config['SESSION_COOKIE_SECURE'] = True
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=365)  # 1 year = permanent
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=3650)  # 10 years = forever
 
 # Import OAuth handlers
 from utils.oauth_handler import *
@@ -77,6 +77,7 @@ def signup():
             cursor.close()
             conn.close()
             
+            # AUTO-LOGIN FOREVER
             session.permanent = True
             session['user_id'] = user_id
             session['username'] = username
@@ -96,7 +97,6 @@ def login():
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
-        remember_me = request.form.get('remember_me')
         
         try:
             conn = get_db_connection()
@@ -112,9 +112,8 @@ def login():
             conn.close()
             
             if user and check_password_hash(user[2], password):
-                # Set session as permanent if remember me is checked
-                session.permanent = (remember_me == 'yes')
-                    
+                # AUTO-LOGIN FOREVER
+                session.permanent = True
                 session['user_id'] = user[0]
                 session['username'] = user[1]
                 
