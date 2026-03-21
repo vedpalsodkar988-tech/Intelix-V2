@@ -19,7 +19,7 @@ app.secret_key = os.getenv('SECRET_KEY')
 app.config['SESSION_COOKIE_SECURE'] = True
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=30)  # 30 days for remember me
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=365)  # 1 year = permanent
 
 # Import OAuth handlers
 from utils.oauth_handler import *
@@ -113,10 +113,7 @@ def login():
             
             if user and check_password_hash(user[2], password):
                 # Set session as permanent if remember me is checked
-                if remember_me == 'yes':
-                    session.permanent = True
-                else:
-                    session.permanent = False
+                session.permanent = (remember_me == 'yes')
                     
                 session['user_id'] = user[0]
                 session['username'] = user[1]
