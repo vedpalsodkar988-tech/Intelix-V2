@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Log In - Intelix</title>
+    <title>Login - Intelix</title>
     <style>
         * {
             margin: 0;
@@ -12,9 +12,8 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Arial, sans-serif;
-            background: #0F0F0F;
-            color: #FFFFFF;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -22,86 +21,110 @@
             padding: 20px;
         }
 
-        .login-container {
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             max-width: 450px;
             width: 100%;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 48px;
+            padding: 50px 40px;
         }
 
-        .logo {
+        .header {
             text-align: center;
-            font-size: 28px;
-            font-weight: 800;
-            margin-bottom: 12px;
-        }
-
-        .subtitle {
-            text-align: center;
-            color: rgba(255, 255, 255, 0.6);
             margin-bottom: 40px;
-            font-size: 15px;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 16px;
         }
 
         .form-group {
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 8px;
+            color: #333;
             font-weight: 600;
-            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 8px;
             font-size: 14px;
         }
 
         .form-group input {
             width: 100%;
-            padding: 14px 16px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 14px;
+            border: 2px solid #e0e0e0;
             border-radius: 10px;
             font-size: 15px;
-            color: #FFFFFF;
-            transition: all 0.3s;
+            transition: border-color 0.3s;
         }
 
         .form-group input:focus {
             outline: none;
-            border-color: #6366F1;
-            background: rgba(255, 255, 255, 0.08);
+            border-color: #667eea;
         }
 
-        .btn-submit {
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 25px;
+        }
+
+        .remember-me input[type="checkbox"] {
+            width: auto;
+            cursor: pointer;
+        }
+
+        .remember-me label {
+            font-size: 14px;
+            color: #666;
+            cursor: pointer;
+            margin: 0;
+            font-weight: 400;
+        }
+
+        .btn-login {
             width: 100%;
-            background: #6366F1;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 16px;
             border: none;
             border-radius: 10px;
             font-size: 16px;
-            font-weight: 700;
+            font-weight: 600;
             cursor: pointer;
-            margin-top: 8px;
-            transition: all 0.3s;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
-        .btn-submit:hover {
-            background: #5558E3;
+        .btn-login:hover {
             transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .divider {
+            text-align: center;
+            margin: 25px 0;
+            color: #999;
+            font-size: 14px;
         }
 
         .signup-link {
             text-align: center;
-            margin-top: 24px;
-            color: rgba(255, 255, 255, 0.6);
+            color: #666;
             font-size: 14px;
         }
 
         .signup-link a {
-            color: #6366F1;
+            color: #667eea;
             text-decoration: none;
             font-weight: 600;
         }
@@ -109,16 +132,28 @@
         .signup-link a:hover {
             text-decoration: underline;
         }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 25px;
+            }
+
+            .header h1 {
+                font-size: 26px;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <div class="logo">Intelix</div>
-        <p class="subtitle">Welcome back</p>
-        
+    <div class="container">
+        <div class="header">
+            <h1>Welcome Back! 👋</h1>
+            <p>Login to validate your ideas</p>
+        </div>
+
         <form action="/login" method="POST">
             <div class="form-group">
-                <label for="email">Email</label>
+                <label for="email">Email Address</label>
                 <input type="email" id="email" name="email" required>
             </div>
 
@@ -127,11 +162,18 @@
                 <input type="password" id="password" name="password" required>
             </div>
 
-            <button type="submit" class="btn-submit">Log In</button>
+            <div class="remember-me">
+                <input type="checkbox" id="remember_me" name="remember_me" value="yes">
+                <label for="remember_me">Keep me logged in for 30 days</label>
+            </div>
+
+            <button type="submit" class="btn-login">Login</button>
         </form>
 
+        <div class="divider">───────  OR  ───────</div>
+
         <div class="signup-link">
-            Don't have an account? <a href="/signup">Sign up</a>
+            Don't have an account? <a href="/signup">Sign up free</a>
         </div>
     </div>
 </body>
