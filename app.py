@@ -5,7 +5,7 @@ import psycopg2
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 import pytz
 import secrets
 
@@ -19,7 +19,7 @@ app.secret_key = os.getenv('SECRET_KEY')
 app.config['SESSION_COOKIE_SECURE'] = True
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-app.config['PERMANENT_SESSION_LIFETIME'] = 3600
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=30)  # 30 days for remember me
 
 # Import OAuth handlers
 from utils.oauth_handler import *
@@ -96,6 +96,7 @@ def login():
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
+        remember_me = request.form.get('remember_me')
         
         try:
             conn = get_db_connection()
@@ -111,9 +112,20 @@ def login():
             conn.close()
             
             if user and check_password_hash(user[2], password):
-                session.permanent = True
+                # Set session as permanent if remember me is checked
+                if remember_me == 'yes':
+                    session.permanent = True
+                else:
+                    session.permanent = False
+                    
                 session['user_id'] = user[0]
                 session['username'] = user[1]
+                
+                # Check if there's a redirect URL from OAuth
+                next_url = session.pop('next_url', None)
+                if next_url:
+                    return redirect(next_url)
+                
                 return redirect(url_for('dashboard'))
             else:
                 return "Invalid email or password!", 401
@@ -386,8 +398,18 @@ def oauth_linkedin():
 
 @app.route('/oauth/linkedin/callback')
 def oauth_linkedin_callback():
-    """Handle LinkedIn OAuth callback"""
-    if 'user_id' not in session:
+    """Handle LinkedIn OAuth callback - NO LOGIN REQUIRED"""
+    # Check if user is logged in
+    user_id = session.get('user_id')
+    
+    if not user_id:
+        # Store the OAuth params and redirect to login
+        session['pending_oauth'] = {
+            'platform': 'linkedin',
+            'code': request.args.get('code'),
+            'state': request.args.get('state')
+        }
+        session['next_url'] = url_for('complete_oauth')
         return redirect(url_for('login'))
     
     code = request.args.get('code')
@@ -412,7 +434,7 @@ def oauth_linkedin_callback():
             error_msg = token_data.get('error_description', token_data.get('error', 'Unknown error'))
             return redirect(url_for('settings') + f'?error=linkedin&msg={error_msg}')
         
-        save_linkedin_token(session['user_id'], token_data)
+        save_linkedin_token(user_id, token_data)
         
         session.pop('oauth_state', None)
         
@@ -420,6 +442,30 @@ def oauth_linkedin_callback():
     except Exception as e:
         print(f"LinkedIn OAuth error: {str(e)}")
         return redirect(url_for('settings') + f'?error=linkedin&msg={str(e)}')
+
+@app.route('/complete-oauth')
+@login_required
+def complete_oauth():
+    """Complete OAuth after login"""
+    pending = session.pop('pending_oauth', None)
+    
+    if not pending:
+        return redirect(url_for('settings'))
+    
+    if pending['platform'] == 'linkedin':
+        try:
+            token_data = exchange_linkedin_code(pending['code'])
+            
+            if 'error' in token_data:
+                return redirect(url_for('settings') + '?error=linkedin')
+            
+            save_linkedin_token(session['user_id'], token_data)
+            return redirect(url_for('settings') + '?success=linkedin')
+        except Exception as e:
+            print(f"OAuth completion error: {str(e)}")
+            return redirect(url_for('settings') + '?error=linkedin')
+    
+    return redirect(url_for('settings'))
 
 @app.route('/oauth/disconnect/linkedin', methods=['POST'])
 @login_required
