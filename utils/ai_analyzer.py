@@ -42,7 +42,7 @@ def analyze_business_idea(idea):
     try:
         response = client.messages.create(
             model="claude-sonnet-4-20250514",
-            max_tokens=1000,  # REDUCED from 2000
+            max_tokens=1000,
             messages=[{"role": "user", "content": prompt}]
         )
         
@@ -87,7 +87,7 @@ def generate_similar_idea(original_idea, analysis):
     try:
         response = client.messages.create(
             model="claude-sonnet-4-20250514",
-            max_tokens=300,  # REDUCED from 500
+            max_tokens=300,
             messages=[{"role": "user", "content": prompt}]
         )
         
@@ -109,7 +109,7 @@ def generate_similar_idea(original_idea, analysis):
 
 
 def generate_reel_scripts(idea, business_name=None):
-    """Generate 3 reel scripts"""
+    """Generate 3 reel scripts for marketing page"""
     
     brand = business_name if business_name else "this product"
     
@@ -117,29 +117,48 @@ def generate_reel_scripts(idea, business_name=None):
     Business: {idea}
     Brand: {brand}
     
-    Create 3 reel scripts (15-30 sec each). Different styles: Problem-Solution, Storytelling, Educational.
+    Create 3 short video scripts for Instagram Reels/YouTube Shorts (15-30 seconds each).
+    
+    Each script should be CONVERSATIONAL and ready to read as voiceover.
+    Write as if talking directly to camera - natural, engaging, not reading text.
+    
+    Different styles:
+    1. Problem-Solution (start with relatable problem)
+    2. Storytelling (personal angle)
+    3. Educational (teach something valuable)
+    
+    Each needs:
+    - Catchy hook (first 3 seconds)
+    - Natural conversational script (what to SAY, not text overlays)
+    - Clear CTA
     
     Return ONLY valid JSON (no markdown):
     {{
         "reel1": {{
-            "title": "title",
-            "duration": "15-20 seconds",
+            "title": "Problem You're Solving",
             "style": "Problem-Solution",
-            "hook": "first 3 sec",
-            "script": "voiceover",
-            "text_overlays": ["text 1", "text 2", "text 3"],
-            "music_vibe": "vibe",
-            "cta": "cta"
+            "script": "Natural conversational script ready for voiceover (150-200 words)",
+            "cta": "What to do next"
         }},
-        "reel2": {{...}},
-        "reel3": {{...}}
+        "reel2": {{
+            "title": "Your Story",
+            "style": "Storytelling",
+            "script": "Natural conversational script ready for voiceover (150-200 words)",
+            "cta": "What to do next"
+        }},
+        "reel3": {{
+            "title": "Quick Tip",
+            "style": "Educational",
+            "script": "Natural conversational script ready for voiceover (150-200 words)",
+            "cta": "What to do next"
+        }}
     }}
     """
     
     try:
         response = client.messages.create(
             model="claude-sonnet-4-20250514",
-            max_tokens=1200,  # REDUCED from 2000
+            max_tokens=1200,
             messages=[{"role": "user", "content": prompt}]
         )
         
@@ -151,35 +170,4 @@ def generate_reel_scripts(idea, business_name=None):
         
     except Exception as e:
         print(f"Reel Scripts Error: {str(e)}")
-        return {
-            "reel1": {
-                "title": "Script 1",
-                "duration": "15-20 seconds",
-                "style": "Problem-Solution",
-                "hook": "Generation failed",
-                "script": "Unable to generate. Please retry.",
-                "text_overlays": ["Retry"],
-                "music_vibe": "Upbeat",
-                "cta": "Try again"
-            },
-            "reel2": {
-                "title": "Script 2",
-                "duration": "15-20 seconds",
-                "style": "Storytelling",
-                "hook": "Generation failed",
-                "script": "Unable to generate. Please retry.",
-                "text_overlays": ["Retry"],
-                "music_vibe": "Calm",
-                "cta": "Try again"
-            },
-            "reel3": {
-                "title": "Script 3",
-                "duration": "15-20 seconds",
-                "style": "Educational",
-                "hook": "Generation failed",
-                "script": "Unable to generate. Please retry.",
-                "text_overlays": ["Retry"],
-                "music_vibe": "Energetic",
-                "cta": "Try again"
-            }
-        }
+        return None
