@@ -19,7 +19,7 @@ app.secret_key = os.getenv('SECRET_KEY')
 app.config['SESSION_COOKIE_SECURE'] = True
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=3650)  # 10 years = forever
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=3650)
 
 # Import OAuth handlers
 from utils.oauth_handler import *
@@ -77,7 +77,6 @@ def signup():
             cursor.close()
             conn.close()
             
-            # AUTO-LOGIN FOREVER
             session.permanent = True
             session['user_id'] = user_id
             session['username'] = username
@@ -112,12 +111,10 @@ def login():
             conn.close()
             
             if user and check_password_hash(user[2], password):
-                # AUTO-LOGIN FOREVER
                 session.permanent = True
                 session['user_id'] = user[0]
                 session['username'] = user[1]
                 
-                # Check if there's a redirect URL from OAuth
                 next_url = session.pop('next_url', None)
                 if next_url:
                     return redirect(next_url)
@@ -152,21 +149,29 @@ def dashboard():
 @app.route('/analyze', methods=['POST'])
 @login_required
 def analyze():
-    """Analyze business idea with AI"""
+    """Analyze business idea with AI + generate similar idea + reel scripts"""
     idea = request.form.get('idea')
     business_name = request.form.get('business_name', '').strip()
     
-    from utils.ai_analyzer import analyze_business_idea
+    from utils.ai_analyzer import analyze_business_idea, generate_similar_idea, generate_reel_scripts
     
     try:
+        # 1. Analyze the idea
         analysis = analyze_business_idea(idea)
         
+        # 2. Generate 1 similar idea
+        similar_idea = generate_similar_idea(idea, analysis)
+        
+        # 3. Generate reel scripts
+        reels = generate_reel_scripts(idea, business_name)
+        
+        # Save to database
         conn = get_db_connection()
         cursor = conn.cursor()
         
         cursor.execute(
-            "INSERT INTO validations (user_id, idea_text, business_name, analysis) VALUES (%s, %s, %s, %s)",
-            (session['user_id'], idea, business_name if business_name else None, json.dumps(analysis))
+            "INSERT INTO validations (user_id, idea_text, business_name, analysis, similar_ideas, reels_scripts) VALUES (%s, %s, %s, %s, %s, %s)",
+            (session['user_id'], idea, business_name if business_name else None, json.dumps(analysis), json.dumps(similar_idea), json.dumps(reels))
         )
         
         conn.commit()
@@ -176,11 +181,29 @@ def analyze():
         session['current_idea'] = idea
         session['current_business_name'] = business_name if business_name else None
         session['current_analysis'] = analysis
+        session['similar_idea'] = similar_idea
+        session['reels'] = reels
         
     except Exception as e:
         return f"Error analyzing idea: {str(e)}"
     
-    return render_template('analysis.html', analysis=analysis, idea=idea, from_history=False)
+    return render_template('analysis.html', 
+                         analysis=analysis, 
+                         idea=idea, 
+                         similar_idea=similar_idea,
+                         from_history=False)
+
+@app.route('/reels')
+@login_required
+def reels():
+    """Show reel scripts"""
+    reels = session.get('reels')
+    idea = session.get('current_idea')
+    
+    if not reels:
+        return redirect(url_for('dashboard'))
+    
+    return render_template('reels.html', reels=reels, idea=idea)
 
 @app.route('/validations')
 @login_required
@@ -212,13 +235,13 @@ def validations():
 @app.route('/validation/<int:validation_id>')
 @login_required
 def view_validation(validation_id):
-    """View a specific validation and generate fresh posts"""
+    """View a specific validation"""
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
         
         cursor.execute(
-            "SELECT id, idea_text, business_name, analysis, created_at FROM validations WHERE id = %s AND user_id = %s",
+            "SELECT id, idea_text, business_name, analysis, similar_ideas, reels_scripts FROM validations WHERE id = %s AND user_id = %s",
             (validation_id, session['user_id'])
         )
         validation = cursor.fetchone()
@@ -229,7 +252,6 @@ def view_validation(validation_id):
         if not validation:
             return "Validation not found", 404
         
-        # Handle both dict and string types for analysis
         analysis_data = validation[3]
         if isinstance(analysis_data, dict):
             analysis = analysis_data
@@ -238,14 +260,30 @@ def view_validation(validation_id):
         else:
             analysis = json.loads(str(analysis_data))
         
-        # Store in session for marketing page
+        similar_idea_data = validation[4]
+        if isinstance(similar_idea_data, dict):
+            similar_idea = similar_idea_data
+        elif isinstance(similar_idea_data, str):
+            similar_idea = json.loads(similar_idea_data) if similar_idea_data else None
+        else:
+            similar_idea = None
+        
         session['current_idea'] = validation[1]
         session['current_business_name'] = validation[2]
         session['current_analysis'] = analysis
+        session['similar_idea'] = similar_idea
+        
+        if validation[5]:
+            reels_data = validation[5]
+            if isinstance(reels_data, dict):
+                session['reels'] = reels_data
+            elif isinstance(reels_data, str):
+                session['reels'] = json.loads(reels_data)
         
         return render_template('analysis.html', 
                              analysis=analysis, 
                              idea=validation[1],
+                             similar_idea=similar_idea,
                              from_history=True)
     except Exception as e:
         print(f"Error in view_validation: {str(e)}")
@@ -256,7 +294,7 @@ def view_validation(validation_id):
 @app.route('/marketing', methods=['GET', 'POST'])
 @login_required
 def marketing():
-    """Marketing campaign setup - ALWAYS generates fresh posts"""
+    """Marketing campaign setup"""
     if request.method == 'POST':
         idea = session.get('current_idea')
         business_name = session.get('current_business_name')
@@ -268,7 +306,6 @@ def marketing():
         from utils.content_generator import generate_marketing_posts
         
         try:
-            # ALWAYS generate fresh posts with business name
             posts = generate_marketing_posts(idea, analysis, business_name)
         except Exception as e:
             return f"Error generating posts: {str(e)}"
@@ -284,12 +321,6 @@ def marketing():
                              posts_limit=5)
     
     return render_template('marketing.html')
-
-@app.route('/results')
-@login_required
-def results():
-    """Validation results"""
-    return render_template('results.html')
 
 @app.route('/settings')
 @login_required
@@ -361,7 +392,7 @@ def change_password():
 @app.route('/settings/delete', methods=['POST'])
 @login_required
 def delete_account():
-    """Delete user account and all data"""
+    """Delete user account"""
     user_id = session['user_id']
     
     conn = get_db_connection()
@@ -394,12 +425,10 @@ def oauth_linkedin():
 
 @app.route('/oauth/linkedin/callback')
 def oauth_linkedin_callback():
-    """Handle LinkedIn OAuth callback - NO LOGIN REQUIRED"""
-    # Check if user is logged in
+    """Handle LinkedIn OAuth callback"""
     user_id = session.get('user_id')
     
     if not user_id:
-        # Store the OAuth params and redirect to login
         session['pending_oauth'] = {
             'platform': 'linkedin',
             'code': request.args.get('code'),
