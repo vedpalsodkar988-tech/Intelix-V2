@@ -8,6 +8,7 @@ import json
 from datetime import datetime, timedelta
 import pytz
 import secrets
+import base64
 
 # Load environment variables
 load_dotenv()
@@ -15,7 +16,7 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY')
 
-# Session configuration - PERMANENT LOGIN FOREVER
+# Session configuration
 app.config['SESSION_COOKIE_SECURE'] = True
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
@@ -149,11 +150,11 @@ def dashboard():
 @app.route('/analyze', methods=['POST'])
 @login_required
 def analyze():
-    """Analyze business idea with AI + generate similar idea + reel scripts"""
+    """Analyze business idea - Analysis + Similar Idea ONLY"""
     idea = request.form.get('idea')
     business_name = request.form.get('business_name', '').strip()
     
-    from utils.ai_analyzer import analyze_business_idea, generate_similar_idea, generate_reel_scripts
+    from utils.ai_analyzer import analyze_business_idea, generate_similar_idea
     
     try:
         # 1. Analyze the idea
@@ -162,16 +163,13 @@ def analyze():
         # 2. Generate 1 similar idea
         similar_idea = generate_similar_idea(idea, analysis)
         
-        # 3. Generate reel scripts
-        reels = generate_reel_scripts(idea, business_name)
-        
         # Save to database
         conn = get_db_connection()
         cursor = conn.cursor()
         
         cursor.execute(
-            "INSERT INTO validations (user_id, idea_text, business_name, analysis, similar_ideas, reels_scripts) VALUES (%s, %s, %s, %s, %s, %s)",
-            (session['user_id'], idea, business_name if business_name else None, json.dumps(analysis), json.dumps(similar_idea), json.dumps(reels))
+            "INSERT INTO validations (user_id, idea_text, business_name, analysis, similar_ideas) VALUES (%s, %s, %s, %s, %s)",
+            (session['user_id'], idea, business_name if business_name else None, json.dumps(analysis), json.dumps(similar_idea))
         )
         
         conn.commit()
@@ -182,7 +180,6 @@ def analyze():
         session['current_business_name'] = business_name if business_name else None
         session['current_analysis'] = analysis
         session['similar_idea'] = similar_idea
-        session['reels'] = reels
         
     except Exception as e:
         return f"Error analyzing idea: {str(e)}"
@@ -192,18 +189,6 @@ def analyze():
                          idea=idea, 
                          similar_idea=similar_idea,
                          from_history=False)
-
-@app.route('/reels')
-@login_required
-def reels():
-    """Show reel scripts"""
-    reels = session.get('reels')
-    idea = session.get('current_idea')
-    
-    if not reels:
-        return redirect(url_for('dashboard'))
-    
-    return render_template('reels.html', reels=reels, idea=idea)
 
 @app.route('/validations')
 @login_required
@@ -241,7 +226,7 @@ def view_validation(validation_id):
         cursor = conn.cursor()
         
         cursor.execute(
-            "SELECT id, idea_text, business_name, analysis, similar_ideas, reels_scripts FROM validations WHERE id = %s AND user_id = %s",
+            "SELECT id, idea_text, business_name, analysis, similar_ideas FROM validations WHERE id = %s AND user_id = %s",
             (validation_id, session['user_id'])
         )
         validation = cursor.fetchone()
@@ -273,13 +258,6 @@ def view_validation(validation_id):
         session['current_analysis'] = analysis
         session['similar_idea'] = similar_idea
         
-        if validation[5]:
-            reels_data = validation[5]
-            if isinstance(reels_data, dict):
-                session['reels'] = reels_data
-            elif isinstance(reels_data, str):
-                session['reels'] = json.loads(reels_data)
-        
         return render_template('analysis.html', 
                              analysis=analysis, 
                              idea=validation[1],
@@ -294,7 +272,7 @@ def view_validation(validation_id):
 @app.route('/marketing', methods=['GET', 'POST'])
 @login_required
 def marketing():
-    """Marketing campaign setup"""
+    """Marketing page - Posts + Reel Scripts with AI Voiceovers"""
     if request.method == 'POST':
         idea = session.get('current_idea')
         business_name = session.get('current_business_name')
@@ -304,23 +282,56 @@ def marketing():
             return redirect(url_for('dashboard'))
         
         from utils.content_generator import generate_marketing_posts
+        from utils.ai_analyzer import generate_reel_scripts
+        from utils.voiceover_generator import generate_voiceover
         
         try:
+            # Generate LinkedIn posts
             posts = generate_marketing_posts(idea, analysis, business_name)
+            
+            # Generate reel scripts
+            reels = generate_reel_scripts(idea, business_name)
+            
+            # Generate voiceovers for each reel
+            if reels:
+                for reel_key in ['reel1', 'reel2', 'reel3']:
+                    if reel_key in reels:
+                        script = reels[reel_key]['script']
+                        
+                        # Generate voiceover
+                        audio_bytes = generate_voiceover(script)
+                        
+                        if audio_bytes:
+                            # Convert to base64 for embedding in HTML
+                            audio_base64 = base64.b64encode(audio_bytes).decode('utf-8')
+                            reels[reel_key]['voiceover'] = audio_base64
+                        else:
+                            reels[reel_key]['voiceover'] = None
+            
         except Exception as e:
-            return f"Error generating posts: {str(e)}"
+            print(f"Marketing generation error: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return f"Error generating marketing content: {str(e)}"
         
         linkedin_connected = is_platform_connected(session['user_id'], 'linkedin')
         posts_used = get_posts_this_month(session['user_id'])
         
         return render_template('marketing.html', 
-                             posts=posts, 
+                             posts=posts,
+                             reels=reels,
                              idea=idea,
                              linkedin_connected=linkedin_connected,
                              posts_used=posts_used,
                              posts_limit=5)
     
     return render_template('marketing.html')
+
+@app.route('/results')
+@login_required
+def results():
+    """Validation results"""
+    return render_template('results.html')
 
 @app.route('/settings')
 @login_required
