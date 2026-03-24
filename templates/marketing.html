@@ -377,3 +377,180 @@
             <h1>Your <span class="gradient-text">Marketing Content</span></h1>
             <p>AI-generated posts and voiceovers ready to launch</p>
         </div>
+
+        {% if idea %}
+        <div class="idea-summary">
+            <h3>FOR YOUR IDEA:</h3>
+            <p>{{ idea }}</p>
+        </div>
+        {% endif %}
+
+        {% if posts %}
+        <!-- LinkedIn Posts Section -->
+        <div class="section-header">
+            <h2>📱 LinkedIn Posts</h2>
+            <p>Ready-to-post content for your audience</p>
+        </div>
+
+        <div class="posts-grid">
+            <div class="post-card">
+                <div class="post-header">
+                    <span class="post-title">{{ posts.post1.title }}</span>
+                    <span class="post-badge">LinkedIn</span>
+                </div>
+                <div class="post-content">{{ posts.post1.content }}</div>
+                <div class="post-actions">
+                    <button class="btn-copy" onclick="copyToClipboard('post1')">
+                        📋 Copy Post
+                    </button>
+                    <textarea id="post1" class="hidden-textarea">{{ posts.post1.content }}</textarea>
+                </div>
+            </div>
+
+            <div class="post-card">
+                <div class="post-header">
+                    <span class="post-title">{{ posts.post2.title }}</span>
+                    <span class="post-badge">LinkedIn</span>
+                </div>
+                <div class="post-content">{{ posts.post2.content }}</div>
+                <div class="post-actions">
+                    <button class="btn-copy" onclick="copyToClipboard('post2')">
+                        📋 Copy Post
+                    </button>
+                    <textarea id="post2" class="hidden-textarea">{{ posts.post2.content }}</textarea>
+                </div>
+            </div>
+
+            <div class="post-card">
+                <div class="post-header">
+                    <span class="post-title">{{ posts.post3.title }}</span>
+                    <span class="post-badge">LinkedIn</span>
+                </div>
+                <div class="post-content">{{ posts.post3.content }}</div>
+                <div class="post-actions">
+                    <button class="btn-copy" onclick="copyToClipboard('post3')">
+                        📋 Copy Post
+                    </button>
+                    <textarea id="post3" class="hidden-textarea">{{ posts.post3.content }}</textarea>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if reels %}
+        <!-- Reel Scripts Section -->
+        <div class="section-header">
+            <h2>🎬 Reel Scripts with AI Voiceovers</h2>
+            <p>Professional scripts with AI-generated voiceovers ready to use</p>
+        </div>
+
+        <div class="reels-grid">
+            <!-- Reel 1 -->
+            <div class="reel-card">
+                <div class="reel-header">
+                    <span class="reel-title">{{ reels.reel1.title }}</span>
+                    <span class="reel-badge">{{ reels.reel1.style }}</span>
+                </div>
+
+                <div class="reel-script">{{ reels.reel1.script }}</div>
+
+                {% if reels.reel1.voiceover %}
+                <div class="voiceover-section">
+                    <h4>🎤 AI Voiceover (Ready to Use)</h4>
+                    <audio controls class="audio-player">
+                        <source src="data:audio/mpeg;base64,{{ reels.reel1.voiceover }}" type="audio/mpeg">
+                        Your browser does not support audio playback.
+                    </audio>
+                    <a href="data:audio/mpeg;base64,{{ reels.reel1.voiceover }}" download="reel1_voiceover.mp3" class="download-audio">
+                        ⬇️ Download Audio
+                    </a>
+                </div>
+                {% endif %}
+
+                <div class="reel-actions">
+                    <button class="btn-copy-script" onclick="copyToClipboard('reel1_script')">
+                        📋 Copy Script
+                    </button>
+                    <textarea id="reel1_script" class="hidden-textarea">{{ reels.reel1.script }}</textarea>
+                </div>
+            </div>
+
+            <!-- Reel 2 -->
+            <div class="reel-card">
+                <div class="reel-header">
+                    <span class="reel-title">{{ reels.reel2.title }}</span>
+                    <span class="reel-badge">{{ reels.reel2.style }}</span>
+                </div>
+
+                <div class="reel-script">{{ reels.reel2.script }}</div>
+
+                {% if reels.reel2.voiceover %}
+                <div class="voiceover-section">
+                    <h4>🎤 AI Voiceover (Ready to Use)</h4>
+                    <audio controls class="audio-player">
+                        <source src="data:audio/mpeg;base64,{{ reels.reel2.voiceover }}" type="audio/mpeg">
+                        Your browser does not support audio playback.
+                    </audio>
+                    <a href="data:audio/mpeg;base64,{{ reels.reel2.voiceover }}" download="reel2_voiceover.mp3" class="download-audio">
+                        ⬇️ Download Audio
+                    </a>
+                </div>
+                {% endif %}
+
+                <div class="reel-actions">
+                    <button class="btn-copy-script" onclick="copyToClipboard('reel2_script')">
+                        📋 Copy Script
+                    </button>
+                    <textarea id="reel2_script" class="hidden-textarea">{{ reels.reel2.script }}</textarea>
+                </div>
+            </div>
+
+            <!-- Reel 3 -->
+            <div class="reel-card">
+                <div class="reel-header">
+                    <span class="reel-title">{{ reels.reel3.title }}</span>
+                    <span class="reel-badge">{{ reels.reel3.style }}</span>
+                </div>
+
+                <div class="reel-script">{{ reels.reel3.script }}</div>
+
+                {% if reels.reel3.voiceover %}
+                <div class="voiceover-section">
+                    <h4>🎤 AI Voiceover (Ready to Use)</h4>
+                    <audio controls class="audio-player">
+                        <source src="data:audio/mpeg;base64,{{ reels.reel3.voiceover }}" type="audio/mpeg">
+                        Your browser does not support audio playback.
+                    </audio>
+                    <a href="data:audio/mpeg;base64,{{ reels.reel3.voiceover }}" download="reel3_voiceover.mp3" class="download-audio">
+                        ⬇️ Download Audio
+                    </a>
+                </div>
+                {% endif %}
+
+                <div class="reel-actions">
+                    <button class="btn-copy-script" onclick="copyToClipboard('reel3_script')">
+                        📋 Copy Script
+                    </button>
+                    <textarea id="reel3_script" class="hidden-textarea">{{ reels.reel3.script }}</textarea>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="back-link">
+            <a href="/dashboard">← Back to Dashboard</a>
+        </div>
+    </div>
+
+    <script>
+        function copyToClipboard(elementId) {
+            var copyText = document.getElementById(elementId);
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+            document.execCommand("copy");
+            
+            alert('Copied to clipboard! 📋');
+        }
+    </script>
+</body>
+</html>
