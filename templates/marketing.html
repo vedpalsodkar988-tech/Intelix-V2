@@ -131,6 +131,68 @@
             font-size: 16px;
         }
 
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            top: 100px;
+            right: 30px;
+            background: white;
+            color: #333;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            display: none;
+            align-items: center;
+            gap: 12px;
+            z-index: 10000;
+            animation: slideIn 0.3s ease;
+            min-width: 300px;
+        }
+
+        .toast.show {
+            display: flex;
+        }
+
+        .toast.success {
+            border-left: 4px solid #10b981;
+        }
+
+        .toast.error {
+            border-left: 4px solid #ef4444;
+        }
+
+        .toast-icon {
+            font-size: 24px;
+        }
+
+        .toast-message {
+            flex: 1;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
         /* LinkedIn Posts */
         .posts-grid {
             display: grid;
@@ -415,10 +477,22 @@
             .posts-grid {
                 grid-template-columns: 1fr;
             }
+
+            .toast {
+                right: 20px;
+                left: 20px;
+                min-width: auto;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <span class="toast-icon" id="toastIcon"></span>
+        <span class="toast-message" id="toastMessage"></span>
+    </div>
+
     <nav>
         <div class="logo">Intelix</div>
         <div class="nav-right">
@@ -539,12 +613,39 @@
     </div>
 
     <script>
+        // Toast Notification Function
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastIcon = document.getElementById('toastIcon');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            // Set icon and class
+            if (type === 'success') {
+                toastIcon.textContent = '✅';
+                toast.className = 'toast success show';
+            } else {
+                toastIcon.textContent = '❌';
+                toast.className = 'toast error show';
+            }
+            
+            toastMessage.textContent = message;
+            
+            // Auto hide after 4 seconds
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    toast.style.animation = '';
+                }, 300);
+            }, 4000);
+        }
+
         function copyToClipboard(elementId) {
             var copyText = document.getElementById(elementId);
             copyText.select();
             copyText.setSelectionRange(0, 99999);
             document.execCommand("copy");
-            alert('Copied to clipboard! 📋');
+            showToast('Copied to clipboard!', 'success');
         }
 
         async function postToLinkedIn(elementId, button) {
@@ -567,15 +668,15 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    alert('✅ Posted to LinkedIn successfully!');
+                    showToast('Posted to LinkedIn successfully!', 'success');
                     button.innerHTML = '✅ Posted!';
                 } else {
-                    alert('❌ Error: ' + data.error);
+                    showToast('Error: ' + data.error, 'error');
                     button.disabled = false;
                     button.innerHTML = originalText;
                 }
             } catch (error) {
-                alert('❌ Error posting. Please try again.');
+                showToast('Error posting. Please try again.', 'error');
                 button.disabled = false;
                 button.innerHTML = originalText;
             }
@@ -585,7 +686,7 @@
             const script = document.getElementById('voiceover-script').value.trim();
             
             if (!script) {
-                alert('Please enter a script first!');
+                showToast('Please enter a script first!', 'error');
                 return;
             }
 
@@ -622,13 +723,15 @@
                     
                     resultDiv.classList.add('active');
 
+                    showToast('Voiceover generated successfully!', 'success');
+
                     // Scroll to result
                     resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 } else {
-                    alert('Error: ' + data.error);
+                    showToast(data.error, 'error');
                 }
             } catch (error) {
-                alert('Error generating voiceover. Please try again.');
+                showToast('Error generating voiceover. Please try again.', 'error');
                 console.error(error);
             }
 
