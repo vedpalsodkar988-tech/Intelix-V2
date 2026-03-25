@@ -129,7 +129,7 @@
             font-size: 18px;
         }
 
-        /* Similar Idea Section - ONLY SHOW IF validation_depth == 1 */
+        /* Similar Idea Section */
         .similar-idea-section {
             background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%);
             border: 2px solid #667eea;
@@ -218,28 +218,6 @@
             box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
         }
 
-        /* Done Message - SHOW IF validation_depth == 2 */
-        .done-message {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%);
-            border: 2px solid #10b981;
-            border-radius: 16px;
-            padding: 30px;
-            margin: 40px 0;
-            text-align: center;
-        }
-
-        .done-message h2 {
-            font-size: 24px;
-            color: #10b981;
-            margin-bottom: 12px;
-        }
-
-        .done-message p {
-            color: #666;
-            font-size: 16px;
-            line-height: 1.6;
-        }
-
         /* Action Buttons */
         .action-buttons {
             display: flex;
@@ -247,7 +225,7 @@
             margin-top: 40px;
         }
 
-        .btn-primary, .btn-secondary {
+        .btn-primary, .btn-secondary, .btn-back {
             flex: 1;
             padding: 16px;
             border: none;
@@ -281,6 +259,16 @@
 
         .btn-secondary:hover {
             background: #e5e7eb;
+        }
+
+        .btn-back {
+            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+            color: white;
+        }
+
+        .btn-back:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(245, 158, 11, 0.4);
         }
 
         .spinner {
@@ -376,7 +364,7 @@
             </ul>
         </div>
 
-        <!-- Similar Idea Section - ONLY SHOW IF validation_depth == 1 -->
+        <!-- Similar Idea Section - ONLY IF validation_depth == 1 -->
         {% if similar_idea and validation_depth == 1 %}
         <div class="similar-idea-section">
             <h2>💡 You Might Also Like This Idea</h2>
@@ -409,17 +397,16 @@
         </div>
         {% endif %}
 
-        <!-- Done Message - SHOW IF validation_depth >= 2 -->
-        {% if validation_depth >= 2 %}
-        <div class="done-message">
-            <h2>✅ Validation Complete!</h2>
-            <p>You've validated 2 ideas. Ready to proceed with marketing content generation?</p>
-        </div>
-        {% endif %}
-
         <!-- Action Buttons -->
         <form action="/marketing" method="POST">
             <div class="action-buttons">
+                <!-- Show "Back to First Idea" button ONLY on 2nd validation -->
+                {% if validation_depth == 2 %}
+                <a href="/dashboard" class="btn-back">
+                    ← Back to Dashboard
+                </a>
+                {% endif %}
+
                 {% if from_history %}
                 <button type="submit" class="btn-primary" id="marketingBtn">
                     <span id="marketingText">🔄 Generate Fresh Posts</span>
@@ -432,7 +419,9 @@
                 </button>
                 {% endif %}
                 
+                {% if validation_depth != 2 %}
                 <a href="/dashboard" class="btn-secondary">Try Different Idea</a>
+                {% endif %}
             </div>
         </form>
     </div>
