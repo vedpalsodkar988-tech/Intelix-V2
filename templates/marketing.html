@@ -11,7 +11,7 @@
   gtag('config', 'G-7B8EWD6CEG');
 </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marketing Campaign - Intelix</title>
+    <title>Marketing Content - Intelix</title>
     <style>
         * {
             margin: 0;
@@ -115,7 +115,6 @@
             color: rgba(255, 255, 255, 0.9);
         }
 
-        /* Section Headers */
         .section-header {
             text-align: center;
             margin: 60px 0 40px;
@@ -132,7 +131,7 @@
             font-size: 16px;
         }
 
-        /* LinkedIn Posts Section */
+        /* LinkedIn Posts */
         .posts-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
@@ -209,70 +208,110 @@
             background: rgba(255, 255, 255, 0.1);
         }
 
-        /* Reel Scripts Section */
-        .reels-grid {
-            display: grid;
-            gap: 32px;
-            margin-bottom: 80px;
+        /* Voiceover Generator */
+        .voiceover-generator {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(239, 68, 68, 0.1) 100%);
+            border: 2px solid rgba(245, 158, 11, 0.3);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 50px;
         }
 
-        .reel-card {
-            background: rgba(255, 255, 255, 0.03);
+        .voiceover-generator h2 {
+            font-size: 28px;
+            font-weight: 900;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .voiceover-generator .subtitle {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 30px;
+        }
+
+        .voiceover-form {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            width: 100%;
+            padding: 16px;
+            background: rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 32px;
+            border-radius: 12px;
+            font-size: 15px;
+            color: #FFFFFF;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 120px;
             transition: all 0.3s;
         }
 
-        .reel-card:hover {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(245, 158, 11, 0.3);
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #f59e0b;
+            background: rgba(0, 0, 0, 0.4);
         }
 
-        .reel-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-            gap: 12px;
+        .form-group textarea::placeholder {
+            color: rgba(255, 255, 255, 0.3);
         }
 
-        .reel-title {
-            font-size: 24px;
+        .btn-generate-voice {
+            width: 100%;
+            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+            color: white;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
             font-weight: 700;
-            color: #FFFFFF;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
-        .reel-badge {
-            background: rgba(245, 158, 11, 0.2);
-            color: #f59e0b;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
+        .btn-generate-voice:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(245, 158, 11, 0.3);
         }
 
-        .reel-script {
+        .btn-generate-voice:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .voiceover-result {
+            margin-top: 30px;
             background: rgba(0, 0, 0, 0.3);
             border-radius: 12px;
             padding: 20px;
-            margin-bottom: 20px;
-            line-height: 1.8;
-            font-size: 15px;
-            color: rgba(255, 255, 255, 0.9);
-            white-space: pre-wrap;
+            display: none;
         }
 
-        .voiceover-section {
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(239, 68, 68, 0.1) 100%);
-            border: 1px solid rgba(245, 158, 11, 0.2);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
+        .voiceover-result.active {
+            display: block;
         }
 
-        .voiceover-section h4 {
+        .voiceover-result h4 {
             font-size: 14px;
             color: #f59e0b;
             margin-bottom: 12px;
@@ -302,31 +341,23 @@
             background: rgba(245, 158, 11, 0.3);
         }
 
-        .reel-actions {
-            display: flex;
-            gap: 12px;
-        }
-
-        .btn-copy-script {
-            flex: 1;
-            background: rgba(245, 158, 11, 0.2);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            color: #f59e0b;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-copy-script:hover {
-            background: rgba(245, 158, 11, 0.3);
-        }
-
         .hidden-textarea {
             position: absolute;
             left: -9999px;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         .back-link {
@@ -375,7 +406,7 @@
     <div class="container">
         <div class="header">
             <h1>Your <span class="gradient-text">Marketing Content</span></h1>
-            <p>AI-generated posts and voiceovers ready to launch</p>
+            <p>AI-generated posts ready to launch</p>
         </div>
 
         {% if idea %}
@@ -437,105 +468,37 @@
         </div>
         {% endif %}
 
-        {% if reels %}
-        <!-- Reel Scripts Section -->
-        <div class="section-header">
-            <h2>🎬 Reel Scripts with AI Voiceovers</h2>
-            <p>Professional scripts with AI-generated voiceovers ready to use</p>
-        </div>
-
-        <div class="reels-grid">
-            <!-- Reel 1 -->
-            <div class="reel-card">
-                <div class="reel-header">
-                    <span class="reel-title">{{ reels.reel1.title }}</span>
-                    <span class="reel-badge">{{ reels.reel1.style }}</span>
+        <!-- AI Voiceover Generator -->
+        <div class="voiceover-generator">
+            <h2>🎤 Need AI Voiceover for Your Reels?</h2>
+            <p class="subtitle">Enter your script below and we'll generate a professional AI voiceover</p>
+            
+            <div class="voiceover-form">
+                <div class="form-group">
+                    <label for="voiceover-script">Your Reel Script</label>
+                    <textarea 
+                        id="voiceover-script" 
+                        placeholder="Enter your reel script here... (e.g., 'Are you tired of spending hours on marketing? Here's how AI can automate everything...')"
+                    ></textarea>
                 </div>
 
-                <div class="reel-script">{{ reels.reel1.script }}</div>
+                <button class="btn-generate-voice" id="generateVoiceBtn" onclick="generateVoiceover()">
+                    <span id="voiceText">Generate AI Voiceover</span>
+                    <span id="voiceIcon">🎤</span>
+                </button>
 
-                {% if reels.reel1.voiceover %}
-                <div class="voiceover-section">
-                    <h4>🎤 AI Voiceover (Ready to Use)</h4>
-                    <audio controls class="audio-player">
-                        <source src="data:audio/mpeg;base64,{{ reels.reel1.voiceover }}" type="audio/mpeg">
+                <div class="voiceover-result" id="voiceoverResult">
+                    <h4>🎤 Your AI Voiceover</h4>
+                    <audio controls class="audio-player" id="audioPlayer">
+                        <source id="audioSource" type="audio/mpeg">
                         Your browser does not support audio playback.
                     </audio>
-                    <a href="data:audio/mpeg;base64,{{ reels.reel1.voiceover }}" download="reel1_voiceover.mp3" class="download-audio">
+                    <a href="#" id="downloadLink" download="voiceover.mp3" class="download-audio">
                         ⬇️ Download Audio
                     </a>
-                </div>
-                {% endif %}
-
-                <div class="reel-actions">
-                    <button class="btn-copy-script" onclick="copyToClipboard('reel1_script')">
-                        📋 Copy Script
-                    </button>
-                    <textarea id="reel1_script" class="hidden-textarea">{{ reels.reel1.script }}</textarea>
-                </div>
-            </div>
-
-            <!-- Reel 2 -->
-            <div class="reel-card">
-                <div class="reel-header">
-                    <span class="reel-title">{{ reels.reel2.title }}</span>
-                    <span class="reel-badge">{{ reels.reel2.style }}</span>
-                </div>
-
-                <div class="reel-script">{{ reels.reel2.script }}</div>
-
-                {% if reels.reel2.voiceover %}
-                <div class="voiceover-section">
-                    <h4>🎤 AI Voiceover (Ready to Use)</h4>
-                    <audio controls class="audio-player">
-                        <source src="data:audio/mpeg;base64,{{ reels.reel2.voiceover }}" type="audio/mpeg">
-                        Your browser does not support audio playback.
-                    </audio>
-                    <a href="data:audio/mpeg;base64,{{ reels.reel2.voiceover }}" download="reel2_voiceover.mp3" class="download-audio">
-                        ⬇️ Download Audio
-                    </a>
-                </div>
-                {% endif %}
-
-                <div class="reel-actions">
-                    <button class="btn-copy-script" onclick="copyToClipboard('reel2_script')">
-                        📋 Copy Script
-                    </button>
-                    <textarea id="reel2_script" class="hidden-textarea">{{ reels.reel2.script }}</textarea>
-                </div>
-            </div>
-
-            <!-- Reel 3 -->
-            <div class="reel-card">
-                <div class="reel-header">
-                    <span class="reel-title">{{ reels.reel3.title }}</span>
-                    <span class="reel-badge">{{ reels.reel3.style }}</span>
-                </div>
-
-                <div class="reel-script">{{ reels.reel3.script }}</div>
-
-                {% if reels.reel3.voiceover %}
-                <div class="voiceover-section">
-                    <h4>🎤 AI Voiceover (Ready to Use)</h4>
-                    <audio controls class="audio-player">
-                        <source src="data:audio/mpeg;base64,{{ reels.reel3.voiceover }}" type="audio/mpeg">
-                        Your browser does not support audio playback.
-                    </audio>
-                    <a href="data:audio/mpeg;base64,{{ reels.reel3.voiceover }}" download="reel3_voiceover.mp3" class="download-audio">
-                        ⬇️ Download Audio
-                    </a>
-                </div>
-                {% endif %}
-
-                <div class="reel-actions">
-                    <button class="btn-copy-script" onclick="copyToClipboard('reel3_script')">
-                        📋 Copy Script
-                    </button>
-                    <textarea id="reel3_script" class="hidden-textarea">{{ reels.reel3.script }}</textarea>
                 </div>
             </div>
         </div>
-        {% endif %}
 
         <div class="back-link">
             <a href="/dashboard">← Back to Dashboard</a>
@@ -548,8 +511,64 @@
             copyText.select();
             copyText.setSelectionRange(0, 99999);
             document.execCommand("copy");
-            
             alert('Copied to clipboard! 📋');
+        }
+
+        async function generateVoiceover() {
+            const script = document.getElementById('voiceover-script').value.trim();
+            
+            if (!script) {
+                alert('Please enter a script first!');
+                return;
+            }
+
+            const btn = document.getElementById('generateVoiceBtn');
+            const btnText = document.getElementById('voiceText');
+            const btnIcon = document.getElementById('voiceIcon');
+            
+            // Disable button
+            btn.disabled = true;
+            btnText.textContent = 'Generating';
+            btnIcon.innerHTML = '<span class="spinner"></span>';
+
+            try {
+                const response = await fetch('/generate-voiceover', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ script: script })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Show result
+                    const resultDiv = document.getElementById('voiceoverResult');
+                    const audioSource = document.getElementById('audioSource');
+                    const audioPlayer = document.getElementById('audioPlayer');
+                    const downloadLink = document.getElementById('downloadLink');
+
+                    audioSource.src = 'data:audio/mpeg;base64,' + data.audio;
+                    audioPlayer.load();
+                    downloadLink.href = 'data:audio/mpeg;base64,' + data.audio;
+                    
+                    resultDiv.classList.add('active');
+
+                    // Scroll to result
+                    resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('Error generating voiceover. Please try again.');
+                console.error(error);
+            }
+
+            // Re-enable button
+            btn.disabled = false;
+            btnText.textContent = 'Generate AI Voiceover';
+            btnIcon.textContent = '🎤';
         }
     </script>
 </body>
