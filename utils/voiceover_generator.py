@@ -73,7 +73,7 @@ def generate_voiceover(script_text, voice_name="en-US-Neural2-F"):
 
 def get_available_voices():
     """Get list of available Google TTS voices"""
-    return {
+    voices = {
         "en-US-Neural2-F": "Female (Natural)",
         "en-US-Neural2-A": "Male (Natural)",
         "en-US-Neural2-C": "Female (Warm)",
@@ -83,3 +83,5 @@ def get_available_voices():
         "en-US-Neural2-H": "Female (Expressive)",
         "en-US-Neural2-I": "Male (Confident)",
         "en-US-Neural2-J": "Male (Friendly)"
+    }
+    return voices
