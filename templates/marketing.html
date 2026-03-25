@@ -208,6 +208,30 @@
             background: rgba(255, 255, 255, 0.1);
         }
 
+        .btn-post-linkedin {
+            flex: 1;
+            background: #0A66C2;
+            border: none;
+            color: #FFFFFF;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-post-linkedin:hover {
+            background: #004182;
+            transform: translateY(-2px);
+        }
+
+        .btn-post-linkedin:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         /* Voiceover Generator */
         .voiceover-generator {
             background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(239, 68, 68, 0.1) 100%);
@@ -432,7 +456,10 @@
                 <div class="post-content">{{ posts.post1.content }}</div>
                 <div class="post-actions">
                     <button class="btn-copy" onclick="copyToClipboard('post1')">
-                        📋 Copy Post
+                        📋 Copy
+                    </button>
+                    <button class="btn-post-linkedin" onclick="postToLinkedIn('post1', this)">
+                        💼 Post to LinkedIn
                     </button>
                     <textarea id="post1" class="hidden-textarea">{{ posts.post1.content }}</textarea>
                 </div>
@@ -446,7 +473,10 @@
                 <div class="post-content">{{ posts.post2.content }}</div>
                 <div class="post-actions">
                     <button class="btn-copy" onclick="copyToClipboard('post2')">
-                        📋 Copy Post
+                        📋 Copy
+                    </button>
+                    <button class="btn-post-linkedin" onclick="postToLinkedIn('post2', this)">
+                        💼 Post to LinkedIn
                     </button>
                     <textarea id="post2" class="hidden-textarea">{{ posts.post2.content }}</textarea>
                 </div>
@@ -460,7 +490,10 @@
                 <div class="post-content">{{ posts.post3.content }}</div>
                 <div class="post-actions">
                     <button class="btn-copy" onclick="copyToClipboard('post3')">
-                        📋 Copy Post
+                        📋 Copy
+                    </button>
+                    <button class="btn-post-linkedin" onclick="postToLinkedIn('post3', this)">
+                        💼 Post to LinkedIn
                     </button>
                     <textarea id="post3" class="hidden-textarea">{{ posts.post3.content }}</textarea>
                 </div>
@@ -512,6 +545,40 @@
             copyText.setSelectionRange(0, 99999);
             document.execCommand("copy");
             alert('Copied to clipboard! 📋');
+        }
+
+        async function postToLinkedIn(elementId, button) {
+            const content = document.getElementById(elementId).value;
+            
+            // Disable button
+            button.disabled = true;
+            const originalText = button.innerHTML;
+            button.innerHTML = '<span class="spinner"></span> Posting...';
+
+            try {
+                const response = await fetch('/post/linkedin', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'content=' + encodeURIComponent(content)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('✅ Posted to LinkedIn successfully!');
+                    button.innerHTML = '✅ Posted!';
+                } else {
+                    alert('❌ Error: ' + data.error);
+                    button.disabled = false;
+                    button.innerHTML = originalText;
+                }
+            } catch (error) {
+                alert('❌ Error posting. Please try again.');
+                button.disabled = false;
+                button.innerHTML = originalText;
+            }
         }
 
         async function generateVoiceover() {
