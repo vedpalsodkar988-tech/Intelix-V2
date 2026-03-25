@@ -223,6 +223,7 @@
             display: flex;
             gap: 15px;
             margin-top: 40px;
+            flex-wrap: wrap;
         }
 
         .btn-primary, .btn-secondary, .btn-back {
@@ -240,6 +241,7 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
+            min-width: 200px;
         }
 
         .btn-primary {
@@ -296,6 +298,10 @@
 
             .action-buttons {
                 flex-direction: column;
+            }
+
+            .btn-primary, .btn-secondary, .btn-back {
+                min-width: auto;
             }
         }
     </style>
@@ -400,10 +406,10 @@
         <!-- Action Buttons -->
         <form action="/marketing" method="POST">
             <div class="action-buttons">
-                <!-- Show "Back to First Idea" button ONLY on 2nd validation -->
-                {% if validation_depth == 2 %}
-                <a href="/dashboard" class="btn-back">
-                    ← Back to Dashboard
+                <!-- Show "Back to My Original Idea" button ONLY on 2nd validation -->
+                {% if validation_depth == 2 and original_validation_id %}
+                <a href="/validation/{{ original_validation_id }}" class="btn-back">
+                    ← Back to My Original Idea
                 </a>
                 {% endif %}
 
