@@ -182,6 +182,9 @@ def analyze():
         session['similar_idea'] = similar_idea
         
     except Exception as e:
+        print(f"Error in analyze: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return f"Error analyzing idea: {str(e)}"
     
     return render_template('analysis.html', 
@@ -272,7 +275,7 @@ def view_validation(validation_id):
 @app.route('/marketing', methods=['GET', 'POST'])
 @login_required
 def marketing():
-    """Marketing page - Posts + Reel Scripts with AI Voiceovers"""
+    """Marketing page - Posts ONLY (no auto voiceovers)"""
     if request.method == 'POST':
         idea = session.get('current_idea')
         business_name = session.get('current_business_name')
@@ -282,31 +285,10 @@ def marketing():
             return redirect(url_for('dashboard'))
         
         from utils.content_generator import generate_marketing_posts
-        from utils.ai_analyzer import generate_reel_scripts
-        from utils.voiceover_generator import generate_voiceover
         
         try:
-            # Generate LinkedIn posts
+            # Generate LinkedIn posts only
             posts = generate_marketing_posts(idea, analysis, business_name)
-            
-            # Generate reel scripts
-            reels = generate_reel_scripts(idea, business_name)
-            
-            # Generate voiceovers for each reel
-            if reels:
-                for reel_key in ['reel1', 'reel2', 'reel3']:
-                    if reel_key in reels:
-                        script = reels[reel_key]['script']
-                        
-                        # Generate voiceover
-                        audio_bytes = generate_voiceover(script)
-                        
-                        if audio_bytes:
-                            # Convert to base64 for embedding in HTML
-                            audio_base64 = base64.b64encode(audio_bytes).decode('utf-8')
-                            reels[reel_key]['voiceover'] = audio_base64
-                        else:
-                            reels[reel_key]['voiceover'] = None
             
         except Exception as e:
             print(f"Marketing generation error: {str(e)}")
@@ -319,13 +301,54 @@ def marketing():
         
         return render_template('marketing.html', 
                              posts=posts,
-                             reels=reels,
                              idea=idea,
                              linkedin_connected=linkedin_connected,
                              posts_used=posts_used,
                              posts_limit=5)
     
     return render_template('marketing.html')
+
+@app.route('/generate-voiceover', methods=['POST'])
+@login_required
+def generate_voiceover_route():
+    """Generate AI voiceover from user's custom script"""
+    try:
+        data = request.get_json()
+        script = data.get('script', '').strip()
+        
+        if not script:
+            return jsonify({'success': False, 'error': 'No script provided'}), 400
+        
+        if len(script) > 2000:
+            return jsonify({'success': False, 'error': 'Script too long. Maximum 2000 characters.'}), 400
+        
+        from utils.voiceover_generator import generate_voiceover
+        
+        # Generate voiceover
+        audio_bytes = generate_voiceover(script)
+        
+        if audio_bytes:
+            # Convert to base64
+            audio_base64 = base64.b64encode(audio_bytes).decode('utf-8')
+            
+            return jsonify({
+                'success': True,
+                'audio': audio_base64
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Failed to generate voiceover. Please try again.'
+            }), 500
+            
+    except Exception as e:
+        print(f"Voiceover generation error: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': f'Error: {str(e)}'
+        }), 500
 
 @app.route('/results')
 @login_required
