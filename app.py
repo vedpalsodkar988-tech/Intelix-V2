@@ -147,13 +147,14 @@ def dashboard():
     
     # Reset validation depth when returning to dashboard
     session['validation_depth'] = 0
+    session.pop('original_validation_id', None)
     
     return render_template('dashboard.html', username=session.get('username'), validation_count=validation_count)
 
 @app.route('/analyze', methods=['POST'])
 @login_required
 def analyze():
-    """Analyze business idea - Track validation depth"""
+    """Analyze business idea - Track validation depth and original ID"""
     idea = request.form.get('idea')
     business_name = request.form.get('business_name', '').strip()
     
@@ -178,18 +179,25 @@ def analyze():
         cursor = conn.cursor()
         
         cursor.execute(
-            "INSERT INTO validations (user_id, idea_text, business_name, analysis, similar_ideas) VALUES (%s, %s, %s, %s, %s)",
+            "INSERT INTO validations (user_id, idea_text, business_name, analysis, similar_ideas) VALUES (%s, %s, %s, %s, %s) RETURNING id",
             (session['user_id'], idea, business_name if business_name else None, json.dumps(analysis), json.dumps(similar_idea) if similar_idea else None)
         )
+        
+        validation_id = cursor.fetchone()[0]
         
         conn.commit()
         cursor.close()
         conn.close()
         
+        # Store original validation ID (user's first idea)
+        if validation_depth == 1:
+            session['original_validation_id'] = validation_id
+        
         session['current_idea'] = idea
         session['current_business_name'] = business_name if business_name else None
         session['current_analysis'] = analysis
         session['similar_idea'] = similar_idea
+        session['current_validation_id'] = validation_id
         
     except Exception as e:
         print(f"Error in analyze: {str(e)}")
@@ -202,6 +210,7 @@ def analyze():
                          idea=idea, 
                          similar_idea=similar_idea,
                          validation_depth=validation_depth,
+                         original_validation_id=session.get('original_validation_id'),
                          from_history=False)
 
 @app.route('/validations')
@@ -271,6 +280,7 @@ def view_validation(validation_id):
         session['current_business_name'] = validation[2]
         session['current_analysis'] = analysis
         session['similar_idea'] = similar_idea
+        session['current_validation_id'] = validation_id
         
         # Reset validation depth when viewing from history
         session['validation_depth'] = 0
@@ -280,6 +290,7 @@ def view_validation(validation_id):
                              idea=validation[1],
                              similar_idea=similar_idea,
                              validation_depth=0,
+                             original_validation_id=None,
                              from_history=True)
     except Exception as e:
         print(f"Error in view_validation: {str(e)}")
