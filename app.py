@@ -145,23 +145,33 @@ def dashboard():
     cursor.close()
     conn.close()
     
+    # Reset validation depth when returning to dashboard
+    session['validation_depth'] = 0
+    
     return render_template('dashboard.html', username=session.get('username'), validation_count=validation_count)
 
 @app.route('/analyze', methods=['POST'])
 @login_required
 def analyze():
-    """Analyze business idea - Analysis + Similar Idea ONLY"""
+    """Analyze business idea - Track validation depth"""
     idea = request.form.get('idea')
     business_name = request.form.get('business_name', '').strip()
     
     from utils.ai_analyzer import analyze_business_idea, generate_similar_idea
     
+    # Track validation depth
+    validation_depth = session.get('validation_depth', 0)
+    validation_depth += 1
+    session['validation_depth'] = validation_depth
+    
     try:
         # 1. Analyze the idea
         analysis = analyze_business_idea(idea)
         
-        # 2. Generate 1 similar idea
-        similar_idea = generate_similar_idea(idea, analysis)
+        # 2. Generate similar idea ONLY if this is first validation
+        similar_idea = None
+        if validation_depth == 1:
+            similar_idea = generate_similar_idea(idea, analysis)
         
         # Save to database
         conn = get_db_connection()
@@ -169,7 +179,7 @@ def analyze():
         
         cursor.execute(
             "INSERT INTO validations (user_id, idea_text, business_name, analysis, similar_ideas) VALUES (%s, %s, %s, %s, %s)",
-            (session['user_id'], idea, business_name if business_name else None, json.dumps(analysis), json.dumps(similar_idea))
+            (session['user_id'], idea, business_name if business_name else None, json.dumps(analysis), json.dumps(similar_idea) if similar_idea else None)
         )
         
         conn.commit()
@@ -191,6 +201,7 @@ def analyze():
                          analysis=analysis, 
                          idea=idea, 
                          similar_idea=similar_idea,
+                         validation_depth=validation_depth,
                          from_history=False)
 
 @app.route('/validations')
@@ -261,10 +272,14 @@ def view_validation(validation_id):
         session['current_analysis'] = analysis
         session['similar_idea'] = similar_idea
         
+        # Reset validation depth when viewing from history
+        session['validation_depth'] = 0
+        
         return render_template('analysis.html', 
                              analysis=analysis, 
                              idea=validation[1],
                              similar_idea=similar_idea,
+                             validation_depth=0,
                              from_history=True)
     except Exception as e:
         print(f"Error in view_validation: {str(e)}")
