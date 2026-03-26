@@ -294,10 +294,10 @@
             transform: none;
         }
 
-        /* Voiceover Generator */
+        /* Voiceover Generator - REDESIGNED */
         .voiceover-generator {
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(239, 68, 68, 0.1) 100%);
-            border: 2px solid rgba(245, 158, 11, 0.3);
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+            border: 2px solid rgba(99, 102, 241, 0.3);
             border-radius: 16px;
             padding: 40px;
             margin-bottom: 50px;
@@ -308,6 +308,10 @@
             font-weight: 900;
             margin-bottom: 12px;
             text-align: center;
+            background: linear-gradient(135deg, #6366F1 0%, #A855F7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .voiceover-generator .subtitle {
@@ -337,7 +341,7 @@
             width: 100%;
             padding: 16px;
             background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.2);
             border-radius: 12px;
             font-size: 15px;
             color: #FFFFFF;
@@ -349,8 +353,9 @@
 
         .form-group textarea:focus {
             outline: none;
-            border-color: #f59e0b;
+            border-color: #6366F1;
             background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
         }
 
         .form-group textarea::placeholder {
@@ -359,7 +364,7 @@
 
         .btn-generate-voice {
             width: 100%;
-            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+            background: linear-gradient(135deg, #6366F1 0%, #A855F7 100%);
             color: white;
             padding: 16px;
             border: none;
@@ -376,7 +381,7 @@
 
         .btn-generate-voice:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(245, 158, 11, 0.3);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
         }
 
         .btn-generate-voice:disabled {
@@ -388,6 +393,7 @@
         .voiceover-result {
             margin-top: 30px;
             background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(99, 102, 241, 0.2);
             border-radius: 12px;
             padding: 20px;
             display: none;
@@ -399,7 +405,7 @@
 
         .voiceover-result h4 {
             font-size: 14px;
-            color: #f59e0b;
+            color: #A855F7;
             margin-bottom: 12px;
             text-transform: uppercase;
             font-weight: 600;
@@ -408,13 +414,15 @@
         .audio-player {
             width: 100%;
             margin-bottom: 12px;
+            height: 40px;
+            border-radius: 8px;
         }
 
         .download-audio {
             display: inline-block;
-            background: rgba(245, 158, 11, 0.2);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            color: #f59e0b;
+            background: linear-gradient(135deg, #6366F1 0%, #A855F7 100%);
+            border: none;
+            color: white;
             padding: 10px 20px;
             border-radius: 8px;
             font-size: 13px;
@@ -424,7 +432,8 @@
         }
 
         .download-audio:hover {
-            background: rgba(245, 158, 11, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
         }
 
         .hidden-textarea {
@@ -504,7 +513,7 @@
     <div class="container">
         <div class="header">
             <h1>Your <span class="gradient-text">Marketing Content</span></h1>
-            <p>AI-generated posts ready to launch</p>
+            <p>AI-generated posts and voiceovers ready to launch</p>
         </div>
 
         {% if idea %}
@@ -575,22 +584,27 @@
         </div>
         {% endif %}
 
-        <!-- AI Voiceover Generator -->
+        <!-- AI Voiceover Generator - REDESIGNED -->
+        <div class="section-header">
+            <h2>🎤 AI Voiceover Generator</h2>
+            <p>Professional voiceovers for your video content</p>
+        </div>
+
         <div class="voiceover-generator">
-            <h2>🎤 Need AI Voiceover for Your Reels?</h2>
-            <p class="subtitle">Enter your script below and we'll generate a professional AI voiceover</p>
+            <h2>Generate AI Voiceover</h2>
+            <p class="subtitle">Enter your script and get a professional voiceover instantly</p>
             
             <div class="voiceover-form">
                 <div class="form-group">
-                    <label for="voiceover-script">Your Reel Script</label>
+                    <label for="voiceover-script">Your Script</label>
                     <textarea 
                         id="voiceover-script" 
-                        placeholder="Enter your reel script here... (e.g., 'Are you tired of spending hours on marketing? Here's how AI can automate everything...')"
+                        placeholder="Enter your video script here... (e.g., 'Are you tired of spending hours on marketing? Here's how AI can automate everything...')"
                     ></textarea>
                 </div>
 
                 <button class="btn-generate-voice" id="generateVoiceBtn" onclick="generateVoiceover()">
-                    <span id="voiceText">Generate AI Voiceover</span>
+                    <span id="voiceText">Generate Voiceover</span>
                     <span id="voiceIcon">🎤</span>
                 </button>
 
@@ -737,7 +751,7 @@
 
             // Re-enable button
             btn.disabled = false;
-            btnText.textContent = 'Generate AI Voiceover';
+            btnText.textContent = 'Generate Voiceover';
             btnIcon.textContent = '🎤';
         }
     </script>
