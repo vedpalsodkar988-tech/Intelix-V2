@@ -37,78 +37,144 @@
 
         .header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
         }
 
         .header h1 {
-            font-size: 32px;
+            font-size: 28px;
             color: #333;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .header p {
             color: #666;
-            font-size: 16px;
+            font-size: 14px;
         }
 
         .idea-box {
             background: #f8f9fa;
-            padding: 20px;
+            padding: 18px;
             border-radius: 10px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             border-left: 4px solid #667eea;
         }
 
         .idea-box h3 {
             color: #667eea;
-            font-size: 14px;
+            font-size: 12px;
             text-transform: uppercase;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .idea-box p {
             color: #333;
             line-height: 1.6;
+            font-size: 15px;
         }
 
-        /* VERDICT SECTION - HERO */
+        .analysis-section {
+            margin-bottom: 25px;
+        }
+
+        .analysis-section h2 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .analysis-section p {
+            color: #555;
+            line-height: 1.7;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .analysis-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .analysis-section li {
+            padding: 8px 0;
+            padding-left: 28px;
+            position: relative;
+            color: #555;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .strengths li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .weaknesses li::before {
+            content: "✗";
+            position: absolute;
+            left: 0;
+            color: #ef4444;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .risks li::before {
+            content: "⚠";
+            position: absolute;
+            left: 0;
+            color: #f59e0b;
+            font-size: 16px;
+        }
+
+        /* VERDICT SECTION - AT BOTTOM */
+        .verdict-section {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 3px solid #e5e7eb;
+        }
+
         .verdict-hero {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 40px;
+            padding: 35px;
             border-radius: 16px;
-            margin-bottom: 40px;
+            margin-bottom: 25px;
             text-align: center;
         }
 
         .verdict-hero h2 {
-            font-size: 18px;
+            font-size: 16px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             opacity: 0.9;
         }
 
         .verdict-hero .score {
-            font-size: 64px;
+            font-size: 52px;
             font-weight: 900;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             line-height: 1;
         }
 
         .verdict-hero .verdict-text {
-            font-size: 22px;
+            font-size: 18px;
             font-weight: 600;
             opacity: 0.95;
         }
 
-        /* DECISION BOX */
         .decision-box {
             background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%);
             border: 2px solid #10b981;
             border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 30px;
+            padding: 20px;
+            margin-bottom: 25px;
         }
 
         .decision-box.warning {
@@ -122,15 +188,15 @@
         }
 
         .decision-box h3 {
-            font-size: 14px;
+            font-size: 12px;
             text-transform: uppercase;
             color: #666;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             letter-spacing: 0.5px;
         }
 
         .decision-box .decision-text {
-            font-size: 20px;
+            font-size: 17px;
             font-weight: 700;
             color: #10b981;
             line-height: 1.4;
@@ -144,22 +210,21 @@
             color: #ef4444;
         }
 
-        /* NEXT STEPS - ACTION ITEMS */
         .next-steps-box {
             background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%);
             border: 2px solid #667eea;
             border-radius: 12px;
-            padding: 28px;
-            margin-bottom: 30px;
+            padding: 24px;
+            margin-bottom: 25px;
         }
 
         .next-steps-box h3 {
-            font-size: 20px;
+            font-size: 18px;
             color: #667eea;
-            margin-bottom: 18px;
+            margin-bottom: 15px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .next-steps-box ul {
@@ -168,11 +233,11 @@
         }
 
         .next-steps-box li {
-            padding: 14px 0;
-            padding-left: 35px;
+            padding: 12px 0;
+            padding-left: 30px;
             position: relative;
             color: #333;
-            font-size: 16px;
+            font-size: 14px;
             line-height: 1.6;
             border-bottom: 1px solid rgba(102, 126, 234, 0.1);
         }
@@ -187,88 +252,29 @@
             left: 0;
             color: #667eea;
             font-weight: bold;
-            font-size: 20px;
+            font-size: 18px;
         }
 
-        /* SUMMARY BOX */
         .summary-box {
             background: #f8f9fa;
-            padding: 20px;
+            padding: 18px;
             border-radius: 10px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             border-left: 4px solid #667eea;
         }
 
         .summary-box h3 {
-            font-size: 14px;
+            font-size: 12px;
             text-transform: uppercase;
             color: #666;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .summary-box p {
-            font-size: 17px;
+            font-size: 15px;
             color: #333;
             line-height: 1.6;
             font-weight: 500;
-        }
-
-        .analysis-section {
-            margin-bottom: 30px;
-        }
-
-        .analysis-section h2 {
-            font-size: 20px;
-            color: #333;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .analysis-section p {
-            color: #555;
-            line-height: 1.8;
-            margin-bottom: 15px;
-        }
-
-        .analysis-section ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .analysis-section li {
-            padding: 10px 0;
-            padding-left: 30px;
-            position: relative;
-            color: #555;
-            line-height: 1.6;
-        }
-
-        .strengths li::before {
-            content: "✓";
-            position: absolute;
-            left: 0;
-            color: #10b981;
-            font-weight: bold;
-            font-size: 18px;
-        }
-
-        .weaknesses li::before {
-            content: "✗";
-            position: absolute;
-            left: 0;
-            color: #ef4444;
-            font-weight: bold;
-            font-size: 18px;
-        }
-
-        .risks li::before {
-            content: "⚠";
-            position: absolute;
-            left: 0;
-            color: #f59e0b;
-            font-size: 18px;
         }
 
         /* Similar Idea Section */
@@ -276,64 +282,65 @@
             background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%);
             border: 2px solid #667eea;
             border-radius: 16px;
-            padding: 30px;
-            margin: 40px 0;
+            padding: 25px;
+            margin: 35px 0;
         }
 
         .similar-idea-section h2 {
-            font-size: 24px;
+            font-size: 20px;
             color: #667eea;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             text-align: center;
         }
 
         .similar-idea-section .subtitle {
             text-align: center;
             color: #666;
-            margin-bottom: 25px;
-            font-size: 14px;
+            margin-bottom: 20px;
+            font-size: 13px;
         }
 
         .idea-card {
             background: white;
-            padding: 24px;
+            padding: 20px;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
 
         .idea-card h3 {
-            font-size: 20px;
+            font-size: 18px;
             color: #333;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         .idea-card p {
             color: #555;
             line-height: 1.6;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
+            font-size: 14px;
         }
 
         .idea-card .why-related {
             background: #f8f9fa;
-            padding: 12px;
+            padding: 10px;
             border-radius: 8px;
-            font-size: 13px;
+            font-size: 12px;
             color: #666;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
             border-left: 3px solid #667eea;
         }
 
         .badges {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 8px;
+            margin-bottom: 16px;
             flex-wrap: wrap;
         }
 
         .badge {
-            padding: 6px 14px;
+            padding: 5px 12px;
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             color: white;
         }
@@ -346,10 +353,10 @@
             width: 100%;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 14px;
+            padding: 13px;
             border: none;
             border-radius: 10px;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
@@ -363,17 +370,17 @@
         /* Action Buttons */
         .action-buttons {
             display: flex;
-            gap: 15px;
-            margin-top: 40px;
+            gap: 12px;
+            margin-top: 30px;
             flex-wrap: wrap;
         }
 
         .btn-primary, .btn-secondary, .btn-back {
             flex: 1;
-            padding: 16px;
+            padding: 14px;
             border: none;
             border-radius: 10px;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
@@ -382,8 +389,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            min-width: 200px;
+            gap: 6px;
+            min-width: 180px;
         }
 
         .btn-primary {
@@ -417,8 +424,8 @@
 
         .spinner {
             display: inline-block;
-            width: 14px;
-            height: 14px;
+            width: 12px;
+            height: 12px;
             border: 2px solid rgba(255, 255, 255, 0.3);
             border-top-color: white;
             border-radius: 50%;
@@ -431,15 +438,15 @@
 
         @media (max-width: 768px) {
             .container {
-                padding: 30px 20px;
+                padding: 25px 18px;
             }
 
             .header h1 {
-                font-size: 24px;
+                font-size: 22px;
             }
 
             .verdict-hero .score {
-                font-size: 48px;
+                font-size: 40px;
             }
 
             .action-buttons {
@@ -464,37 +471,7 @@
             <p>{{ idea }}</p>
         </div>
 
-        <!-- VERDICT HERO SECTION -->
-        <div class="verdict-hero">
-            <h2>🔥 Final Verdict</h2>
-            <div class="score">{{ analysis.verdict.split(' - ')[0] if ' - ' in analysis.verdict else analysis.verdict.split('/')[0] + '/10' }}</div>
-            <div class="verdict-text">{{ analysis.verdict.split(' - ')[1] if ' - ' in analysis.verdict else 'Assessment Complete' }}</div>
-        </div>
-
-        <!-- DECISION BOX -->
-        {% set decision_class = 'warning' if '⚠️' in analysis.decision else ('danger' if '❌' in analysis.decision else '') %}
-        <div class="decision-box {{ decision_class }}">
-            <h3>Clear Decision</h3>
-            <div class="decision-text">{{ analysis.decision }}</div>
-        </div>
-
-        <!-- NEXT STEPS -->
-        <div class="next-steps-box">
-            <h3>🚀 Next Steps</h3>
-            <ul>
-                {% for step in analysis.next_steps %}
-                <li>{{ step }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-
-        <!-- ONE LINE SUMMARY -->
-        <div class="summary-box">
-            <h3>Bottom Line</h3>
-            <p>{{ analysis.summary }}</p>
-        </div>
-
-        <!-- DETAILED ANALYSIS -->
+        <!-- DETAILED ANALYSIS FIRST -->
         <div class="analysis-section">
             <h2>📈 Market Size & Opportunity</h2>
             <p>{{ analysis.market_size }}</p>
@@ -547,6 +524,35 @@
             </ul>
         </div>
 
+        <!-- VERDICT SECTION AT BOTTOM -->
+        <div class="verdict-section">
+            <div class="verdict-hero">
+                <h2>🔥 Final Verdict</h2>
+                <div class="score">{{ analysis.verdict.split(' - ')[0] if ' - ' in analysis.verdict else analysis.verdict.split('/')[0] + '/10' }}</div>
+                <div class="verdict-text">{{ analysis.verdict.split(' - ')[1] if ' - ' in analysis.verdict else 'Assessment Complete' }}</div>
+            </div>
+
+            {% set decision_class = 'warning' if '⚠️' in analysis.decision else ('danger' if '❌' in analysis.decision else '') %}
+            <div class="decision-box {{ decision_class }}">
+                <h3>Clear Decision</h3>
+                <div class="decision-text">{{ analysis.decision }}</div>
+            </div>
+
+            <div class="next-steps-box">
+                <h3>🚀 Next Steps</h3>
+                <ul>
+                    {% for step in analysis.next_steps %}
+                    <li>{{ step }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="summary-box">
+                <h3>Bottom Line</h3>
+                <p>{{ analysis.summary }}</p>
+            </div>
+        </div>
+
         <!-- Similar Idea Section -->
         {% if similar_idea and validation_depth == 1 %}
         <div class="similar-idea-section">
@@ -570,7 +576,7 @@
                     </span>
                 </div>
                 
-                <form action="/analyze" method="POST">
+                <form action="{{ url_for('analyze') }}" method="POST">
                     <input type="hidden" name="idea" value="{{ similar_idea.title }}. {{ similar_idea.description }}">
                     <button type="submit" class="btn-validate-similar">
                         Validate This Idea →
