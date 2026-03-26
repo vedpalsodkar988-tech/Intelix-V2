@@ -1,140 +1,623 @@
-import anthropic
-import os
-import json
-import re
-
-client = anthropic.Anthropic(api_key=os.getenv('ANTHROPIC_API_KEY'))
-
-def clean_json_response(text):
-    """Clean Claude's response to extract valid JSON"""
-    text = re.sub(r'```json\s*', '', text)
-    text = re.sub(r'```\s*', '', text)
-    
-    start = text.find('{')
-    end = text.rfind('}')
-    
-    if start != -1 and end != -1:
-        text = text[start:end+1]
-    
-    return text.strip()
-
-def analyze_business_idea(idea):
-    """Analyze business idea with Claude AI - WITH VERDICT & NEXT STEPS"""
-    
-    prompt = f"""
-    Analyze this business idea comprehensively:
-    
-    "{idea}"
-    
-    Provide a detailed analysis with these sections:
-    
-    1. Market Size & Opportunity: Estimate the total addressable market and growth potential
-    2. Target Audience: Define the specific customer segments who would benefit most
-    3. Strengths & Opportunities: List 3-4 key advantages and opportunities
-    4. Weaknesses & Challenges: List 3-4 potential obstacles and weaknesses
-    5. Competition Analysis: Describe the competitive landscape
-    6. Revenue Potential: Assess monetization opportunities and pricing strategies
-    7. Execution Difficulty: Rate complexity and required resources
-    8. Key Risks: Identify 3-4 major risks to consider
-    
-    9. FINAL VERDICT: Rate this idea from 1-10 and give a clear verdict (e.g., "7/10 - Worth Testing", "4/10 - High Risk", "9/10 - Strong Potential")
-    
-    10. CLEAR DECISION: Give ONE clear recommendation from these options:
-    - "✅ Build MVP immediately - Strong market demand"
-    - "✅ Build small test version first"
-    - "⚠️ Validate demand before building"
-    - "⚠️ Pivot the approach - too competitive"
-    - "❌ Don't pursue - too many obstacles"
-    
-    11. NEXT STEPS: List 3-4 specific, actionable next steps the person should take (be concrete and practical)
-    
-    12. ONE LINE SUMMARY: A single sentence summarizing whether this idea is worth pursuing
-    
-    IMPORTANT: Return ONLY valid JSON, no other text. Format:
-    {{
-        "market_size": "detailed text",
-        "target_audience": "detailed text",
-        "strengths": ["strength 1", "strength 2", "strength 3"],
-        "weaknesses": ["weakness 1", "weakness 2", "weakness 3"],
-        "competition": "detailed text",
-        "revenue_potential": "detailed text",
-        "execution_difficulty": "detailed text",
-        "key_risks": ["risk 1", "risk 2", "risk 3"],
-        "verdict": "7/10 - Worth Testing",
-        "decision": "✅ Build small test version first",
-        "next_steps": ["Talk to 5 target users this week", "Build simple landing page", "Test demand in 7 days"],
-        "summary": "This idea has good potential but needs validation before scaling"
-    }}
-    """
-    
-    try:
-        response = client.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=1500,
-            messages=[{"role": "user", "content": prompt}]
-        )
-        
-        analysis_text = response.content[0].text
-        cleaned_text = clean_json_response(analysis_text)
-        analysis = json.loads(cleaned_text)
-        
-        return analysis
-        
-    except Exception as e:
-        print(f"Analysis Error: {str(e)}")
-        return {
-            "market_size": "Analysis failed. Please try again.",
-            "target_audience": "Analysis failed. Please try again.",
-            "strengths": ["Please retry"],
-            "weaknesses": ["Please retry"],
-            "competition": "Analysis failed. Please try again.",
-            "revenue_potential": "Analysis failed. Please try again.",
-            "execution_difficulty": "Analysis failed. Please try again.",
-            "key_risks": ["Please retry"],
-            "verdict": "Unable to analyze",
-            "decision": "Please try validating again",
-            "next_steps": ["Retry validation"],
-            "summary": "Analysis failed"
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-7B8EWD6CEG"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-7B8EWD6CEG');
+</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Idea Analysis - Intelix</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-
-def generate_similar_idea(original_idea, analysis):
-    """Generate 1 similar business idea"""
-    
-    prompt = f"""
-    Original idea: {original_idea}
-    
-    Generate 1 related business idea (different approach, same industry).
-    
-    Return ONLY valid JSON (no markdown):
-    {{
-        "title": "5-8 word title",
-        "description": "2 sentences",
-        "market_potential": "High/Medium/Low",
-        "competition": "High/Medium/Low",
-        "why_related": "1 sentence"
-    }}
-    """
-    
-    try:
-        response = client.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=300,
-            messages=[{"role": "user", "content": prompt}]
-        )
-        
-        similar_idea_text = response.content[0].text
-        cleaned_text = clean_json_response(similar_idea_text)
-        similar_idea = json.loads(cleaned_text)
-        
-        return similar_idea
-        
-    except Exception as e:
-        print(f"Similar Idea Error: {str(e)}")
-        return {
-            "title": "Related Opportunity",
-            "description": "Generation failed. Please retry.",
-            "market_potential": "Medium",
-            "competition": "Medium",
-            "why_related": "Unable to generate"
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
         }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .idea-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 4px solid #667eea;
+        }
+
+        .idea-box h3 {
+            color: #667eea;
+            font-size: 14px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .idea-box p {
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* VERDICT SECTION - HERO */
+        .verdict-hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 16px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .verdict-hero h2 {
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .verdict-hero .score {
+            font-size: 64px;
+            font-weight: 900;
+            margin-bottom: 10px;
+            line-height: 1;
+        }
+
+        .verdict-hero .verdict-text {
+            font-size: 22px;
+            font-weight: 600;
+            opacity: 0.95;
+        }
+
+        /* DECISION BOX */
+        .decision-box {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%);
+            border: 2px solid #10b981;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 30px;
+        }
+
+        .decision-box.warning {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.1) 100%);
+            border-color: #f59e0b;
+        }
+
+        .decision-box.danger {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.1) 100%);
+            border-color: #ef4444;
+        }
+
+        .decision-box h3 {
+            font-size: 14px;
+            text-transform: uppercase;
+            color: #666;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .decision-box .decision-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: #10b981;
+            line-height: 1.4;
+        }
+
+        .decision-box.warning .decision-text {
+            color: #f59e0b;
+        }
+
+        .decision-box.danger .decision-text {
+            color: #ef4444;
+        }
+
+        /* NEXT STEPS - ACTION ITEMS */
+        .next-steps-box {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%);
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 30px;
+        }
+
+        .next-steps-box h3 {
+            font-size: 20px;
+            color: #667eea;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .next-steps-box ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .next-steps-box li {
+            padding: 14px 0;
+            padding-left: 35px;
+            position: relative;
+            color: #333;
+            font-size: 16px;
+            line-height: 1.6;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .next-steps-box li:last-child {
+            border-bottom: none;
+        }
+
+        .next-steps-box li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        /* SUMMARY BOX */
+        .summary-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 4px solid #667eea;
+        }
+
+        .summary-box h3 {
+            font-size: 14px;
+            text-transform: uppercase;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .summary-box p {
+            font-size: 17px;
+            color: #333;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .analysis-section {
+            margin-bottom: 30px;
+        }
+
+        .analysis-section h2 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .analysis-section p {
+            color: #555;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .analysis-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .analysis-section li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .strengths li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .weaknesses li::before {
+            content: "✗";
+            position: absolute;
+            left: 0;
+            color: #ef4444;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .risks li::before {
+            content: "⚠";
+            position: absolute;
+            left: 0;
+            color: #f59e0b;
+            font-size: 18px;
+        }
+
+        /* Similar Idea Section */
+        .similar-idea-section {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%);
+            border: 2px solid #667eea;
+            border-radius: 16px;
+            padding: 30px;
+            margin: 40px 0;
+        }
+
+        .similar-idea-section h2 {
+            font-size: 24px;
+            color: #667eea;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .similar-idea-section .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+
+        .idea-card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .idea-card h3 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .idea-card p {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .idea-card .why-related {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 16px;
+            border-left: 3px solid #667eea;
+        }
+
+        .badges {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .badge-high { background: #10b981; }
+        .badge-medium { background: #f59e0b; }
+        .badge-low { background: #ef4444; }
+
+        .btn-validate-similar {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-validate-similar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary, .btn-secondary, .btn-back {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-width: 200px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .btn-back {
+            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+            color: white;
+        }
+
+        .btn-back:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(245, 158, 11, 0.4);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .verdict-hero .score {
+                font-size: 48px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn-primary, .btn-secondary, .btn-back {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Detailed Idea Analysis</h1>
+            <p>Here's a comprehensive AI analysis of your business idea</p>
+        </div>
+
+        <div class="idea-box">
+            <h3>YOUR IDEA:</h3>
+            <p>{{ idea }}</p>
+        </div>
+
+        <!-- VERDICT HERO SECTION -->
+        <div class="verdict-hero">
+            <h2>🔥 Final Verdict</h2>
+            <div class="score">{{ analysis.verdict.split(' - ')[0] if ' - ' in analysis.verdict else analysis.verdict.split('/')[0] + '/10' }}</div>
+            <div class="verdict-text">{{ analysis.verdict.split(' - ')[1] if ' - ' in analysis.verdict else 'Assessment Complete' }}</div>
+        </div>
+
+        <!-- DECISION BOX -->
+        {% set decision_class = 'warning' if '⚠️' in analysis.decision else ('danger' if '❌' in analysis.decision else '') %}
+        <div class="decision-box {{ decision_class }}">
+            <h3>Clear Decision</h3>
+            <div class="decision-text">{{ analysis.decision }}</div>
+        </div>
+
+        <!-- NEXT STEPS -->
+        <div class="next-steps-box">
+            <h3>🚀 Next Steps</h3>
+            <ul>
+                {% for step in analysis.next_steps %}
+                <li>{{ step }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- ONE LINE SUMMARY -->
+        <div class="summary-box">
+            <h3>Bottom Line</h3>
+            <p>{{ analysis.summary }}</p>
+        </div>
+
+        <!-- DETAILED ANALYSIS -->
+        <div class="analysis-section">
+            <h2>📈 Market Size & Opportunity</h2>
+            <p>{{ analysis.market_size }}</p>
+        </div>
+
+        <div class="analysis-section">
+            <h2>🎯 Target Audience</h2>
+            <p>{{ analysis.target_audience }}</p>
+        </div>
+
+        <div class="analysis-section strengths">
+            <h2>✅ Strengths & Opportunities</h2>
+            <ul>
+                {% for strength in analysis.strengths %}
+                <li>{{ strength }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="analysis-section weaknesses">
+            <h2>⚠️ Weaknesses & Challenges</h2>
+            <ul>
+                {% for weakness in analysis.weaknesses %}
+                <li>{{ weakness }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="analysis-section">
+            <h2>🥊 Competition Analysis</h2>
+            <p>{{ analysis.competition }}</p>
+        </div>
+
+        <div class="analysis-section">
+            <h2>💰 Revenue Potential</h2>
+            <p>{{ analysis.revenue_potential }}</p>
+        </div>
+
+        <div class="analysis-section">
+            <h2>⚙️ Execution Difficulty</h2>
+            <p>{{ analysis.execution_difficulty }}</p>
+        </div>
+
+        <div class="analysis-section risks">
+            <h2>🚨 Key Risks</h2>
+            <ul>
+                {% for risk in analysis.key_risks %}
+                <li>{{ risk }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Similar Idea Section -->
+        {% if similar_idea and validation_depth == 1 %}
+        <div class="similar-idea-section">
+            <h2>💡 You Might Also Like This Idea</h2>
+            <p class="subtitle">Based on your validation, here's a related business opportunity</p>
+            
+            <div class="idea-card">
+                <h3>{{ similar_idea.title }}</h3>
+                <p>{{ similar_idea.description }}</p>
+                
+                <div class="why-related">
+                    <strong>Why this relates:</strong> {{ similar_idea.why_related }}
+                </div>
+                
+                <div class="badges">
+                    <span class="badge {% if similar_idea.market_potential == 'High' %}badge-high{% elif similar_idea.market_potential == 'Medium' %}badge-medium{% else %}badge-low{% endif %}">
+                        📈 Market: {{ similar_idea.market_potential }}
+                    </span>
+                    <span class="badge {% if similar_idea.competition == 'Low' %}badge-high{% elif similar_idea.competition == 'Medium' %}badge-medium{% else %}badge-low{% endif %}">
+                        🥊 Competition: {{ similar_idea.competition }}
+                    </span>
+                </div>
+                
+                <form action="/analyze" method="POST">
+                    <input type="hidden" name="idea" value="{{ similar_idea.title }}. {{ similar_idea.description }}">
+                    <button type="submit" class="btn-validate-similar">
+                        Validate This Idea →
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Action Buttons -->
+        <form action="/marketing" method="POST">
+            <div class="action-buttons">
+                {% if validation_depth == 2 and original_validation_id %}
+                <a href="/validation/{{ original_validation_id }}" class="btn-back">
+                    ← Back to My Original Idea
+                </a>
+                {% endif %}
+
+                {% if from_history %}
+                <button type="submit" class="btn-primary" id="marketingBtn">
+                    <span id="marketingText">🔄 Generate Fresh Posts</span>
+                    <span id="marketingArrow"></span>
+                </button>
+                {% else %}
+                <button type="submit" class="btn-primary" id="marketingBtn">
+                    <span id="marketingText">Proceed to Marketing</span>
+                    <span id="marketingArrow">→</span>
+                </button>
+                {% endif %}
+                
+                {% if validation_depth != 2 %}
+                <a href="/dashboard" class="btn-secondary">Try Different Idea</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.querySelector('form[action="/marketing"]').addEventListener('submit', function(e) {
+            const btn = document.getElementById('marketingBtn');
+            const btnText = document.getElementById('marketingText');
+            const btnArrow = document.getElementById('marketingArrow');
+            
+            btn.disabled = true;
+            btnText.textContent = 'Generating';
+            btnArrow.innerHTML = '<span class="spinner"></span>';
+        });
+    </script>
+</body>
+</html>
