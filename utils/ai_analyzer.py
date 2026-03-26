@@ -28,14 +28,14 @@ def analyze_business_idea(idea):
     
     Provide a detailed analysis with these sections:
     
-    1. Market Size & Opportunity: Estimate the total addressable market and growth potential
-    2. Target Audience: Define the specific customer segments who would benefit most
-    3. Strengths & Opportunities: List 3-4 key advantages and opportunities
-    4. Weaknesses & Challenges: List 3-4 potential obstacles and weaknesses
-    5. Competition Analysis: Describe the competitive landscape
-    6. Revenue Potential: Assess monetization opportunities and pricing strategies
-    7. Execution Difficulty: Rate complexity and required resources
-    8. Key Risks: Identify 3-4 major risks to consider
+    1. Market Size & Opportunity: Estimate the total addressable market and growth potential (2-3 sentences)
+    2. Target Audience: Define the specific customer segments who would benefit most (2-3 sentences)
+    3. Strengths & Opportunities: List 3 key advantages
+    4. Weaknesses & Challenges: List 3 potential obstacles
+    5. Competition Analysis: Describe the competitive landscape (2-3 sentences)
+    6. Revenue Potential: Assess monetization opportunities (2-3 sentences)
+    7. Execution Difficulty: Rate complexity and required resources (2-3 sentences)
+    8. Key Risks: Identify 3 major risks
     
     9. FINAL VERDICT: Rate this idea from 1-10 and give a clear verdict (e.g., "7/10 - Worth Testing", "4/10 - High Risk", "9/10 - Strong Potential")
     
@@ -46,19 +46,19 @@ def analyze_business_idea(idea):
     - "⚠️ Pivot the approach - too competitive"
     - "❌ Don't pursue - too many obstacles"
     
-    11. NEXT STEPS: List 3-4 specific, actionable next steps the person should take (be concrete and practical)
+    11. NEXT STEPS: List 3 specific, actionable next steps (be concrete and practical)
     
     12. ONE LINE SUMMARY: A single sentence summarizing whether this idea is worth pursuing
     
     IMPORTANT: Return ONLY valid JSON, no other text. Format:
     {{
-        "market_size": "detailed text",
-        "target_audience": "detailed text",
+        "market_size": "2-3 sentences",
+        "target_audience": "2-3 sentences",
         "strengths": ["strength 1", "strength 2", "strength 3"],
         "weaknesses": ["weakness 1", "weakness 2", "weakness 3"],
-        "competition": "detailed text",
-        "revenue_potential": "detailed text",
-        "execution_difficulty": "detailed text",
+        "competition": "2-3 sentences",
+        "revenue_potential": "2-3 sentences",
+        "execution_difficulty": "2-3 sentences",
         "key_risks": ["risk 1", "risk 2", "risk 3"],
         "verdict": "7/10 - Worth Testing",
         "decision": "✅ Build small test version first",
@@ -70,7 +70,7 @@ def analyze_business_idea(idea):
     try:
         response = client.messages.create(
             model="claude-sonnet-4-20250514",
-            max_tokens=1500,
+            max_tokens=1200,
             messages=[{"role": "user", "content": prompt}]
         )
         
