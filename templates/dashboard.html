@@ -24,6 +24,59 @@
             background: #0F0F0F;
             color: #FFFFFF;
             min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background - SAME AS LANDING PAGE */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .gradient-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .orb-1 {
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(135deg, #6366F1, #A855F7);
+            top: -100px;
+            left: -100px;
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, #EC4899, #F59E0B);
+            bottom: -100px;
+            right: -100px;
+            animation-delay: 5s;
+        }
+
+        .orb-3 {
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(135deg, #10B981, #3B82F6);
+            top: 50%;
+            left: 50%;
+            animation-delay: 10s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(100px, -50px) scale(1.1); }
+            66% { transform: translate(-50px, 100px) scale(0.9); }
         }
 
         nav {
@@ -34,17 +87,25 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: rgba(15, 15, 15, 0.9);
+            background: rgba(15, 15, 15, 0.8);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             z-index: 1000;
+            animation: slideDown 0.8s ease;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
         .logo {
             font-size: 28px;
             font-weight: 800;
-            color: #FFFFFF;
-            letter-spacing: -1px;
+            background: linear-gradient(135deg, #6366F1 0%, #EC4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .nav-right {
@@ -58,6 +119,7 @@
             text-decoration: none;
             font-size: 15px;
             transition: color 0.3s;
+            font-weight: 500;
         }
 
         .nav-right a:hover {
@@ -68,18 +130,41 @@
             max-width: 1100px;
             margin: 0 auto;
             padding: 140px 60px 100px;
+            position: relative;
+            z-index: 1;
         }
 
         .header {
             text-align: center;
             margin-bottom: 70px;
+            animation: fadeInUp 1s ease;
+        }
+
+        @keyframes fadeInUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
         .header h1 {
-            font-size: 48px;
+            font-size: 56px;
             font-weight: 900;
             margin-bottom: 16px;
             letter-spacing: -2px;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #6366F1 0%, #A855F7 50%, #EC4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 3s infinite linear;
+            background-size: 200% 200%;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         .header p {
@@ -90,9 +175,18 @@
         .form-card {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
+            border-radius: 24px;
             padding: 50px;
             margin-bottom: 50px;
+            backdrop-filter: blur(20px);
+            animation: fadeInUp 1s ease 0.3s backwards;
+            transition: all 0.4s;
+        }
+
+        .form-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(99, 102, 241, 0.3);
+            box-shadow: 0 20px 60px rgba(99, 102, 241, 0.2);
         }
 
         .form-group {
@@ -158,21 +252,31 @@
         }
 
         .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(99, 102, 241, 0.4);
         }
 
         .stats-section {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 30px;
+            animation: fadeInUp 1s ease 0.6s backwards;
         }
 
         .stat-card {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 35px;
+            border-radius: 24px;
+            padding: 40px;
+            backdrop-filter: blur(20px);
+            transition: all 0.4s;
+        }
+
+        .stat-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(99, 102, 241, 0.3);
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(99, 102, 241, 0.2);
         }
 
         .stat-card h3 {
@@ -185,9 +289,12 @@
         }
 
         .stat-card .value {
-            font-size: 42px;
+            font-size: 48px;
             font-weight: 900;
-            color: #FFFFFF;
+            background: linear-gradient(135deg, #6366F1 0%, #EC4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             margin-bottom: 12px;
         }
 
@@ -206,8 +313,8 @@
         .stat-card ul li {
             font-size: 15px;
             color: rgba(255, 255, 255, 0.7);
-            padding: 10px 0;
-            padding-left: 24px;
+            padding: 12px 0;
+            padding-left: 28px;
             position: relative;
             line-height: 1.5;
         }
@@ -230,7 +337,7 @@
             }
 
             .header h1 {
-                font-size: 32px;
+                font-size: 36px;
             }
 
             .form-card {
@@ -244,6 +351,13 @@
     </style>
 </head>
 <body>
+    <!-- Animated Background -->
+    <div class="animated-bg">
+        <div class="gradient-orb orb-1"></div>
+        <div class="gradient-orb orb-2"></div>
+        <div class="gradient-orb orb-3"></div>
+    </div>
+
     <nav>
         <div class="logo">Intelix</div>
         <div class="nav-right">
@@ -255,7 +369,7 @@
 
     <div class="container">
         <div class="header">
-            <h1>Welcome back, {{ username }}! 👋</h1>
+            <h1>Welcome back, <span class="gradient-text">{{ username }}</span>! 👋</h1>
             <p>Validate your next big idea with AI</p>
         </div>
 
