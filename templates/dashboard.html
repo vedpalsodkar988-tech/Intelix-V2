@@ -21,148 +21,137 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #0F0F0F;
+            color: #FFFFFF;
             min-height: 100vh;
-            padding: 40px 20px;
         }
 
         nav {
             position: fixed;
             top: 0;
-            left: 0;
-            right: 0;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 20px 40px;
+            width: 100%;
+            padding: 24px 80px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            background: rgba(15, 15, 15, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             z-index: 1000;
         }
 
         .logo {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: 800;
-            color: #667eea;
+            color: #FFFFFF;
+            letter-spacing: -1px;
         }
 
-        .nav-links {
+        .nav-right {
             display: flex;
-            gap: 30px;
+            gap: 32px;
             align-items: center;
         }
 
-        .nav-links a {
-            color: #333;
+        .nav-right a {
+            color: rgba(255, 255, 255, 0.7);
             text-decoration: none;
-            font-weight: 500;
+            font-size: 15px;
             transition: color 0.3s;
         }
 
-        .nav-links a:hover {
-            color: #667eea;
+        .nav-right a:hover {
+            color: #FFFFFF;
         }
 
         .container {
-            max-width: 700px;
-            margin: 100px auto 0;
-            background: white;
-            border-radius: 20px;
-            padding: 50px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 120px 40px 80px;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 50px;
         }
 
         .header h1 {
-            font-size: 36px;
-            color: #333;
-            margin-bottom: 10px;
+            font-size: 42px;
+            font-weight: 900;
+            margin-bottom: 12px;
+            letter-spacing: -2px;
         }
 
         .header p {
-            color: #666;
-            font-size: 16px;
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.6);
         }
 
-        .stats {
-            display: flex;
-            gap: 20px;
+        .form-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 40px;
             margin-bottom: 40px;
         }
 
-        .stat-card {
-            flex: 1;
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-        }
-
-        .stat-card h3 {
-            font-size: 32px;
-            color: #667eea;
-            margin-bottom: 5px;
-        }
-
-        .stat-card p {
-            color: #666;
-            font-size: 14px;
-        }
-
         .form-group {
-            margin-bottom: 25px;
+            margin-bottom: 28px;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 8px;
-            color: #333;
+            margin-bottom: 10px;
             font-weight: 600;
-            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 15px;
         }
 
-        .form-group input,
-        .form-group textarea {
+        .form-group textarea,
+        .form-group input {
             width: 100%;
-            padding: 15px;
-            border: 2px solid #e5e7eb;
-            border-radius: 10px;
+            padding: 16px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
             font-size: 16px;
+            color: #FFFFFF;
             font-family: inherit;
             transition: all 0.3s;
         }
 
-        .form-group input:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
         .form-group textarea {
             resize: vertical;
-            min-height: 120px;
+            min-height: 140px;
+        }
+
+        .form-group textarea:focus,
+        .form-group input:focus {
+            outline: none;
+            border-color: #6366F1;
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-group textarea::placeholder,
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
         }
 
         .helper-text {
             font-size: 13px;
-            color: #666;
-            margin-top: 5px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 8px;
         }
 
         .btn-submit {
             width: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #6366F1 0%, #A855F7 100%);
             color: white;
             padding: 18px;
             border: none;
-            border-radius: 10px;
-            font-size: 18px;
+            border-radius: 12px;
+            font-size: 17px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s;
@@ -170,65 +159,84 @@
 
         .btn-submit:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
         }
 
-        .recent-validations {
-            margin-top: 50px;
-            padding-top: 30px;
-            border-top: 2px solid #e5e7eb;
+        .stats-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 40px;
         }
 
-        .recent-validations h3 {
-            font-size: 20px;
-            color: #333;
-            margin-bottom: 20px;
+        .stat-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 28px;
         }
 
-        .validation-item {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
+        .stat-card h3 {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
         }
 
-        .validation-item:hover {
-            background: #e5e7eb;
-            transform: translateX(5px);
+        .stat-card .value {
+            font-size: 36px;
+            font-weight: 900;
+            color: #FFFFFF;
+            margin-bottom: 8px;
         }
 
-        .validation-item p {
-            color: #333;
-            margin-bottom: 5px;
+        .stat-card p {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.5);
+            line-height: 1.6;
         }
 
-        .validation-item span {
-            font-size: 12px;
-            color: #999;
+        .stat-card ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .stat-card ul li {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            padding: 8px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .stat-card ul li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #6366F1;
         }
 
         @media (max-width: 768px) {
+            nav {
+                padding: 20px 24px;
+            }
+
             .container {
-                padding: 30px 20px;
-                margin-top: 80px;
+                padding: 100px 24px 60px;
             }
 
             .header h1 {
-                font-size: 28px;
+                font-size: 32px;
             }
 
-            .stats {
-                flex-direction: column;
+            .form-card {
+                padding: 28px;
             }
 
-            nav {
-                padding: 15px 20px;
-            }
-
-            .nav-links {
-                gap: 15px;
+            .stats-section {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -236,7 +244,7 @@
 <body>
     <nav>
         <div class="logo">Intelix</div>
-        <div class="nav-links">
+        <div class="nav-right">
             <a href="/validations">History</a>
             <a href="/settings">Settings</a>
             <a href="/logout">Logout</a>
@@ -246,59 +254,55 @@
     <div class="container">
         <div class="header">
             <h1>Welcome back, {{ username }}! 👋</h1>
-            <p>Validate your next big idea with AI-powered insights</p>
-        </div>
-
-        <div class="stats">
-            <div class="stat-card">
-                <h3>{{ validation_count }}</h3>
-                <p>Ideas Validated</p>
-            </div>
-            <div class="stat-card">
-                <h3>∞</h3>
-                <p>Possibilities Ahead</p>
-            </div>
+            <p>Validate your next big idea with AI</p>
         </div>
 
         <form action="/analyze" method="POST">
-            <div class="form-group">
-                <label for="business_name">Business/Product Name (Optional)</label>
-                <input 
-                    type="text" 
-                    id="business_name" 
-                    name="business_name" 
-                    placeholder="e.g., TechFlow, CloudSync, MarketIQ, FitTrack"
-                >
-                <p class="helper-text">Give your idea a name to personalize the analysis</p>
-            </div>
+            <div class="form-card">
+                <div class="form-group">
+                    <label for="idea">Describe Your Business Idea *</label>
+                    <textarea 
+                        id="idea" 
+                        name="idea" 
+                        required
+                        placeholder="e.g., AI-powered project management tool that automatically assigns tasks based on team member skills and workload..."
+                    ></textarea>
+                    <p class="helper-text">Be specific about what problem you're solving and who it's for</p>
+                </div>
 
-            <div class="form-group">
-                <label for="idea">Describe Your Business Idea *</label>
-                <textarea 
-                    id="idea" 
-                    name="idea" 
-                    required
-                    placeholder="e.g., AI-powered project management tool that automatically assigns tasks based on team member skills and workload, with built-in time tracking and smart deadline predictions..."
-                ></textarea>
-                <p class="helper-text">Be specific about what problem you're solving and who it's for</p>
-            </div>
+                <div class="form-group">
+                    <label for="business_name">Business/Product Name (Optional)</label>
+                    <input 
+                        type="text" 
+                        id="business_name" 
+                        name="business_name" 
+                        placeholder="e.g., TechFlow, CloudSync, MarketIQ, FitTrack"
+                    >
+                    <p class="helper-text">Give your idea a name to personalize the analysis</p>
+                </div>
 
-            <button type="submit" class="btn-submit">
-                Validate My Idea 🚀
-            </button>
+                <button type="submit" class="btn-submit">
+                    Validate My Idea 🚀
+                </button>
+            </div>
         </form>
 
-        {% if validation_count > 0 %}
-        <div class="recent-validations">
-            <h3>Quick Actions</h3>
-            <div class="validation-item" onclick="window.location.href='/validations'">
-                <p><strong>📊 View All Validations</strong></p>
-                <span>See your complete validation history</span>
+        <div class="stats-section">
+            <div class="stat-card">
+                <h3>Total Ideas Validated</h3>
+                <div class="value">{{ validation_count }}</div>
+                <p>Keep validating to find your winning idea!</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>Pro Tips</h3>
+                <ul>
+                    <li>Be specific about your target audience</li>
+                    <li>Describe the problem clearly</li>
+                    <li>Mention your unique approach</li>
+                </ul>
             </div>
         </div>
-        {% endif %}
     </div>
 </body>
 </html>
-
-NEW: AI-powered project management tool...
