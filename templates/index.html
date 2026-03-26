@@ -26,6 +26,58 @@
             overflow-x: hidden;
         }
 
+        /* Animated Background */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .gradient-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .orb-1 {
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(135deg, #6366F1, #A855F7);
+            top: -100px;
+            left: -100px;
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, #EC4899, #F59E0B);
+            bottom: -100px;
+            right: -100px;
+            animation-delay: 5s;
+        }
+
+        .orb-3 {
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(135deg, #10B981, #3B82F6);
+            top: 50%;
+            left: 50%;
+            animation-delay: 10s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(100px, -50px) scale(1.1); }
+            66% { transform: translate(-50px, 100px) scale(0.9); }
+        }
+
         /* Navigation */
         nav {
             position: fixed;
@@ -39,13 +91,21 @@
             backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             z-index: 1000;
+            animation: slideDown 0.8s ease;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
         .logo {
             font-size: 28px;
             font-weight: 800;
-            color: #FFFFFF;
-            letter-spacing: -1px;
+            background: linear-gradient(135deg, #6366F1 0%, #EC4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .nav-links {
@@ -59,7 +119,7 @@
             color: rgba(255, 255, 255, 0.7);
             font-weight: 500;
             font-size: 15px;
-            transition: color 0.3s;
+            transition: all 0.3s;
         }
 
         .nav-links a:hover {
@@ -67,7 +127,7 @@
         }
 
         .btn-nav {
-            background: #6366F1;
+            background: linear-gradient(135deg, #6366F1 0%, #A855F7 100%);
             color: #FFFFFF;
             padding: 12px 28px;
             border-radius: 10px;
@@ -78,8 +138,8 @@
         }
 
         .btn-nav:hover {
-            background: #5558E3;
             transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
         }
 
         /* Hero Section */
@@ -91,42 +151,21 @@
             text-align: center;
             padding: 140px 40px 100px;
             position: relative;
-            background: linear-gradient(180deg, #0F0F0F 0%, #1A1A1A 100%);
-        }
-
-        .grid-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: 
-                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-            background-size: 50px 50px;
-            pointer-events: none;
-        }
-
-        .glow {
-            position: absolute;
-            top: 20%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
-            filter: blur(80px);
-            pointer-events: none;
-        }
-
-        .hero-content {
-            max-width: 900px;
-            position: relative;
             z-index: 1;
         }
 
+        .hero-content {
+            max-width: 1000px;
+            animation: fadeInUp 1s ease;
+        }
+
+        @keyframes fadeInUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
         .hero h1 {
-            font-size: 76px;
+            font-size: 80px;
             font-weight: 900;
             line-height: 1.1;
             margin-bottom: 28px;
@@ -138,54 +177,61 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            animation: shimmer 3s infinite linear;
+            background-size: 200% 200%;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         .hero p {
-            font-size: 20px;
-            color: rgba(255, 255, 255, 0.6);
+            font-size: 24px;
+            color: rgba(255, 255, 255, 0.7);
             margin-bottom: 48px;
             line-height: 1.7;
-            max-width: 650px;
-            margin-left: auto;
-            margin-right: auto;
+            animation: fadeInUp 1s ease 0.3s backwards;
         }
 
         .cta-buttons {
             display: flex;
-            gap: 16px;
+            gap: 20px;
             justify-content: center;
             flex-wrap: wrap;
+            animation: fadeInUp 1s ease 0.6s backwards;
         }
 
         .btn-primary {
-            background: #FFFFFF;
-            color: #0F0F0F;
-            padding: 18px 42px;
+            background: linear-gradient(135deg, #6366F1 0%, #A855F7 100%);
+            color: #FFFFFF;
+            padding: 20px 48px;
             border-radius: 12px;
             text-decoration: none;
             font-weight: 700;
-            font-size: 16px;
+            font-size: 18px;
             transition: all 0.3s;
             border: none;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
 
         .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 20px 40px rgba(255, 255, 255, 0.1);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.4);
         }
 
         .btn-secondary {
             background: rgba(255, 255, 255, 0.05);
             color: #FFFFFF;
-            padding: 18px 42px;
+            padding: 20px 48px;
             border-radius: 12px;
             text-decoration: none;
             font-weight: 600;
-            font-size: 16px;
+            font-size: 18px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             transition: all 0.3s;
             display: inline-block;
@@ -199,31 +245,32 @@
         /* Features Section */
         .features {
             padding: 120px 80px;
-            background: #0F0F0F;
+            position: relative;
+            z-index: 1;
         }
 
         .section-header {
             text-align: center;
             max-width: 700px;
-            margin: 0 auto 80px;
+            margin: 0 auto 100px;
         }
 
         .section-header h2 {
-            font-size: 48px;
+            font-size: 56px;
             font-weight: 900;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
             letter-spacing: -2px;
         }
 
         .section-header p {
-            font-size: 18px;
+            font-size: 20px;
             color: rgba(255, 255, 255, 0.6);
         }
 
         .feature-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 32px;
+            gap: 40px;
             max-width: 1200px;
             margin: 0 auto;
         }
@@ -231,88 +278,65 @@
         .feature-card {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 16px;
+            border-radius: 20px;
             padding: 40px;
-            transition: all 0.3s;
+            transition: all 0.4s;
+            animation: fadeInUp 1s ease backwards;
         }
+
+        .feature-card:nth-child(1) { animation-delay: 0.1s; }
+        .feature-card:nth-child(2) { animation-delay: 0.2s; }
+        .feature-card:nth-child(3) { animation-delay: 0.3s; }
+        .feature-card:nth-child(4) { animation-delay: 0.4s; }
+        .feature-card:nth-child(5) { animation-delay: 0.5s; }
+        .feature-card:nth-child(6) { animation-delay: 0.6s; }
 
         .feature-card:hover {
             background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(255, 255, 255, 0.15);
-            transform: translateY(-4px);
+            border-color: rgba(99, 102, 241, 0.3);
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(99, 102, 241, 0.2);
         }
 
         .feature-icon {
-            font-size: 48px;
+            font-size: 56px;
             margin-bottom: 24px;
+            display: block;
         }
 
         .feature-card h3 {
-            font-size: 22px;
+            font-size: 24px;
             font-weight: 700;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
         }
 
         .feature-card p {
             color: rgba(255, 255, 255, 0.6);
-            line-height: 1.6;
-            font-size: 15px;
+            line-height: 1.7;
+            font-size: 16px;
         }
 
         /* CTA Section */
         .final-cta {
-            padding: 120px 80px;
+            padding: 150px 80px;
             text-align: center;
-            background: linear-gradient(135deg, #6366F1 0%, #A855F7 100%);
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
             position: relative;
             overflow: hidden;
-        }
-
-        .final-cta::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="2" fill="white" opacity="0.1"/></svg>');
-            pointer-events: none;
+            z-index: 1;
         }
 
         .final-cta h2 {
-            font-size: 56px;
+            font-size: 64px;
             font-weight: 900;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
             letter-spacing: -2px;
-            position: relative;
-            z-index: 1;
         }
 
         .final-cta p {
-            font-size: 20px;
+            font-size: 22px;
             margin-bottom: 40px;
-            opacity: 0.95;
-            position: relative;
-            z-index: 1;
-        }
-
-        .btn-white {
-            background: #FFFFFF;
-            color: #6366F1;
-            padding: 18px 42px;
-            border-radius: 12px;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 16px;
-            display: inline-block;
-            transition: all 0.3s;
-            position: relative;
-            z-index: 1;
-        }
-
-        .btn-white:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            color: rgba(255, 255, 255, 0.7);
         }
 
         /* Footer */
@@ -321,6 +345,8 @@
             text-align: center;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             background: #0A0A0A;
+            position: relative;
+            z-index: 1;
         }
 
         footer p {
@@ -341,6 +367,10 @@
                 font-size: 48px;
             }
 
+            .hero p {
+                font-size: 18px;
+            }
+
             .feature-grid {
                 grid-template-columns: 1fr;
             }
@@ -350,26 +380,31 @@
             }
 
             .final-cta h2 {
-                font-size: 36px;
+                font-size: 40px;
             }
         }
     </style>
 </head>
 <body>
+    <!-- Animated Background -->
+    <div class="animated-bg">
+        <div class="gradient-orb orb-1"></div>
+        <div class="gradient-orb orb-2"></div>
+        <div class="gradient-orb orb-3"></div>
+    </div>
+
     <!-- Navigation -->
     <nav>
         <div class="logo">Intelix</div>
         <div class="nav-links">
             <a href="#features">Features</a>
             <a href="/login">Login</a>
-            <a href="/signup" class="btn-nav">Get Started</a>
+            <a href="/signup" class="btn-nav">Get Started →</a>
         </div>
     </nav>
 
     <!-- Hero Section -->
     <section class="hero">
-        <div class="grid-bg"></div>
-        <div class="glow"></div>
         <div class="hero-content">
             <h1>
                 AI That Runs Your Startup's<br>
@@ -397,37 +432,37 @@
         
         <div class="feature-grid">
             <div class="feature-card">
-                <div class="feature-icon">🧠</div>
+                <span class="feature-icon">🧠</span>
                 <h3>AI Market Analysis</h3>
                 <p>Get detailed insights on market size, competition, target audience, and revenue potential in minutes.</p>
             </div>
 
             <div class="feature-card">
-                <div class="feature-icon">✍️</div>
+                <span class="feature-icon">✍️</span>
                 <h3>Auto Content Generation</h3>
                 <p>AI creates professional LinkedIn posts, reel scripts, and marketing content automatically.</p>
             </div>
 
             <div class="feature-card">
-                <div class="feature-icon">🎤</div>
+                <span class="feature-icon">🎤</span>
                 <h3>AI Voiceovers</h3>
                 <p>Generate professional voiceovers for your video content with realistic AI voices.</p>
             </div>
 
             <div class="feature-card">
-                <div class="feature-icon">⚡</div>
+                <span class="feature-icon">⚡</span>
                 <h3>One-Click Posting</h3>
                 <p>Publish directly to LinkedIn with a single click. No copy-pasting, no manual work.</p>
             </div>
 
             <div class="feature-card">
-                <div class="feature-icon">🎯</div>
+                <span class="feature-icon">🎯</span>
                 <h3>Smart Suggestions</h3>
                 <p>Get related business ideas and content recommendations based on AI analysis.</p>
             </div>
 
             <div class="feature-card">
-                <div class="feature-icon">💰</div>
+                <span class="feature-icon">💰</span>
                 <h3>Save Time & Money</h3>
                 <p>No marketing team needed. AI handles everything from content creation to distribution.</p>
             </div>
@@ -438,7 +473,7 @@
     <section class="final-cta">
         <h2>Ready to automate your marketing?</h2>
         <p>Join founders who stopped wasting time on content creation</p>
-        <a href="/signup" class="btn-white">Generate My First Post 🚀</a>
+        <a href="/signup" class="btn-primary">Generate My First Post 🚀</a>
     </section>
 
     <!-- Footer -->
