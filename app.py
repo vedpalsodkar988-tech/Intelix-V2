@@ -1,620 +1,381 @@
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash
-import os
-from dotenv import load_dotenv
-import psycopg2
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
+from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
-from functools import wraps
-import json
+import os
 from datetime import datetime, timedelta
-import pytz
-import secrets
+from utils.ai_analyzer import analyze_business_idea, generate_similar_idea
+from utils.linkedin_poster import post_to_linkedin, generate_linkedin_posts
+import json
+import requests
 import base64
 
-# Load environment variables
-load_dotenv()
-
 app = Flask(__name__)
-app.secret_key = os.getenv('SECRET_KEY')
+app.secret_key = os.getenv('SECRET_KEY', 'your-secret-key-here')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Session configuration
-app.config['SESSION_COOKIE_SECURE'] = True
-app.config['SESSION_COOKIE_HTTPONLY'] = True
-app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=3650)
+db = SQLAlchemy(app)
 
-# Import OAuth handlers
-from utils.oauth_handler import *
+# LinkedIn OAuth Configuration
+LINKEDIN_CLIENT_ID = os.getenv('LINKEDIN_CLIENT_ID')
+LINKEDIN_CLIENT_SECRET = os.getenv('LINKEDIN_CLIENT_SECRET')
+LINKEDIN_REDIRECT_URI = 'https://intelix.dev/linkedin/callback'
 
-# Database connection helper
-def get_db_connection():
-    conn = psycopg2.connect(os.getenv('DATABASE_URL'))
-    return conn
+# Database Models
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password = db.Column(db.String(200), nullable=False)
+    linkedin_access_token = db.Column(db.String(500))
+    linkedin_user_id = db.Column(db.String(100))
+    validations_this_month = db.Column(db.Integer, default=0)
+    last_reset_date = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    validations = db.relationship('Validation', backref='user', lazy=True)
 
-# Timezone helper
-def convert_to_ist(utc_time):
-    """Convert UTC time to IST"""
-    if utc_time.tzinfo is None:
-        utc_time = pytz.utc.localize(utc_time)
-    ist = pytz.timezone('Asia/Kolkata')
-    return utc_time.astimezone(ist)
+class Validation(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    idea = db.Column(db.Text, nullable=False)
+    business_name = db.Column(db.String(200))
+    analysis = db.Column(db.Text)
+    similar_idea = db.Column(db.Text)
+    marketing_posts = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-# Login required decorator
-def login_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if 'user_id' not in session:
-            return redirect(url_for('login'))
-        return f(*args, **kwargs)
-    return decorated_function
+# Helper function to check and reset monthly validations
+def check_and_reset_monthly_limit(user):
+    """Check if it's a new month and reset validation counter"""
+    now = datetime.utcnow()
+    last_reset = user.last_reset_date
+    
+    # Check if we're in a new month
+    if last_reset.month != now.month or last_reset.year != now.year:
+        user.validations_this_month = 0
+        user.last_reset_date = now
+        db.session.commit()
+        print(f"Reset validations for user {user.username} - New month!")
+    
+    return user.validations_this_month
 
-# ========== ROUTES ==========
-
+# Routes
 @app.route('/')
 def index():
-    """Landing page"""
     return render_template('index.html')
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
-    """User signup"""
     if request.method == 'POST':
         username = request.form.get('username')
         email = request.form.get('email')
         password = request.form.get('password')
         
-        hashed_password = generate_password_hash(password)
+        if User.query.filter_by(username=username).first():
+            return render_template('signup.html', error='Username already exists')
         
-        try:
-            conn = get_db_connection()
-            cursor = conn.cursor()
-            
-            cursor.execute(
-                "INSERT INTO users (username, email, password) VALUES (%s, %s, %s) RETURNING id",
-                (username, email, hashed_password)
-            )
-            user_id = cursor.fetchone()[0]
-            
-            conn.commit()
-            cursor.close()
-            conn.close()
-            
-            session.permanent = True
-            session['user_id'] = user_id
-            session['username'] = username
-            
-            return redirect(url_for('dashboard'))
-            
-        except psycopg2.IntegrityError:
-            return "Email or username already exists!", 400
-        except Exception as e:
-            return f"Error: {str(e)}", 500
+        if User.query.filter_by(email=email).first():
+            return render_template('signup.html', error='Email already registered')
+        
+        hashed_password = generate_password_hash(password)
+        new_user = User(
+            username=username, 
+            email=email, 
+            password=hashed_password,
+            validations_this_month=0,
+            last_reset_date=datetime.utcnow()
+        )
+        
+        db.session.add(new_user)
+        db.session.commit()
+        
+        session['user_id'] = new_user.id
+        return redirect(url_for('dashboard'))
     
     return render_template('signup.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    """User login"""
     if request.method == 'POST':
-        email = request.form.get('email')
+        username = request.form.get('username')
         password = request.form.get('password')
         
-        try:
-            conn = get_db_connection()
-            cursor = conn.cursor()
-            
-            cursor.execute(
-                "SELECT id, username, password FROM users WHERE email = %s",
-                (email,)
-            )
-            user = cursor.fetchone()
-            
-            cursor.close()
-            conn.close()
-            
-            if user and check_password_hash(user[2], password):
-                session.permanent = True
-                session['user_id'] = user[0]
-                session['username'] = user[1]
-                
-                next_url = session.pop('next_url', None)
-                if next_url:
-                    return redirect(next_url)
-                
-                return redirect(url_for('dashboard'))
-            else:
-                return "Invalid email or password!", 401
-                
-        except Exception as e:
-            return f"Error: {str(e)}", 500
+        user = User.query.filter_by(username=username).first()
+        
+        if user and check_password_hash(user.password, password):
+            session['user_id'] = user.id
+            return redirect(url_for('dashboard'))
+        
+        return render_template('login.html', error='Invalid credentials')
     
     return render_template('login.html')
 
 @app.route('/dashboard')
-@login_required
 def dashboard():
-    """Main validator dashboard"""
-    conn = get_db_connection()
-    cursor = conn.cursor()
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
     
-    cursor.execute(
-        "SELECT COUNT(*) FROM validations WHERE user_id = %s",
-        (session['user_id'],)
-    )
-    validation_count = cursor.fetchone()[0]
+    user = User.query.get(session['user_id'])
     
-    cursor.close()
-    conn.close()
+    # Check and reset monthly limit if needed
+    validations_used = check_and_reset_monthly_limit(user)
     
-    # Reset validation depth when returning to dashboard
+    # Reset validation depth when visiting dashboard
     session['validation_depth'] = 0
     session.pop('original_validation_id', None)
     
-    return render_template('dashboard.html', username=session.get('username'), validation_count=validation_count)
+    return render_template('dashboard.html', 
+                         username=user.username, 
+                         validation_count=validations_used,
+                         validations_remaining=7 - validations_used)
 
 @app.route('/analyze', methods=['POST'])
-@login_required
 def analyze():
-    """Analyze business idea - Track validation depth and original ID"""
-    idea = request.form.get('idea')
-    business_name = request.form.get('business_name', '').strip()
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
     
-    from utils.ai_analyzer import analyze_business_idea, generate_similar_idea
+    user = User.query.get(session['user_id'])
+    
+    # Check and reset monthly limit if needed
+    validations_used = check_and_reset_monthly_limit(user)
+    
+    # Check if user has reached monthly limit (7 validations)
+    if validations_used >= 7:
+        return render_template('limit_reached.html', 
+                             validations_used=validations_used,
+                             reset_date=get_next_reset_date())
+    
+    idea = request.form.get('idea')
+    business_name = request.form.get('business_name', '')
     
     # Track validation depth
-    validation_depth = session.get('validation_depth', 0)
-    validation_depth += 1
+    validation_depth = session.get('validation_depth', 0) + 1
     session['validation_depth'] = validation_depth
     
-    try:
-        # 1. Analyze the idea
-        analysis = analyze_business_idea(idea)
-        
-        # 2. Generate similar idea ONLY if this is first validation
-        similar_idea = None
-        if validation_depth == 1:
-            similar_idea = generate_similar_idea(idea, analysis)
-        
-        # Save to database
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        
-        cursor.execute(
-            "INSERT INTO validations (user_id, idea_text, business_name, analysis, similar_ideas) VALUES (%s, %s, %s, %s, %s) RETURNING id",
-            (session['user_id'], idea, business_name if business_name else None, json.dumps(analysis), json.dumps(similar_idea) if similar_idea else None)
-        )
-        
-        validation_id = cursor.fetchone()[0]
-        
-        conn.commit()
-        cursor.close()
-        conn.close()
-        
-        # Store original validation ID (user's first idea)
-        if validation_depth == 1:
-            session['original_validation_id'] = validation_id
-        
-        session['current_idea'] = idea
-        session['current_business_name'] = business_name if business_name else None
-        session['current_analysis'] = analysis
-        session['similar_idea'] = similar_idea
-        session['current_validation_id'] = validation_id
-        
-    except Exception as e:
-        print(f"Error in analyze: {str(e)}")
-        import traceback
-        traceback.print_exc()
-        return f"Error analyzing idea: {str(e)}"
+    print(f"Analyzing idea (depth: {validation_depth}): {idea[:50]}...")
+    
+    # Get AI analysis
+    analysis = analyze_business_idea(idea)
+    
+    # Generate similar idea only for first validation
+    similar_idea = None
+    if validation_depth == 1:
+        similar_idea = generate_similar_idea(idea, analysis)
+    
+    # Save validation to database
+    validation = Validation(
+        user_id=user.id,
+        idea=idea,
+        business_name=business_name,
+        analysis=json.dumps(analysis),
+        similar_idea=json.dumps(similar_idea) if similar_idea else None
+    )
+    db.session.add(validation)
+    
+    # Increment monthly validation counter
+    user.validations_this_month += 1
+    
+    db.session.commit()
+    
+    # Store original validation ID for back button
+    if validation_depth == 1:
+        session['original_validation_id'] = validation.id
+    
+    original_validation_id = session.get('original_validation_id')
     
     return render_template('analysis.html', 
-                         analysis=analysis, 
-                         idea=idea, 
+                         idea=idea,
+                         business_name=business_name,
+                         analysis=analysis,
                          similar_idea=similar_idea,
                          validation_depth=validation_depth,
-                         original_validation_id=session.get('original_validation_id'),
-                         from_history=False)
-
-@app.route('/validations')
-@login_required
-def validations():
-    """User's validation history"""
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
-    cursor.execute(
-        "SELECT id, idea_text, created_at FROM validations WHERE user_id = %s ORDER BY created_at DESC",
-        (session['user_id'],)
-    )
-    validations_list = cursor.fetchall()
-    
-    cursor.close()
-    conn.close()
-    
-    validations_data = [
-        {
-            'id': v[0],
-            'idea': v[1][:100] + '...' if len(v[1]) > 100 else v[1],
-            'date': convert_to_ist(v[2])
-        }
-        for v in validations_list
-    ]
-    
-    return render_template('validations.html', validations=validations_data)
+                         original_validation_id=original_validation_id)
 
 @app.route('/validation/<int:validation_id>')
-@login_required
 def view_validation(validation_id):
-    """View a specific validation"""
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        
-        cursor.execute(
-            "SELECT id, idea_text, business_name, analysis, similar_ideas FROM validations WHERE id = %s AND user_id = %s",
-            (validation_id, session['user_id'])
-        )
-        validation = cursor.fetchone()
-        
-        cursor.close()
-        conn.close()
-        
-        if not validation:
-            return "Validation not found", 404
-        
-        analysis_data = validation[3]
-        if isinstance(analysis_data, dict):
-            analysis = analysis_data
-        elif isinstance(analysis_data, str):
-            analysis = json.loads(analysis_data)
-        else:
-            analysis = json.loads(str(analysis_data))
-        
-        similar_idea_data = validation[4]
-        if isinstance(similar_idea_data, dict):
-            similar_idea = similar_idea_data
-        elif isinstance(similar_idea_data, str):
-            similar_idea = json.loads(similar_idea_data) if similar_idea_data else None
-        else:
-            similar_idea = None
-        
-        session['current_idea'] = validation[1]
-        session['current_business_name'] = validation[2]
-        session['current_analysis'] = analysis
-        session['similar_idea'] = similar_idea
-        session['current_validation_id'] = validation_id
-        
-        # Reset validation depth when viewing from history
-        session['validation_depth'] = 0
-        
-        return render_template('analysis.html', 
-                             analysis=analysis, 
-                             idea=validation[1],
-                             similar_idea=similar_idea,
-                             validation_depth=0,
-                             original_validation_id=None,
-                             from_history=True)
-    except Exception as e:
-        print(f"Error in view_validation: {str(e)}")
-        import traceback
-        traceback.print_exc()
-        return f"Error loading validation: {str(e)}", 500
-
-@app.route('/marketing', methods=['GET', 'POST'])
-@login_required
-def marketing():
-    """Marketing page - Posts ONLY (no auto voiceovers)"""
-    if request.method == 'POST':
-        idea = session.get('current_idea')
-        business_name = session.get('current_business_name')
-        analysis = session.get('current_analysis')
-        
-        if not idea or not analysis:
-            return redirect(url_for('dashboard'))
-        
-        from utils.content_generator import generate_marketing_posts
-        
-        try:
-            # Generate LinkedIn posts only
-            posts = generate_marketing_posts(idea, analysis, business_name)
-            
-        except Exception as e:
-            print(f"Marketing generation error: {str(e)}")
-            import traceback
-            traceback.print_exc()
-            return f"Error generating marketing content: {str(e)}"
-        
-        linkedin_connected = is_platform_connected(session['user_id'], 'linkedin')
-        posts_used = get_posts_this_month(session['user_id'])
-        
-        return render_template('marketing.html', 
-                             posts=posts,
-                             idea=idea,
-                             linkedin_connected=linkedin_connected,
-                             posts_used=posts_used,
-                             posts_limit=5)
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
     
-    return render_template('marketing.html')
+    validation = Validation.query.get_or_404(validation_id)
+    
+    if validation.user_id != session['user_id']:
+        return "Unauthorized", 403
+    
+    analysis = json.loads(validation.analysis)
+    similar_idea = json.loads(validation.similar_idea) if validation.similar_idea else None
+    marketing_posts = json.loads(validation.marketing_posts) if validation.marketing_posts else None
+    
+    return render_template('analysis.html',
+                         idea=validation.idea,
+                         business_name=validation.business_name,
+                         analysis=analysis,
+                         similar_idea=similar_idea,
+                         marketing_posts=marketing_posts,
+                         validation_depth=1,
+                         from_history=True)
+
+@app.route('/marketing', methods=['POST'])
+def marketing():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    user = User.query.get(session['user_id'])
+    
+    idea = request.form.get('idea', session.get('current_idea', ''))
+    business_name = request.form.get('business_name', session.get('current_business_name', ''))
+    
+    session['current_idea'] = idea
+    session['current_business_name'] = business_name
+    
+    print(f"Generating marketing posts for: {idea[:50]}...")
+    
+    posts = generate_linkedin_posts(idea, business_name)
+    
+    last_validation = Validation.query.filter_by(user_id=user.id).order_by(Validation.created_at.desc()).first()
+    if last_validation:
+        last_validation.marketing_posts = json.dumps(posts)
+        db.session.commit()
+    
+    return render_template('marketing.html', 
+                         idea=idea,
+                         business_name=business_name,
+                         posts=posts)
+
+@app.route('/validations')
+def validations():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    user = User.query.get(session['user_id'])
+    user_validations = Validation.query.filter_by(user_id=user.id).order_by(Validation.created_at.desc()).all()
+    
+    return render_template('validations.html', validations=user_validations)
+
+@app.route('/settings')
+def settings():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    user = User.query.get(session['user_id'])
+    
+    # Check and reset monthly limit
+    validations_used = check_and_reset_monthly_limit(user)
+    
+    return render_template('settings.html', 
+                         user=user,
+                         validations_used=validations_used,
+                         validations_remaining=7 - validations_used,
+                         reset_date=get_next_reset_date())
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('index'))
+
+# LinkedIn OAuth Routes
+@app.route('/linkedin/auth')
+def linkedin_auth():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    auth_url = f"https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id={LINKEDIN_CLIENT_ID}&redirect_uri={LINKEDIN_REDIRECT_URI}&scope=openid%20profile%20w_member_social"
+    
+    return redirect(auth_url)
+
+@app.route('/linkedin/callback')
+def linkedin_callback():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    code = request.args.get('code')
+    
+    if not code:
+        return "LinkedIn authentication failed", 400
+    
+    token_url = "https://www.linkedin.com/oauth/v2/accessToken"
+    token_data = {
+        'grant_type': 'authorization_code',
+        'code': code,
+        'redirect_uri': LINKEDIN_REDIRECT_URI,
+        'client_id': LINKEDIN_CLIENT_ID,
+        'client_secret': LINKEDIN_CLIENT_SECRET
+    }
+    
+    token_response = requests.post(token_url, data=token_data)
+    token_json = token_response.json()
+    
+    access_token = token_json.get('access_token')
+    
+    if access_token:
+        user = User.query.get(session['user_id'])
+        user.linkedin_access_token = access_token
+        
+        headers = {'Authorization': f'Bearer {access_token}'}
+        user_info = requests.get('https://api.linkedin.com/v2/userinfo', headers=headers).json()
+        user.linkedin_user_id = user_info.get('sub')
+        
+        db.session.commit()
+        
+        return redirect(url_for('settings'))
+    
+    return "Failed to get access token", 400
+
+@app.route('/post/linkedin', methods=['POST'])
+def post_linkedin():
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Not logged in'}), 401
+    
+    user = User.query.get(session['user_id'])
+    
+    if not user.linkedin_access_token:
+        return jsonify({'success': False, 'error': 'LinkedIn not connected'}), 400
+    
+    content = request.form.get('content')
+    
+    result = post_to_linkedin(user.linkedin_access_token, user.linkedin_user_id, content)
+    
+    if result['success']:
+        return jsonify({'success': True})
+    else:
+        return jsonify({'success': False, 'error': result['error']}), 400
 
 @app.route('/generate-voiceover', methods=['POST'])
-@login_required
 def generate_voiceover_route():
-    """Generate AI voiceover from user's custom script"""
     try:
+        from utils.voiceover_generator import generate_voiceover
+        
         data = request.get_json()
-        script = data.get('script', '').strip()
+        script = data.get('script', '')
         
         if not script:
             return jsonify({'success': False, 'error': 'No script provided'}), 400
         
-        if len(script) > 2000:
-            return jsonify({'success': False, 'error': 'Script too long. Maximum 2000 characters.'}), 400
+        print(f"Generating voiceover for script: {script[:50]}...")
         
-        from utils.voiceover_generator import generate_voiceover
+        audio_content = generate_voiceover(script)
         
-        # Generate voiceover
-        audio_bytes = generate_voiceover(script)
-        
-        if audio_bytes:
-            # Convert to base64
-            audio_base64 = base64.b64encode(audio_bytes).decode('utf-8')
-            
+        if audio_content:
+            audio_base64 = base64.b64encode(audio_content).decode('utf-8')
             return jsonify({
                 'success': True,
                 'audio': audio_base64
             })
         else:
-            return jsonify({
-                'success': False,
-                'error': 'Failed to generate voiceover. Please try again.'
-            }), 500
+            return jsonify({'success': False, 'error': 'Failed to generate voiceover'}), 500
             
     except Exception as e:
         print(f"Voiceover generation error: {str(e)}")
-        import traceback
-        traceback.print_exc()
-        return jsonify({
-            'success': False,
-            'error': f'Error: {str(e)}'
-        }), 500
+        return jsonify({'success': False, 'error': str(e)}), 500
 
-@app.route('/results')
-@login_required
-def results():
-    """Validation results"""
-    return render_template('results.html')
-
-@app.route('/settings')
-@login_required
-def settings():
-    """User settings page"""
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
-    cursor.execute(
-        "SELECT username, email, created_at FROM users WHERE id = %s",
-        (session['user_id'],)
-    )
-    user = cursor.fetchone()
-    
-    cursor.execute(
-        "SELECT COUNT(*) FROM validations WHERE user_id = %s",
-        (session['user_id'],)
-    )
-    validation_count = cursor.fetchone()[0]
-    
-    cursor.close()
-    conn.close()
-    
-    created_at_ist = convert_to_ist(user[2])
-    
-    linkedin_connected = is_platform_connected(session['user_id'], 'linkedin')
-    
-    user_data = {
-        'username': user[0],
-        'email': user[1],
-        'created_at': created_at_ist,
-        'validation_count': validation_count,
-        'linkedin_connected': linkedin_connected
-    }
-    
-    return render_template('settings.html', user=user_data)
-
-@app.route('/settings/password', methods=['POST'])
-@login_required
-def change_password():
-    """Change user password"""
-    current_password = request.form.get('current_password')
-    new_password = request.form.get('new_password')
-    
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
-    cursor.execute(
-        "SELECT password FROM users WHERE id = %s",
-        (session['user_id'],)
-    )
-    user = cursor.fetchone()
-    
-    if user and check_password_hash(user[0], current_password):
-        new_hash = generate_password_hash(new_password)
-        cursor.execute(
-            "UPDATE users SET password = %s WHERE id = %s",
-            (new_hash, session['user_id'])
-        )
-        conn.commit()
-        cursor.close()
-        conn.close()
-        return redirect(url_for('settings') + '?success=password')
+def get_next_reset_date():
+    """Get the date of next month's 1st"""
+    now = datetime.utcnow()
+    if now.month == 12:
+        return datetime(now.year + 1, 1, 1)
     else:
-        cursor.close()
-        conn.close()
-        return redirect(url_for('settings') + '?error=password')
-
-@app.route('/settings/delete', methods=['POST'])
-@login_required
-def delete_account():
-    """Delete user account"""
-    user_id = session['user_id']
-    
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
-    cursor.execute("DELETE FROM validations WHERE user_id = %s", (user_id,))
-    cursor.execute("DELETE FROM posts WHERE user_id = %s", (user_id,))
-    cursor.execute("DELETE FROM oauth_tokens WHERE user_id = %s", (user_id,))
-    cursor.execute("DELETE FROM users WHERE id = %s", (user_id,))
-    
-    conn.commit()
-    cursor.close()
-    conn.close()
-    
-    session.clear()
-    
-    return redirect(url_for('index'))
-
-# ========== OAUTH ROUTES ==========
-
-@app.route('/oauth/linkedin')
-@login_required
-def oauth_linkedin():
-    """Initiate LinkedIn OAuth"""
-    state = secrets.token_urlsafe(32)
-    session['oauth_state'] = state
-    session.modified = True
-    auth_url = get_linkedin_auth_url(state)
-    return redirect(auth_url)
-
-@app.route('/oauth/linkedin/callback')
-def oauth_linkedin_callback():
-    """Handle LinkedIn OAuth callback"""
-    user_id = session.get('user_id')
-    
-    if not user_id:
-        session['pending_oauth'] = {
-            'platform': 'linkedin',
-            'code': request.args.get('code'),
-            'state': request.args.get('state')
-        }
-        session['next_url'] = url_for('complete_oauth')
-        return redirect(url_for('login'))
-    
-    code = request.args.get('code')
-    state = request.args.get('state')
-    error = request.args.get('error')
-    
-    if error:
-        return redirect(url_for('settings') + f'?error=linkedin&msg={error}')
-    
-    if not code:
-        return redirect(url_for('settings') + '?error=linkedin&msg=no_code')
-    
-    stored_state = session.get('oauth_state')
-    
-    if not stored_state or state != stored_state:
-        print(f"State mismatch: stored={stored_state}, received={state}")
-    
-    try:
-        token_data = exchange_linkedin_code(code)
-        
-        if 'error' in token_data:
-            error_msg = token_data.get('error_description', token_data.get('error', 'Unknown error'))
-            return redirect(url_for('settings') + f'?error=linkedin&msg={error_msg}')
-        
-        save_linkedin_token(user_id, token_data)
-        
-        session.pop('oauth_state', None)
-        
-        return redirect(url_for('settings') + '?success=linkedin')
-    except Exception as e:
-        print(f"LinkedIn OAuth error: {str(e)}")
-        return redirect(url_for('settings') + f'?error=linkedin&msg={str(e)}')
-
-@app.route('/complete-oauth')
-@login_required
-def complete_oauth():
-    """Complete OAuth after login"""
-    pending = session.pop('pending_oauth', None)
-    
-    if not pending:
-        return redirect(url_for('settings'))
-    
-    if pending['platform'] == 'linkedin':
-        try:
-            token_data = exchange_linkedin_code(pending['code'])
-            
-            if 'error' in token_data:
-                return redirect(url_for('settings') + '?error=linkedin')
-            
-            save_linkedin_token(session['user_id'], token_data)
-            return redirect(url_for('settings') + '?success=linkedin')
-        except Exception as e:
-            print(f"OAuth completion error: {str(e)}")
-            return redirect(url_for('settings') + '?error=linkedin')
-    
-    return redirect(url_for('settings'))
-
-@app.route('/oauth/disconnect/linkedin', methods=['POST'])
-@login_required
-def disconnect_linkedin():
-    """Disconnect LinkedIn account"""
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
-    cursor.execute("""
-        DELETE FROM oauth_tokens 
-        WHERE user_id = %s AND platform = 'linkedin'
-    """, (session['user_id'],))
-    
-    conn.commit()
-    cursor.close()
-    conn.close()
-    
-    return redirect(url_for('settings') + '?success=linkedin_disconnected')
-
-# ========== POSTING ROUTES ==========
-
-@app.route('/post/linkedin', methods=['POST'])
-@login_required
-def post_linkedin_route():
-    """Post to LinkedIn"""
-    content = request.form.get('content')
-    
-    posts_count = get_posts_this_month(session['user_id'])
-    if posts_count >= 5:
-        return jsonify({'error': 'Monthly post limit reached (5/5). Upgrade to Pro for unlimited posts!'}), 403
-    
-    try:
-        post_to_linkedin(session['user_id'], content)
-        return jsonify({'success': True, 'posts_remaining': 5 - posts_count - 1})
-    except Exception as e:
-        return jsonify({'error': str(e)}), 400
-
-@app.route('/api/connection-status')
-@login_required
-def connection_status():
-    """Check platform connection status"""
-    return jsonify({
-        'linkedin': is_platform_connected(session['user_id'], 'linkedin'),
-        'posts_used': get_posts_this_month(session['user_id']),
-        'posts_limit': 5
-    })
-
-@app.route('/logout')
-def logout():
-    """Logout user"""
-    session.clear()
-    return redirect(url_for('index'))
-
-# Error handlers
-@app.errorhandler(404)
-def page_not_found(e):
-    return render_template('404.html'), 404
-
-@app.errorhandler(500)
-def internal_error(e):
-    return render_template('500.html'), 500
-
-# ========== RUN APP ==========
+        return datetime(now.year, now.month + 1, 1)
 
 if __name__ == '__main__':
-    port = int(os.getenv('PORT', 10000))
-    app.run(host='0.0.0.0', port=port, debug=False)
+    with app.app_context():
+        db.create_all()
+    app.run(debug=True)
