@@ -59,6 +59,14 @@ def check_and_reset_monthly_limit(user):
     
     return user.validations_this_month
 
+def get_next_reset_date():
+    """Get the date of next month's 1st"""
+    now = datetime.utcnow()
+    if now.month == 12:
+        return datetime(now.year + 1, 1, 1)
+    else:
+        return datetime(now.year, now.month + 1, 1)
+
 # Routes
 @app.route('/')
 def index():
@@ -367,15 +375,7 @@ def generate_voiceover_route():
         print(f"Voiceover generation error: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
-def get_next_reset_date():
-    """Get the date of next month's 1st"""
-    now = datetime.utcnow()
-    if now.month == 12:
-        return datetime(now.year + 1, 1, 1)
-    else:
-        return datetime(now.year, now.month + 1, 1)
-
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    app.run(debug=True) 
+    app.run(debug=True)
