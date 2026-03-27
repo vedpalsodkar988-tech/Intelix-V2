@@ -413,9 +413,9 @@
 
         <div class="stats-section">
             <div class="stat-card">
-                <h3>Total Ideas Validated</h3>
-                <div class="value">{{ validation_count }}</div>
-                <p>Keep validating to find your winning idea!</p>
+                <h3>Validations This Month</h3>
+                <div class="value">{{ validation_count }}/7</div>
+                <p>{{ 7 - validation_count }} validations remaining. Resets monthly on the 1st!</p>
             </div>
 
             <div class="stat-card">
@@ -430,7 +430,6 @@
     </div>
 
     <script>
-        // Show validating spinner on form submit
         document.querySelector('form').addEventListener('submit', function(e) {
             const btn = document.querySelector('.btn-submit');
             btn.disabled = true;
