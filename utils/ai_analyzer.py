@@ -19,58 +19,49 @@ def clean_json_response(text):
     return text.strip()
 
 def analyze_business_idea(idea):
-    """Analyze business idea with Claude AI - WITH VERDICT & NEXT STEPS"""
+    """Analyze business idea with Claude AI - OPTIMIZED FOR SPEED"""
     
     prompt = f"""
-    Analyze this business idea comprehensively:
+    Analyze this business idea:
     
     "{idea}"
     
-    Provide a detailed analysis with these sections:
+    Provide analysis in these sections (keep each section to 2-3 sentences):
     
-    1. Market Size & Opportunity: Estimate the total addressable market and growth potential (2-3 sentences)
-    2. Target Audience: Define the specific customer segments who would benefit most (2-3 sentences)
-    3. Strengths & Opportunities: List 3 key advantages
-    4. Weaknesses & Challenges: List 3 potential obstacles
-    5. Competition Analysis: Describe the competitive landscape (2-3 sentences)
-    6. Revenue Potential: Assess monetization opportunities (2-3 sentences)
-    7. Execution Difficulty: Rate complexity and required resources (2-3 sentences)
-    8. Key Risks: Identify 3 major risks
+    1. Market Size & Opportunity (2-3 sentences)
+    2. Target Audience (2-3 sentences)
+    3. Strengths & Opportunities (3 bullet points)
+    4. Weaknesses & Challenges (3 bullet points)
+    5. Competition Analysis (2-3 sentences)
+    6. Revenue Potential (2-3 sentences)
+    7. Execution Difficulty (2-3 sentences)
+    8. Key Risks (3 bullet points)
+    9. FINAL VERDICT: Rate 1-10 with short verdict (e.g., "7/10 - Worth Testing")
+    10. CLEAR DECISION: ONE recommendation (e.g., "✅ Build small test version first")
+    11. NEXT STEPS: 3 specific action items
+    12. ONE LINE SUMMARY: Single sentence summary
     
-    9. FINAL VERDICT: Rate this idea from 1-10 and give a clear verdict (e.g., "7/10 - Worth Testing", "4/10 - High Risk", "9/10 - Strong Potential")
-    
-    10. CLEAR DECISION: Give ONE clear recommendation from these options:
-    - "✅ Build MVP immediately - Strong market demand"
-    - "✅ Build small test version first"
-    - "⚠️ Validate demand before building"
-    - "⚠️ Pivot the approach - too competitive"
-    - "❌ Don't pursue - too many obstacles"
-    
-    11. NEXT STEPS: List 3 specific, actionable next steps (be concrete and practical)
-    
-    12. ONE LINE SUMMARY: A single sentence summarizing whether this idea is worth pursuing
-    
-    IMPORTANT: Return ONLY valid JSON, no other text. Format:
+    Return ONLY valid JSON:
     {{
-        "market_size": "2-3 sentences",
-        "target_audience": "2-3 sentences",
-        "strengths": ["strength 1", "strength 2", "strength 3"],
-        "weaknesses": ["weakness 1", "weakness 2", "weakness 3"],
-        "competition": "2-3 sentences",
-        "revenue_potential": "2-3 sentences",
-        "execution_difficulty": "2-3 sentences",
+        "market_size": "text",
+        "target_audience": "text",
+        "strengths": ["point 1", "point 2", "point 3"],
+        "weaknesses": ["point 1", "point 2", "point 3"],
+        "competition": "text",
+        "revenue_potential": "text",
+        "execution_difficulty": "text",
         "key_risks": ["risk 1", "risk 2", "risk 3"],
         "verdict": "7/10 - Worth Testing",
         "decision": "✅ Build small test version first",
-        "next_steps": ["Talk to 5 target users this week", "Build simple landing page", "Test demand in 7 days"],
-        "summary": "This idea has good potential but needs validation before scaling"
+        "next_steps": ["action 1", "action 2", "action 3"],
+        "summary": "one sentence"
     }}
     """
     
     try:
         response = client.messages.create(
             model="claude-sonnet-4-20250514",
-            max_tokens=1200,
+            max_tokens=1000,
             messages=[{"role": "user", "content": prompt}]
         )
         
@@ -82,6 +73,8 @@ def analyze_business_idea(idea):
         
     except Exception as e:
         print(f"Analysis Error: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return {
             "market_size": "Analysis failed. Please try again.",
             "target_audience": "Analysis failed. Please try again.",
@@ -102,13 +95,13 @@ def generate_similar_idea(original_idea, analysis):
     """Generate 1 similar business idea"""
     
     prompt = f"""
-    Original idea: {original_idea}
+    Original: {original_idea}
     
-    Generate 1 related business idea (different approach, same industry).
+    Generate 1 related idea (different approach, same industry).
     
-    Return ONLY valid JSON (no markdown):
+    JSON only:
     {{
-        "title": "5-8 word title",
+        "title": "5-8 words",
         "description": "2 sentences",
         "market_potential": "High/Medium/Low",
         "competition": "High/Medium/Low",
@@ -119,7 +112,7 @@ def generate_similar_idea(original_idea, analysis):
     try:
         response = client.messages.create(
             model="claude-sonnet-4-20250514",
-            max_tokens=300,
+            max_tokens=250,
             messages=[{"role": "user", "content": prompt}]
         )
         
