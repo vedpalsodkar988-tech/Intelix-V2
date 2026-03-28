@@ -67,6 +67,34 @@ def get_next_reset_date():
     else:
         return datetime(now.year, now.month + 1, 1)
 
+# Database Migration Route
+@app.route('/migrate-db-now')
+def migrate_db():
+    """One-time migration to add new columns"""
+    try:
+        from sqlalchemy import text
+        
+        with db.engine.connect() as conn:
+            # Add validations_this_month column
+            try:
+                conn.execute(text('ALTER TABLE "user" ADD COLUMN validations_this_month INTEGER DEFAULT 0'))
+                conn.commit()
+                result1 = "✅ Added validations_this_month column"
+            except Exception as e:
+                result1 = f"ℹ️ validations_this_month: {str(e)}"
+            
+            # Add last_reset_date column
+            try:
+                conn.execute(text("ALTER TABLE \"user\" ADD COLUMN last_reset_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP"))
+                conn.commit()
+                result2 = "✅ Added last_reset_date column"
+            except Exception as e:
+                result2 = f"ℹ️ last_reset_date: {str(e)}"
+        
+        return f"<h1>Migration Results:</h1><p>{result1}</p><p>{result2}</p><p><a href='/dashboard'>Go to Dashboard</a></p>"
+    except Exception as e:
+        return f"<h1>Migration Error:</h1><p>{str(e)}</p>"
+
 # Routes
 @app.route('/')
 def index():
@@ -374,35 +402,6 @@ def generate_voiceover_route():
     except Exception as e:
         print(f"Voiceover generation error: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
-
-@app.route('/migrate-db')
-def migrate_db():
-    """One-time migration to add new columns"""
-    try:
-        with app.app_context():
-            from sqlalchemy import text
-            
-            # Check if columns exist and add them if they don't
-            with db.engine.connect() as conn:
-                # Add validations_this_month column
-                try:
-                    conn.execute(text('ALTER TABLE "user" ADD COLUMN validations_this_month INTEGER DEFAULT 0'))
-                    conn.commit()
-                    print("Added validations_this_month column")
-                except Exception as e:
-                    print(f"validations_this_month column might already exist: {e}")
-                
-                # Add last_reset_date column
-                try:
-                    conn.execute(text("ALTER TABLE \"user\" ADD COLUMN last_reset_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP"))
-                    conn.commit()
-                    print("Added last_reset_date column")
-                except Exception as e:
-                    print(f"last_reset_date column might already exist: {e}")
-            
-            return "Migration completed! New columns added to database."
-    except Exception as e:
-        return f"Migration error: {str(e)}"
 
 if __name__ == '__main__':
     with app.app_context():
