@@ -105,6 +105,25 @@ def migrate_db():
     except Exception as e:
         return f"<h1>Migration Error:</h1><p>{str(e)}</p>"
 
+@app.route('/fix-old-users-now')
+def fix_old_users():
+    """Add missing columns data to existing users"""
+    try:
+        from sqlalchemy import text
+        
+        with db.engine.connect() as conn:
+            # Update all users to have default values for new columns
+            try:
+                conn.execute(text("UPDATE \"user\" SET validations_this_month = 0 WHERE validations_this_month IS NULL"))
+                conn.execute(text("UPDATE \"user\" SET last_reset_date = CURRENT_TIMESTAMP WHERE last_reset_date IS NULL"))
+                conn.commit()
+                return "<h1>✅ All old users fixed!</h1><p>You can login now!</p><p><a href='/login'>Go to Login</a></p>"
+            except Exception as e:
+                conn.rollback()
+                return f"<h1>❌ Error:</h1><p>{str(e)}</p>"
+    except Exception as e:
+        return f"<h1>❌ Error:</h1><p>{str(e)}</p>"
+
 # Routes
 @app.route('/')
 def index():
