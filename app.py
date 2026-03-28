@@ -375,6 +375,35 @@ def generate_voiceover_route():
         print(f"Voiceover generation error: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
+@app.route('/migrate-db')
+def migrate_db():
+    """One-time migration to add new columns"""
+    try:
+        with app.app_context():
+            from sqlalchemy import text
+            
+            # Check if columns exist and add them if they don't
+            with db.engine.connect() as conn:
+                # Add validations_this_month column
+                try:
+                    conn.execute(text('ALTER TABLE "user" ADD COLUMN validations_this_month INTEGER DEFAULT 0'))
+                    conn.commit()
+                    print("Added validations_this_month column")
+                except Exception as e:
+                    print(f"validations_this_month column might already exist: {e}")
+                
+                # Add last_reset_date column
+                try:
+                    conn.execute(text("ALTER TABLE \"user\" ADD COLUMN last_reset_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP"))
+                    conn.commit()
+                    print("Added last_reset_date column")
+                except Exception as e:
+                    print(f"last_reset_date column might already exist: {e}")
+            
+            return "Migration completed! New columns added to database."
+    except Exception as e:
+        return f"Migration error: {str(e)}"
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
