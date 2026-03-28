@@ -67,7 +67,17 @@ def get_next_reset_date():
     else:
         return datetime(now.year, now.month + 1, 1)
 
-# Database Migration Route
+# Database Setup Routes
+@app.route('/create-tables-now')
+def create_tables():
+    """Create all database tables"""
+    try:
+        with app.app_context():
+            db.create_all()
+        return "<h1>✅ All tables created successfully!</h1><p><a href='/dashboard'>Go to Dashboard</a></p><p><a href='/'>Go to Home</a></p>"
+    except Exception as e:
+        return f"<h1>❌ Error creating tables:</h1><p>{str(e)}</p>"
+
 @app.route('/migrate-db-now')
 def migrate_db():
     """One-time migration to add new columns"""
