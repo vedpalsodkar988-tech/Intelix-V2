@@ -47,17 +47,29 @@ class Validation(db.Model):
 # Helper function to check and reset monthly validations
 def check_and_reset_monthly_limit(user):
     """Check if it's a new month and reset validation counter"""
-    now = datetime.utcnow()
-    last_reset = user.last_reset_date
-    
-    # Check if we're in a new month
-    if last_reset.month != now.month or last_reset.year != now.year:
-        user.validations_this_month = 0
-        user.last_reset_date = now
-        db.session.commit()
-        print(f"Reset validations for user {user.username} - New month!")
-    
-    return user.validations_this_month
+    try:
+        # Fix user if missing columns
+        if user.validations_this_month is None:
+            user.validations_this_month = 0
+        if user.last_reset_date is None:
+            user.last_reset_date = datetime.utcnow()
+            db.session.commit()
+            return 0
+        
+        now = datetime.utcnow()
+        last_reset = user.last_reset_date
+        
+        # Check if we're in a new month
+        if last_reset.month != now.month or last_reset.year != now.year:
+            user.validations_this_month = 0
+            user.last_reset_date = now
+            db.session.commit()
+            print(f"Reset validations for user {user.username} - New month!")
+        
+        return user.validations_this_month
+    except Exception as e:
+        print(f"Error in check_and_reset_monthly_limit: {e}")
+        return 0
 
 def get_next_reset_date():
     """Get the date of next month's 1st"""
@@ -168,7 +180,19 @@ def login():
         user = User.query.filter_by(username=username).first()
         
         if user and check_password_hash(user.password, password):
+            # Set session BEFORE checking monthly limit
             session['user_id'] = user.id
+            
+            # Fix user if missing columns
+            try:
+                if user.validations_this_month is None:
+                    user.validations_this_month = 0
+                if user.last_reset_date is None:
+                    user.last_reset_date = datetime.utcnow()
+                db.session.commit()
+            except Exception as e:
+                print(f"Error fixing user columns: {e}")
+            
             return redirect(url_for('dashboard'))
         
         return render_template('login.html', error='Invalid credentials')
