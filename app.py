@@ -144,58 +144,79 @@ def index():
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
-        username = request.form.get('username')
-        email = request.form.get('email')
-        password = request.form.get('password')
-        
-        if User.query.filter_by(username=username).first():
-            return render_template('signup.html', error='Username already exists')
-        
-        if User.query.filter_by(email=email).first():
-            return render_template('signup.html', error='Email already registered')
-        
-        hashed_password = generate_password_hash(password)
-        new_user = User(
-            username=username, 
-            email=email, 
-            password=hashed_password,
-            validations_this_month=0,
-            last_reset_date=datetime.utcnow()
-        )
-        
-        db.session.add(new_user)
-        db.session.commit()
-        
-        session['user_id'] = new_user.id
-        return redirect(url_for('dashboard'))
+        try:
+            username = request.form.get('username')
+            email = request.form.get('email')
+            password = request.form.get('password')
+            
+            if User.query.filter_by(username=username).first():
+                return render_template('signup.html', error='Username already exists')
+            
+            if User.query.filter_by(email=email).first():
+                return render_template('signup.html', error='Email already registered')
+            
+            hashed_password = generate_password_hash(password)
+            new_user = User(
+                username=username, 
+                email=email, 
+                password=hashed_password,
+                validations_this_month=0,
+                last_reset_date=datetime.utcnow()
+            )
+            
+            db.session.add(new_user)
+            db.session.commit()
+            
+            session['user_id'] = new_user.id
+            return redirect(url_for('dashboard'))
+        except Exception as e:
+            print(f"Signup error: {e}")
+            return render_template('signup.html', error='An error occurred. Please try again.')
     
     return render_template('signup.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        
-        user = User.query.filter_by(username=username).first()
-        
-        if user and check_password_hash(user.password, password):
-            # Set session BEFORE checking monthly limit
-            session['user_id'] = user.id
+        try:
+            username = request.form.get('username')
+            password = request.form.get('password')
             
-            # Fix user if missing columns
-            try:
-                if user.validations_this_month is None:
-                    user.validations_this_month = 0
-                if user.last_reset_date is None:
-                    user.last_reset_date = datetime.utcnow()
-                db.session.commit()
-            except Exception as e:
-                print(f"Error fixing user columns: {e}")
+            print(f"Login attempt for username: {username}")
             
-            return redirect(url_for('dashboard'))
+            if not username or not password:
+                return render_template('login.html', error='Please enter both username and password')
+            
+            user = User.query.filter_by(username=username).first()
+            
+            print(f"User found: {user is not None}")
+            
+            if user and check_password_hash(user.password, password):
+                print(f"Password verified for user: {username}")
+                
+                # Set session FIRST
+                session['user_id'] = user.id
+                
+                # Fix user columns if needed
+                try:
+                    if user.validations_this_month is None:
+                        user.validations_this_month = 0
+                    if user.last_reset_date is None:
+                        user.last_reset_date = datetime.utcnow()
+                    db.session.commit()
+                    print(f"User columns fixed for: {username}")
+                except Exception as e:
+                    print(f"Error fixing user columns: {e}")
+                
+                print(f"Redirecting to dashboard for user: {username}")
+                return redirect(url_for('dashboard'))
+            else:
+                print(f"Invalid credentials for username: {username}")
+                return render_template('login.html', error='Invalid username or password')
         
-        return render_template('login.html', error='Invalid credentials')
+        except Exception as e:
+            print(f"Login error: {e}")
+            return render_template('login.html', error='An error occurred. Please try again.')
     
     return render_template('login.html')
 
@@ -204,19 +225,28 @@ def dashboard():
     if 'user_id' not in session:
         return redirect(url_for('login'))
     
-    user = User.query.get(session['user_id'])
-    
-    # Check and reset monthly limit if needed
-    validations_used = check_and_reset_monthly_limit(user)
-    
-    # Reset validation depth when visiting dashboard
-    session['validation_depth'] = 0
-    session.pop('original_validation_id', None)
-    
-    return render_template('dashboard.html', 
-                         username=user.username, 
-                         validation_count=validations_used,
-                         validations_remaining=7 - validations_used)
+    try:
+        user = User.query.get(session['user_id'])
+        
+        if not user:
+            session.clear()
+            return redirect(url_for('login'))
+        
+        # Check and reset monthly limit if needed
+        validations_used = check_and_reset_monthly_limit(user)
+        
+        # Reset validation depth when visiting dashboard
+        session['validation_depth'] = 0
+        session.pop('original_validation_id', None)
+        
+        return render_template('dashboard.html', 
+                             username=user.username, 
+                             validation_count=validations_used,
+                             validations_remaining=7 - validations_used)
+    except Exception as e:
+        print(f"Dashboard error: {e}")
+        session.clear()
+        return redirect(url_for('login'))
 
 @app.route('/analyze', methods=['POST'])
 def analyze():
