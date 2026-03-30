@@ -13,6 +13,12 @@ app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'your-secret-key-here')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    'pool_pre_ping': True,
+    'pool_recycle': 300,
+    'pool_size': 10,
+    'max_overflow': 20
+}
 
 db = SQLAlchemy(app)
 
@@ -171,6 +177,7 @@ def signup():
             return redirect(url_for('dashboard'))
         except Exception as e:
             print(f"Signup error: {e}")
+            db.session.rollback()
             return render_template('signup.html', error='An error occurred. Please try again.')
     
     return render_template('signup.html')
@@ -207,6 +214,7 @@ def login():
                     print(f"User columns fixed for: {username}")
                 except Exception as e:
                     print(f"Error fixing user columns: {e}")
+                    db.session.rollback()
                 
                 print(f"Redirecting to dashboard for user: {username}")
                 return redirect(url_for('dashboard'))
@@ -216,6 +224,7 @@ def login():
         
         except Exception as e:
             print(f"Login error: {e}")
+            db.session.rollback()
             return render_template('login.html', error='An error occurred. Please try again.')
     
     return render_template('login.html')
@@ -253,138 +262,169 @@ def analyze():
     if 'user_id' not in session:
         return redirect(url_for('login'))
     
-    user = User.query.get(session['user_id'])
+    try:
+        user = User.query.get(session['user_id'])
+        
+        if not user:
+            session.clear()
+            return redirect(url_for('login'))
+        
+        # Check and reset monthly limit if needed
+        validations_used = check_and_reset_monthly_limit(user)
+        
+        # Check if user has reached monthly limit (7 validations)
+        if validations_used >= 7:
+            return render_template('limit_reached.html', 
+                                 validations_used=validations_used,
+                                 reset_date=get_next_reset_date())
+        
+        idea = request.form.get('idea')
+        business_name = request.form.get('business_name', '')
+        
+        # Track validation depth
+        validation_depth = session.get('validation_depth', 0) + 1
+        session['validation_depth'] = validation_depth
+        
+        print(f"Analyzing idea (depth: {validation_depth}): {idea[:50]}...")
+        
+        # Get AI analysis
+        analysis = analyze_business_idea(idea)
+        
+        # Generate similar idea only for first validation
+        similar_idea = None
+        if validation_depth == 1:
+            similar_idea = generate_similar_idea(idea, analysis)
+        
+        # Save validation to database
+        validation = Validation(
+            user_id=user.id,
+            idea=idea,
+            business_name=business_name,
+            analysis=json.dumps(analysis),
+            similar_idea=json.dumps(similar_idea) if similar_idea else None
+        )
+        db.session.add(validation)
+        
+        # Increment monthly validation counter
+        user.validations_this_month += 1
+        
+        db.session.commit()
+        
+        # Store original validation ID for back button
+        if validation_depth == 1:
+            session['original_validation_id'] = validation.id
+        
+        original_validation_id = session.get('original_validation_id')
+        
+        return render_template('analysis.html', 
+                             idea=idea,
+                             business_name=business_name,
+                             analysis=analysis,
+                             similar_idea=similar_idea,
+                             validation_depth=validation_depth,
+                             original_validation_id=original_validation_id)
     
-    # Check and reset monthly limit if needed
-    validations_used = check_and_reset_monthly_limit(user)
-    
-    # Check if user has reached monthly limit (7 validations)
-    if validations_used >= 7:
-        return render_template('limit_reached.html', 
-                             validations_used=validations_used,
-                             reset_date=get_next_reset_date())
-    
-    idea = request.form.get('idea')
-    business_name = request.form.get('business_name', '')
-    
-    # Track validation depth
-    validation_depth = session.get('validation_depth', 0) + 1
-    session['validation_depth'] = validation_depth
-    
-    print(f"Analyzing idea (depth: {validation_depth}): {idea[:50]}...")
-    
-    # Get AI analysis
-    analysis = analyze_business_idea(idea)
-    
-    # Generate similar idea only for first validation
-    similar_idea = None
-    if validation_depth == 1:
-        similar_idea = generate_similar_idea(idea, analysis)
-    
-    # Save validation to database
-    validation = Validation(
-        user_id=user.id,
-        idea=idea,
-        business_name=business_name,
-        analysis=json.dumps(analysis),
-        similar_idea=json.dumps(similar_idea) if similar_idea else None
-    )
-    db.session.add(validation)
-    
-    # Increment monthly validation counter
-    user.validations_this_month += 1
-    
-    db.session.commit()
-    
-    # Store original validation ID for back button
-    if validation_depth == 1:
-        session['original_validation_id'] = validation.id
-    
-    original_validation_id = session.get('original_validation_id')
-    
-    return render_template('analysis.html', 
-                         idea=idea,
-                         business_name=business_name,
-                         analysis=analysis,
-                         similar_idea=similar_idea,
-                         validation_depth=validation_depth,
-                         original_validation_id=original_validation_id)
+    except Exception as e:
+        print(f"Analyze error: {e}")
+        db.session.rollback()
+        return render_template('dashboard.html', 
+                             error='An error occurred. Please try again.',
+                             username=user.username if 'user' in locals() else '',
+                             validation_count=0,
+                             validations_remaining=7)
 
 @app.route('/validation/<int:validation_id>')
 def view_validation(validation_id):
     if 'user_id' not in session:
         return redirect(url_for('login'))
     
-    validation = Validation.query.get_or_404(validation_id)
-    
-    if validation.user_id != session['user_id']:
-        return "Unauthorized", 403
-    
-    analysis = json.loads(validation.analysis)
-    similar_idea = json.loads(validation.similar_idea) if validation.similar_idea else None
-    marketing_posts = json.loads(validation.marketing_posts) if validation.marketing_posts else None
-    
-    return render_template('analysis.html',
-                         idea=validation.idea,
-                         business_name=validation.business_name,
-                         analysis=analysis,
-                         similar_idea=similar_idea,
-                         marketing_posts=marketing_posts,
-                         validation_depth=1,
-                         from_history=True)
+    try:
+        validation = Validation.query.get_or_404(validation_id)
+        
+        if validation.user_id != session['user_id']:
+            return "Unauthorized", 403
+        
+        analysis = json.loads(validation.analysis)
+        similar_idea = json.loads(validation.similar_idea) if validation.similar_idea else None
+        marketing_posts = json.loads(validation.marketing_posts) if validation.marketing_posts else None
+        
+        return render_template('analysis.html',
+                             idea=validation.idea,
+                             business_name=validation.business_name,
+                             analysis=analysis,
+                             similar_idea=similar_idea,
+                             marketing_posts=marketing_posts,
+                             validation_depth=1,
+                             from_history=True)
+    except Exception as e:
+        print(f"View validation error: {e}")
+        return redirect(url_for('dashboard'))
 
 @app.route('/marketing', methods=['POST'])
 def marketing():
     if 'user_id' not in session:
         return redirect(url_for('login'))
     
-    user = User.query.get(session['user_id'])
-    
-    idea = request.form.get('idea', session.get('current_idea', ''))
-    business_name = request.form.get('business_name', session.get('current_business_name', ''))
-    
-    session['current_idea'] = idea
-    session['current_business_name'] = business_name
-    
-    print(f"Generating marketing posts for: {idea[:50]}...")
-    
-    posts = generate_linkedin_posts(idea, business_name)
-    
-    last_validation = Validation.query.filter_by(user_id=user.id).order_by(Validation.created_at.desc()).first()
-    if last_validation:
-        last_validation.marketing_posts = json.dumps(posts)
-        db.session.commit()
-    
-    return render_template('marketing.html', 
-                         idea=idea,
-                         business_name=business_name,
-                         posts=posts)
+    try:
+        user = User.query.get(session['user_id'])
+        
+        idea = request.form.get('idea', session.get('current_idea', ''))
+        business_name = request.form.get('business_name', session.get('current_business_name', ''))
+        
+        session['current_idea'] = idea
+        session['current_business_name'] = business_name
+        
+        print(f"Generating marketing posts for: {idea[:50]}...")
+        
+        posts = generate_linkedin_posts(idea, business_name)
+        
+        last_validation = Validation.query.filter_by(user_id=user.id).order_by(Validation.created_at.desc()).first()
+        if last_validation:
+            last_validation.marketing_posts = json.dumps(posts)
+            db.session.commit()
+        
+        return render_template('marketing.html', 
+                             idea=idea,
+                             business_name=business_name,
+                             posts=posts)
+    except Exception as e:
+        print(f"Marketing error: {e}")
+        db.session.rollback()
+        return redirect(url_for('dashboard'))
 
 @app.route('/validations')
 def validations():
     if 'user_id' not in session:
         return redirect(url_for('login'))
     
-    user = User.query.get(session['user_id'])
-    user_validations = Validation.query.filter_by(user_id=user.id).order_by(Validation.created_at.desc()).all()
-    
-    return render_template('validations.html', validations=user_validations)
+    try:
+        user = User.query.get(session['user_id'])
+        user_validations = Validation.query.filter_by(user_id=user.id).order_by(Validation.created_at.desc()).all()
+        
+        return render_template('validations.html', validations=user_validations)
+    except Exception as e:
+        print(f"Validations error: {e}")
+        return redirect(url_for('dashboard'))
 
 @app.route('/settings')
 def settings():
     if 'user_id' not in session:
         return redirect(url_for('login'))
     
-    user = User.query.get(session['user_id'])
-    
-    # Check and reset monthly limit
-    validations_used = check_and_reset_monthly_limit(user)
-    
-    return render_template('settings.html', 
-                         user=user,
-                         validations_used=validations_used,
-                         validations_remaining=7 - validations_used,
-                         reset_date=get_next_reset_date())
+    try:
+        user = User.query.get(session['user_id'])
+        
+        # Check and reset monthly limit
+        validations_used = check_and_reset_monthly_limit(user)
+        
+        return render_template('settings.html', 
+                             user=user,
+                             validations_used=validations_used,
+                             validations_remaining=7 - validations_used,
+                             reset_date=get_next_reset_date())
+    except Exception as e:
+        print(f"Settings error: {e}")
+        return redirect(url_for('dashboard'))
 
 @app.route('/logout')
 def logout():
@@ -406,57 +446,66 @@ def linkedin_callback():
     if 'user_id' not in session:
         return redirect(url_for('login'))
     
-    code = request.args.get('code')
-    
-    if not code:
-        return "LinkedIn authentication failed", 400
-    
-    token_url = "https://www.linkedin.com/oauth/v2/accessToken"
-    token_data = {
-        'grant_type': 'authorization_code',
-        'code': code,
-        'redirect_uri': LINKEDIN_REDIRECT_URI,
-        'client_id': LINKEDIN_CLIENT_ID,
-        'client_secret': LINKEDIN_CLIENT_SECRET
-    }
-    
-    token_response = requests.post(token_url, data=token_data)
-    token_json = token_response.json()
-    
-    access_token = token_json.get('access_token')
-    
-    if access_token:
-        user = User.query.get(session['user_id'])
-        user.linkedin_access_token = access_token
+    try:
+        code = request.args.get('code')
         
-        headers = {'Authorization': f'Bearer {access_token}'}
-        user_info = requests.get('https://api.linkedin.com/v2/userinfo', headers=headers).json()
-        user.linkedin_user_id = user_info.get('sub')
+        if not code:
+            return "LinkedIn authentication failed", 400
         
-        db.session.commit()
+        token_url = "https://www.linkedin.com/oauth/v2/accessToken"
+        token_data = {
+            'grant_type': 'authorization_code',
+            'code': code,
+            'redirect_uri': LINKEDIN_REDIRECT_URI,
+            'client_id': LINKEDIN_CLIENT_ID,
+            'client_secret': LINKEDIN_CLIENT_SECRET
+        }
         
+        token_response = requests.post(token_url, data=token_data)
+        token_json = token_response.json()
+        
+        access_token = token_json.get('access_token')
+        
+        if access_token:
+            user = User.query.get(session['user_id'])
+            user.linkedin_access_token = access_token
+            
+            headers = {'Authorization': f'Bearer {access_token}'}
+            user_info = requests.get('https://api.linkedin.com/v2/userinfo', headers=headers).json()
+            user.linkedin_user_id = user_info.get('sub')
+            
+            db.session.commit()
+            
+            return redirect(url_for('settings'))
+        
+        return "Failed to get access token", 400
+    except Exception as e:
+        print(f"LinkedIn callback error: {e}")
+        db.session.rollback()
         return redirect(url_for('settings'))
-    
-    return "Failed to get access token", 400
 
 @app.route('/post/linkedin', methods=['POST'])
 def post_linkedin():
     if 'user_id' not in session:
         return jsonify({'success': False, 'error': 'Not logged in'}), 401
     
-    user = User.query.get(session['user_id'])
-    
-    if not user.linkedin_access_token:
-        return jsonify({'success': False, 'error': 'LinkedIn not connected'}), 400
-    
-    content = request.form.get('content')
-    
-    result = post_to_linkedin(user.linkedin_access_token, user.linkedin_user_id, content)
-    
-    if result['success']:
-        return jsonify({'success': True})
-    else:
-        return jsonify({'success': False, 'error': result['error']}), 400
+    try:
+        user = User.query.get(session['user_id'])
+        
+        if not user.linkedin_access_token:
+            return jsonify({'success': False, 'error': 'LinkedIn not connected'}), 400
+        
+        content = request.form.get('content')
+        
+        result = post_to_linkedin(user.linkedin_access_token, user.linkedin_user_id, content)
+        
+        if result['success']:
+            return jsonify({'success': True})
+        else:
+            return jsonify({'success': False, 'error': result['error']}), 400
+    except Exception as e:
+        print(f"Post LinkedIn error: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/generate-voiceover', methods=['POST'])
 def generate_voiceover_route():
