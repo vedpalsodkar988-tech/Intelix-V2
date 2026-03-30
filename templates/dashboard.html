@@ -18,7 +18,6 @@
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Arial, sans-serif;
             background: #0F0F0F;
@@ -26,7 +25,6 @@
             min-height: 100vh;
             overflow-x: hidden;
         }
-
         .animated-bg {
             position: fixed;
             top: 0;
@@ -36,7 +34,6 @@
             z-index: 0;
             overflow: hidden;
         }
-
         .gradient-orb {
             position: absolute;
             border-radius: 50%;
@@ -44,7 +41,6 @@
             opacity: 0.3;
             animation: float 20s infinite ease-in-out;
         }
-
         .orb-1 {
             width: 500px;
             height: 500px;
@@ -53,7 +49,6 @@
             left: -100px;
             animation-delay: 0s;
         }
-
         .orb-2 {
             width: 400px;
             height: 400px;
@@ -62,7 +57,6 @@
             right: -100px;
             animation-delay: 5s;
         }
-
         .orb-3 {
             width: 300px;
             height: 300px;
@@ -71,17 +65,14 @@
             left: 50%;
             animation-delay: 10s;
         }
-
         @keyframes float {
             0%, 100% { transform: translate(0, 0) scale(1); }
             33% { transform: translate(100px, -50px) scale(1.1); }
             66% { transform: translate(-50px, 100px) scale(0.9); }
         }
-
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-
         nav {
             position: fixed;
             top: 0;
@@ -96,12 +87,10 @@
             z-index: 1000;
             animation: slideDown 0.8s ease;
         }
-
         @keyframes slideDown {
             from { transform: translateY(-100px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
-
         .logo {
             font-size: 24px;
             font-weight: 800;
@@ -110,13 +99,11 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-
         .nav-right {
             display: flex;
             gap: 32px;
             align-items: center;
         }
-
         .nav-right a {
             color: rgba(255, 255, 255, 0.7);
             text-decoration: none;
@@ -124,11 +111,18 @@
             transition: color 0.3s;
             font-weight: 500;
         }
-
         .nav-right a:hover {
             color: #FFFFFF;
         }
-
+        .developer-badge {
+            background: linear-gradient(135deg, #10B981, #3B82F6);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
         .container {
             max-width: 1100px;
             margin: 0 auto;
@@ -136,25 +130,21 @@
             position: relative;
             z-index: 1;
         }
-
         .header {
             text-align: center;
             margin-bottom: 60px;
             animation: fadeInUp 1s ease;
         }
-
         @keyframes fadeInUp {
             from { transform: translateY(50px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
-
         .header h1 {
             font-size: 42px;
             font-weight: 900;
             margin-bottom: 12px;
             letter-spacing: -2px;
         }
-
         .gradient-text {
             background: linear-gradient(135deg, #6366F1 0%, #A855F7 50%, #EC4899 100%);
             -webkit-background-clip: text;
@@ -163,18 +153,15 @@
             animation: shimmer 3s infinite linear;
             background-size: 200% 200%;
         }
-
         @keyframes shimmer {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
-
         .header p {
             font-size: 16px;
             color: rgba(255, 255, 255, 0.6);
         }
-
         .form-card {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -185,17 +172,14 @@
             animation: fadeInUp 1s ease 0.3s backwards;
             transition: all 0.4s;
         }
-
         .form-card:hover {
             background: rgba(255, 255, 255, 0.05);
             border-color: rgba(99, 102, 241, 0.3);
             box-shadow: 0 20px 60px rgba(99, 102, 241, 0.2);
         }
-
         .form-group {
             margin-bottom: 30px;
         }
-
         .form-group label {
             display: block;
             margin-bottom: 10px;
@@ -203,7 +187,6 @@
             color: rgba(255, 255, 255, 0.9);
             font-size: 14px;
         }
-
         .form-group textarea,
         .form-group input {
             width: 100%;
@@ -216,12 +199,10 @@
             font-family: inherit;
             transition: all 0.3s;
         }
-
         .form-group textarea {
             resize: vertical;
             min-height: 140px;
         }
-
         .form-group textarea:focus,
         .form-group input:focus {
             outline: none;
@@ -229,18 +210,15 @@
             background: rgba(0, 0, 0, 0.4);
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
         }
-
         .form-group textarea::placeholder,
         .form-group input::placeholder {
             color: rgba(255, 255, 255, 0.3);
         }
-
         .helper-text {
             font-size: 13px;
             color: rgba(255, 255, 255, 0.5);
             margin-top: 8px;
         }
-
         .btn-submit {
             width: 100%;
             background: linear-gradient(135deg, #6366F1 0%, #A855F7 100%);
@@ -253,25 +231,21 @@
             cursor: pointer;
             transition: all 0.3s;
         }
-
         .btn-submit:hover {
             transform: translateY(-3px);
             box-shadow: 0 15px 40px rgba(99, 102, 241, 0.4);
         }
-
         .btn-submit:disabled {
             opacity: 0.7;
             cursor: not-allowed;
             transform: none;
         }
-
         .stats-section {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 28px;
             animation: fadeInUp 1s ease 0.6s backwards;
         }
-
         .stat-card {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -280,14 +254,12 @@
             backdrop-filter: blur(20px);
             transition: all 0.4s;
         }
-
         .stat-card:hover {
             background: rgba(255, 255, 255, 0.05);
             border-color: rgba(99, 102, 241, 0.3);
             transform: translateY(-8px);
             box-shadow: 0 20px 60px rgba(99, 102, 241, 0.2);
         }
-
         .stat-card h3 {
             font-size: 12px;
             color: rgba(255, 255, 255, 0.6);
@@ -296,7 +268,6 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-
         .stat-card .value {
             font-size: 40px;
             font-weight: 900;
@@ -306,19 +277,16 @@
             background-clip: text;
             margin-bottom: 10px;
         }
-
         .stat-card p {
             font-size: 14px;
             color: rgba(255, 255, 255, 0.5);
             line-height: 1.6;
         }
-
         .stat-card ul {
             list-style: none;
             padding: 0;
             margin: 0;
         }
-
         .stat-card ul li {
             font-size: 14px;
             color: rgba(255, 255, 255, 0.7);
@@ -327,7 +295,6 @@
             position: relative;
             line-height: 1.5;
         }
-
         .stat-card ul li::before {
             content: "→";
             position: absolute;
@@ -335,24 +302,19 @@
             color: #6366F1;
             font-size: 16px;
         }
-
         @media (max-width: 768px) {
             nav {
                 padding: 20px 24px;
             }
-
             .container {
                 padding: 100px 24px 60px;
             }
-
             .header h1 {
                 font-size: 32px;
             }
-
             .form-card {
                 padding: 28px;
             }
-
             .stats-section {
                 grid-template-columns: 1fr;
             }
@@ -365,22 +327,22 @@
         <div class="gradient-orb orb-2"></div>
         <div class="gradient-orb orb-3"></div>
     </div>
-
     <nav>
         <div class="logo">Intelix</div>
         <div class="nav-right">
+            {% if is_developer %}
+            <span class="developer-badge">🔓 Developer</span>
+            {% endif %}
             <a href="/validations">History</a>
             <a href="/settings">Settings</a>
             <a href="/logout">Logout</a>
         </div>
     </nav>
-
     <div class="container">
         <div class="header">
             <h1>Welcome back, <span class="gradient-text">{{ username }}</span>! 👋</h1>
             <p>Validate your next big idea with AI</p>
         </div>
-
         <form action="/analyze" method="POST">
             <div class="form-card">
                 <div class="form-group">
@@ -393,7 +355,6 @@
                     ></textarea>
                     <p class="helper-text">Be specific about what problem you're solving and who it's for</p>
                 </div>
-
                 <div class="form-group">
                     <label for="business_name">Business/Product Name (Optional)</label>
                     <input 
@@ -404,20 +365,22 @@
                     >
                     <p class="helper-text">Give your idea a name to personalize the analysis</p>
                 </div>
-
                 <button type="submit" class="btn-submit">
                     Validate My Idea 🚀
                 </button>
             </div>
         </form>
-
         <div class="stats-section">
             <div class="stat-card">
                 <h3>Validations This Month</h3>
+                {% if is_developer %}
+                <div class="value">∞</div>
+                <p>🔓 Unlimited validations in developer mode!</p>
+                {% else %}
                 <div class="value">{{ validation_count }}/7</div>
-                <p>{{ 7 - validation_count }} validations remaining. Resets monthly on the 1st!</p>
+                <p>{{ validations_remaining }} validations remaining. Resets monthly on the 1st!</p>
+                {% endif %}
             </div>
-
             <div class="stat-card">
                 <h3>Pro Tips</h3>
                 <ul>
@@ -428,7 +391,6 @@
             </div>
         </div>
     </div>
-
     <script>
         document.querySelector('form').addEventListener('submit', function(e) {
             const btn = document.querySelector('.btn-submit');
@@ -440,4 +402,4 @@
         });
     </script>
 </body>
-</html> 
+</html>
