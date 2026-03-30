@@ -262,11 +262,15 @@ def dashboard():
         session['validation_depth'] = 0
         session.pop('original_validation_id', None)
         
+        # Get recent validations (last 3)
+        recent_validations = Validation.query.filter_by(user_id=user.id).order_by(Validation.created_at.desc()).limit(3).all()
+        
         return render_template('dashboard.html', 
                              username=user.username, 
                              validation_count=validations_used,
                              validations_remaining=validations_remaining,
-                             is_developer=is_developer(user))
+                             is_developer=is_developer(user),
+                             recent_validations=recent_validations)
     except Exception as e:
         print(f"Dashboard error: {e}")
         session.clear()
@@ -354,7 +358,8 @@ def analyze():
                              username=user.username if 'user' in locals() else '',
                              validation_count=0,
                              validations_remaining=7,
-                             is_developer=False)
+                             is_developer=False,
+                             recent_validations=[])
 
 @app.route('/validation/<int:validation_id>')
 def view_validation(validation_id):
