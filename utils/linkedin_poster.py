@@ -1,146 +1,106 @@
-import requests
 import anthropic
 import os
 import json
-import re
 
 client = anthropic.Anthropic(api_key=os.getenv('ANTHROPIC_API_KEY'))
-
-def clean_json_response(text):
-    """Clean Claude's response to extract valid JSON"""
-    # Remove markdown code blocks
-    text = re.sub(r'```json\s*', '', text)
-    text = re.sub(r'```\s*', '', text)
-    
-    # Find JSON object
-    start = text.find('{')
-    end = text.rfind('}')
-    
-    if start != -1 and end != -1:
-        text = text[start:end+1]
-    
-    return text.strip()
 
 def generate_linkedin_posts(idea, business_name=""):
     """Generate 3 LinkedIn posts for the business idea"""
     
-    business_context = f"The business is called '{business_name}'. " if business_name else ""
+    business_mention = f"Business Name: {business_name}\n" if business_name else ""
     
-    prompt = f"""You are a LinkedIn marketing expert. Generate 3 engaging LinkedIn posts for this specific business idea:
+    prompt = f"""Generate 3 specific LinkedIn marketing posts for this business:
 
-Business Idea: "{idea}"
-{business_context}
+{business_mention}Business Idea: {idea}
 
-CRITICAL INSTRUCTIONS:
-- Each post MUST be specifically about THIS exact business idea
-- Include the business name "{business_name}" if provided
-- Reference specific features and benefits of THIS idea
-- Make posts unique and tailored to THIS concept
-- DO NOT write generic startup posts
+Create 3 posts that are DIRECTLY about this specific business concept:
 
-Create 3 different post styles:
+1. PROBLEM/SOLUTION POST:
+- Identify the exact problem this business solves
+- Explain the specific solution
+- Use concrete details from the idea
+- 120-150 words
 
-POST 1 - Problem/Solution:
-- Start with the specific problem this idea solves
-- Explain how THIS business solves it
-- Be specific and concrete
+2. VALUE PROPOSITION POST:
+- Highlight what makes THIS business unique
+- Focus on specific benefits and outcomes
+- Mention key features
+- 120-150 words
 
-POST 2 - Value Proposition:
-- Highlight unique benefits of THIS specific idea
-- Explain the transformation/outcome for users
-- Use specific details from the idea
+3. ENGAGEMENT POST:
+- Generate excitement about THIS specific concept
+- Ask for feedback on THIS idea
+- Be conversational and inviting
+- 120-150 words
 
-POST 3 - Call to Action:
-- Share excitement about THIS specific concept
-- Invite feedback on THIS idea
-- Ask a specific question related to THIS business
+RULES:
+- Every post MUST mention specific details from the business idea
+- Include the business name if provided: {business_name}
+- Use 2-3 relevant emojis per post
+- End each with a question
+- Be professional but conversational
+- NO generic startup language
 
-REQUIREMENTS:
-- 100-150 words per post
-- Professional but conversational tone
-- Include 2-3 relevant emojis per post
-- End with engagement question
-- Be SPECIFIC to this business idea
-
-Return ONLY valid JSON, no other text:
-
+Output as JSON only:
 {{
-    "post1": {{
-        "title": "Problem/Solution",
-        "content": "your post here - MUST mention the specific idea"
-    }},
-    "post2": {{
-        "title": "Value Proposition",
-        "content": "your post here - MUST mention the specific benefits"
-    }},
-    "post3": {{
-        "title": "Call to Action",
-        "content": "your post here - MUST be about this specific idea"
-    }}
+  "post1": {{"title": "Problem/Solution", "content": "..."}},
+  "post2": {{"title": "Value Proposition", "content": "..."}},
+  "post3": {{"title": "Engagement", "content": "..."}}
 }}"""
     
     try:
-        response = client.messages.create(
+        message = client.messages.create(
             model="claude-sonnet-4-20250514",
-            max_tokens=2000,
-            temperature=0.8,
-            messages=[{"role": "user", "content": prompt}]
+            max_tokens=2500,
+            temperature=0.9,
+            messages=[{
+                "role": "user",
+                "content": prompt
+            }]
         )
         
-        posts_text = response.content[0].text
-        print(f"Raw AI Response: {posts_text[:300]}...")  # Debug log
+        response_text = message.content[0].text.strip()
         
-        cleaned_text = clean_json_response(posts_text)
-        print(f"Cleaned JSON: {cleaned_text[:300]}...")  # Debug log
+        # Remove markdown formatting
+        if response_text.startswith('```'):
+            response_text = response_text.split('```')[1]
+            if response_text.startswith('json'):
+                response_text = response_text[4:]
         
-        posts = json.loads(cleaned_text)
+        response_text = response_text.strip()
         
-        # Validate structure
-        if not all(key in posts for key in ['post1', 'post2', 'post3']):
-            raise ValueError("Invalid JSON structure")
+        print(f"Marketing AI Response (first 500 chars): {response_text[:500]}")
         
-        # Validate content mentions the idea
-        idea_lower = idea.lower()
-        business_lower = business_name.lower() if business_name else ""
+        # Parse JSON
+        posts = json.loads(response_text)
         
-        for post_key in ['post1', 'post2', 'post3']:
-            content_lower = posts[post_key]['content'].lower()
-            # Check if post is too generic
-            if len(content_lower) < 50 or (business_name and business_lower not in content_lower):
-                print(f"Warning: {post_key} might be too generic")
+        # Validate all required keys exist
+        required_keys = ['post1', 'post2', 'post3']
+        if not all(key in posts for key in required_keys):
+            raise ValueError(f"Missing required keys. Got: {list(posts.keys())}")
         
+        # Validate each post has content
+        for key in required_keys:
+            if 'content' not in posts[key]:
+                raise ValueError(f"{key} missing content")
+            if len(posts[key]['content']) < 50:
+                raise ValueError(f"{key} content too short")
+        
+        print("✅ Marketing posts generated successfully!")
         return posts
         
-    except json.JSONDecodeError as e:
-        print(f"JSON Decode Error: {str(e)}")
-        print(f"Failed to parse: {cleaned_text if 'cleaned_text' in locals() else 'N/A'}")
-        return generate_fallback_posts(idea, business_name)
+    except json.JSONDecodeError as je:
+        print(f"❌ JSON Parse Error: {je}")
+        print(f"Response was: {response_text[:500] if 'response_text' in locals() else 'N/A'}")
+        raise Exception("Failed to generate valid marketing posts. Please try again.")
+        
     except Exception as e:
-        print(f"LinkedIn Posts Error: {str(e)}")
-        return generate_fallback_posts(idea, business_name)
-
-def generate_fallback_posts(idea, business_name=""):
-    """Generate fallback posts when AI fails"""
-    business_text = f"{business_name} - " if business_name else ""
-    
-    # Make fallback posts specific to the idea
-    return {
-        "post1": {
-            "title": "Problem/Solution",
-            "content": f"🎯 {business_text}{idea}\n\nThis innovative solution addresses a real market need. By focusing on the core problem, we're building something that actually helps people.\n\nWhat challenges do you see in this space? Let's discuss! 👇"
-        },
-        "post2": {
-            "title": "Value Proposition",
-            "content": f"🚀 Excited about {business_text}{idea}\n\n✨ Why this matters:\n• Solves a genuine problem\n• User-focused approach\n• Built with real feedback in mind\n\nWould you use something like this? Share your thoughts! 💭"
-        },
-        "post3": {
-            "title": "Call to Action",
-            "content": f"📢 Building: {business_text}{idea}\n\n🔍 We're in the early stages and want YOUR input!\n\nWhat features would make this most valuable to you?\n\nDrop a comment or DM - all feedback welcome! 🙌"
-        }
-    }
+        print(f"❌ Marketing Generation Error: {e}")
+        raise Exception(f"Failed to generate marketing posts: {str(e)}")
 
 def post_to_linkedin(access_token, user_id, content):
     """Post content to LinkedIn"""
+    import requests
     
     url = "https://api.linkedin.com/v2/ugcPosts"
     
