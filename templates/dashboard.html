@@ -167,7 +167,7 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 24px;
             padding: 45px;
-            margin-bottom: 45px;
+            margin-bottom: 50px;
             backdrop-filter: blur(20px);
             animation: fadeInUp 1s ease 0.3s backwards;
             transition: all 0.4s;
@@ -245,7 +245,7 @@
             grid-template-columns: 1fr 1fr;
             gap: 28px;
             animation: fadeInUp 1s ease 0.6s backwards;
-            margin-bottom: 45px;
+            margin-bottom: 50px;
         }
         .stat-card {
             background: rgba(255, 255, 255, 0.03);
@@ -306,61 +306,73 @@
         .recent-validations {
             animation: fadeInUp 1s ease 0.9s backwards;
         }
-        .section-title {
-            font-size: 24px;
-            font-weight: 800;
-            margin-bottom: 24px;
-            color: rgba(255, 255, 255, 0.9);
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
         }
-        .validation-item {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 16px;
-            backdrop-filter: blur(20px);
+        .section-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: rgba(255, 255, 255, 0.95);
+        }
+        .view-all-link {
+            color: #6366F1;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
             transition: all 0.3s;
         }
+        .view-all-link:hover {
+            color: #A855F7;
+        }
+        .validation-item {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(20px);
+            transition: all 0.4s;
+        }
         .validation-item:hover {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(99, 102, 241, 0.3);
-            transform: translateX(8px);
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(99, 102, 241, 0.4);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 60px rgba(99, 102, 241, 0.25);
         }
         .validation-header {
             display: flex;
             justify-content: space-between;
             align-items: start;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
         }
         .validation-title {
-            font-size: 16px;
+            font-size: 20px;
             font-weight: 700;
             color: #FFFFFF;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
         .validation-date {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.4);
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
         }
         .validation-idea {
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.7);
-            line-height: 1.6;
-            margin-bottom: 16px;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.7;
+            margin-bottom: 24px;
         }
         .validation-actions {
             display: flex;
-            gap: 12px;
+            gap: 14px;
         }
         .btn-small {
-            padding: 10px 18px;
+            padding: 14px 24px;
             border: none;
-            border-radius: 8px;
-            font-size: 13px;
+            border-radius: 12px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
@@ -373,24 +385,30 @@
         }
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+            box-shadow: 0 12px 30px rgba(99, 102, 241, 0.5);
         }
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
             color: rgba(255, 255, 255, 0.9);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
         .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.3);
         }
         .empty-state {
             text-align: center;
-            padding: 60px 20px;
+            padding: 80px 20px;
             color: rgba(255, 255, 255, 0.5);
         }
         .empty-state-icon {
-            font-size: 48px;
-            margin-bottom: 16px;
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+        .empty-state h3 {
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 12px;
         }
         @media (max-width: 768px) {
             nav {
@@ -415,6 +433,11 @@
                 width: 100%;
                 text-align: center;
             }
+            .section-header {
+                flex-direction: column;
+                align-items: start;
+                gap: 12px;
+            }
         }
     </style>
 </head>
@@ -430,7 +453,6 @@
             {% if is_developer %}
             <span class="developer-badge">🔓 Developer</span>
             {% endif %}
-            <a href="/validations">History</a>
             <a href="/settings">Settings</a>
             <a href="/logout">Logout</a>
         </div>
@@ -490,7 +512,10 @@
 
         {% if recent_validations %}
         <div class="recent-validations">
-            <h2 class="section-title">Recent Validations 📊</h2>
+            <div class="section-header">
+                <h2 class="section-title">🎯 Your Recent Validations</h2>
+                <a href="/validations" class="view-all-link">View All →</a>
+            </div>
             {% for validation in recent_validations %}
             <div class="validation-item">
                 <div class="validation-header">
@@ -498,7 +523,7 @@
                         {% if validation.business_name %}
                         <div class="validation-title">{{ validation.business_name }}</div>
                         {% endif %}
-                        <div class="validation-date">{{ validation.created_at.strftime('%B %d, %Y at %I:%M %p') }}</div>
+                        <div class="validation-date">{{ validation.created_at.strftime('%B %d, %Y') }}</div>
                     </div>
                 </div>
                 <div class="validation-idea">{{ validation.idea }}</div>
@@ -511,11 +536,19 @@
                         </button>
                     </form>
                     <a href="/validation/{{ validation.id }}" class="btn-small btn-secondary">
-                        📄 View Full Report
+                        📄 View Full Analysis
                     </a>
                 </div>
             </div>
             {% endfor %}
+        </div>
+        {% else %}
+        <div class="recent-validations">
+            <div class="empty-state">
+                <div class="empty-state-icon">💡</div>
+                <h3>No validations yet!</h3>
+                <p>Start by validating your first business idea above.</p>
+            </div>
         </div>
         {% endif %}
     </div>
