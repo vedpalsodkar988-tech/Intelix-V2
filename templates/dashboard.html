@@ -132,7 +132,7 @@
         }
         .header {
             text-align: center;
-            margin-bottom: 60px;
+            margin-bottom: 50px;
             animation: fadeInUp 1s ease;
         }
         @keyframes fadeInUp {
@@ -162,89 +162,11 @@
             font-size: 16px;
             color: rgba(255, 255, 255, 0.6);
         }
-        .form-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 24px;
-            padding: 45px;
-            margin-bottom: 50px;
-            backdrop-filter: blur(20px);
-            animation: fadeInUp 1s ease 0.3s backwards;
-            transition: all 0.4s;
-        }
-        .form-card:hover {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(99, 102, 241, 0.3);
-            box-shadow: 0 20px 60px rgba(99, 102, 241, 0.2);
-        }
-        .form-group {
-            margin-bottom: 30px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 14px;
-        }
-        .form-group textarea,
-        .form-group input {
-            width: 100%;
-            padding: 16px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            font-size: 15px;
-            color: #FFFFFF;
-            font-family: inherit;
-            transition: all 0.3s;
-        }
-        .form-group textarea {
-            resize: vertical;
-            min-height: 140px;
-        }
-        .form-group textarea:focus,
-        .form-group input:focus {
-            outline: none;
-            border-color: #6366F1;
-            background: rgba(0, 0, 0, 0.4);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-        }
-        .form-group textarea::placeholder,
-        .form-group input::placeholder {
-            color: rgba(255, 255, 255, 0.3);
-        }
-        .helper-text {
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.5);
-            margin-top: 8px;
-        }
-        .btn-submit {
-            width: 100%;
-            background: linear-gradient(135deg, #6366F1 0%, #A855F7 100%);
-            color: white;
-            padding: 16px;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .btn-submit:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(99, 102, 241, 0.4);
-        }
-        .btn-submit:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-            transform: none;
-        }
         .stats-section {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 28px;
-            animation: fadeInUp 1s ease 0.6s backwards;
+            animation: fadeInUp 1s ease 0.3s backwards;
             margin-bottom: 50px;
         }
         .stat-card {
@@ -304,7 +226,8 @@
             font-size: 16px;
         }
         .recent-validations {
-            animation: fadeInUp 1s ease 0.9s backwards;
+            animation: fadeInUp 1s ease 0.6s backwards;
+            margin-bottom: 50px;
         }
         .section-header {
             display: flex;
@@ -396,19 +319,84 @@
             background: rgba(255, 255, 255, 0.12);
             border-color: rgba(255, 255, 255, 0.3);
         }
-        .empty-state {
-            text-align: center;
-            padding: 80px 20px;
+        .new-validation-section {
+            animation: fadeInUp 1s ease 0.9s backwards;
+        }
+        .form-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 45px;
+            backdrop-filter: blur(20px);
+            transition: all 0.4s;
+        }
+        .form-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(99, 102, 241, 0.3);
+            box-shadow: 0 20px 60px rgba(99, 102, 241, 0.2);
+        }
+        .form-group {
+            margin-bottom: 30px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+        }
+        .form-group textarea,
+        .form-group input {
+            width: 100%;
+            padding: 16px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            font-size: 15px;
+            color: #FFFFFF;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 140px;
+        }
+        .form-group textarea:focus,
+        .form-group input:focus {
+            outline: none;
+            border-color: #6366F1;
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+        .form-group textarea::placeholder,
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+        .helper-text {
+            font-size: 13px;
             color: rgba(255, 255, 255, 0.5);
+            margin-top: 8px;
         }
-        .empty-state-icon {
-            font-size: 64px;
-            margin-bottom: 20px;
+        .btn-submit {
+            width: 100%;
+            background: linear-gradient(135deg, #6366F1 0%, #A855F7 100%);
+            color: white;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
         }
-        .empty-state h3 {
-            font-size: 20px;
-            color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 12px;
+        .btn-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(99, 102, 241, 0.4);
+        }
+        .btn-submit:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
         }
         @media (max-width: 768px) {
             nav {
@@ -462,33 +450,7 @@
             <h1>Welcome back, <span class="gradient-text">{{ username }}</span>! 👋</h1>
             <p>Validate your next big idea with AI</p>
         </div>
-        <form action="/analyze" method="POST">
-            <div class="form-card">
-                <div class="form-group">
-                    <label for="idea">Describe Your Business Idea *</label>
-                    <textarea 
-                        id="idea" 
-                        name="idea" 
-                        required
-                        placeholder="e.g., AI-powered project management tool that automatically assigns tasks based on team member skills and workload..."
-                    ></textarea>
-                    <p class="helper-text">Be specific about what problem you're solving and who it's for</p>
-                </div>
-                <div class="form-group">
-                    <label for="business_name">Business/Product Name (Optional)</label>
-                    <input 
-                        type="text" 
-                        id="business_name" 
-                        name="business_name" 
-                        placeholder="e.g., TechFlow, CloudSync, MarketIQ, FitTrack"
-                    >
-                    <p class="helper-text">Give your idea a name to personalize the analysis</p>
-                </div>
-                <button type="submit" class="btn-submit">
-                    Validate My Idea 🚀
-                </button>
-            </div>
-        </form>
+        
         <div class="stats-section">
             <div class="stat-card">
                 <h3>Validations This Month</h3>
@@ -542,15 +504,40 @@
             </div>
             {% endfor %}
         </div>
-        {% else %}
-        <div class="recent-validations">
-            <div class="empty-state">
-                <div class="empty-state-icon">💡</div>
-                <h3>No validations yet!</h3>
-                <p>Start by validating your first business idea above.</p>
-            </div>
-        </div>
         {% endif %}
+
+        <div class="new-validation-section">
+            <div class="section-header">
+                <h2 class="section-title">💡 Validate New Idea</h2>
+            </div>
+            <form action="/analyze" method="POST">
+                <div class="form-card">
+                    <div class="form-group">
+                        <label for="idea">Describe Your Business Idea *</label>
+                        <textarea 
+                            id="idea" 
+                            name="idea" 
+                            required
+                            placeholder="e.g., AI-powered project management tool that automatically assigns tasks based on team member skills and workload..."
+                        ></textarea>
+                        <p class="helper-text">Be specific about what problem you're solving and who it's for</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="business_name">Business/Product Name (Optional)</label>
+                        <input 
+                            type="text" 
+                            id="business_name" 
+                            name="business_name" 
+                            placeholder="e.g., TechFlow, CloudSync, MarketIQ, FitTrack"
+                        >
+                        <p class="helper-text">Give your idea a name to personalize the analysis</p>
+                    </div>
+                    <button type="submit" class="btn-submit">
+                        Validate My Idea 🚀
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
     <script>
         document.querySelector('form[action="/analyze"]').addEventListener('submit', function(e) {
