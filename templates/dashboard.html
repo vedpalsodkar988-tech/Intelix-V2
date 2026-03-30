@@ -77,7 +77,7 @@
             position: fixed;
             top: 0;
             width: 100%;
-            padding: 24px 80px;
+            padding: 20px 60px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -92,7 +92,7 @@
             to { transform: translateY(0); opacity: 1; }
         }
         .logo {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 800;
             background: linear-gradient(135deg, #6366F1 0%, #EC4899 100%);
             -webkit-background-clip: text;
@@ -101,7 +101,7 @@
         }
         .nav-right {
             display: flex;
-            gap: 32px;
+            gap: 28px;
             align-items: center;
         }
         .nav-right a {
@@ -116,23 +116,23 @@
         }
         .developer-badge {
             background: linear-gradient(135deg, #10B981, #3B82F6);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 12px;
+            padding: 5px 12px;
+            border-radius: 16px;
+            font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
         .container {
-            max-width: 1400px;
+            max-width: 1500px;
             margin: 0 auto;
-            padding: 140px 60px 100px;
+            padding: 100px 60px 40px;
             position: relative;
             z-index: 1;
         }
         .header {
             text-align: center;
-            margin-bottom: 50px;
+            margin-bottom: 40px;
             animation: fadeInUp 1s ease;
         }
         @keyframes fadeInUp {
@@ -140,10 +140,10 @@
             to { transform: translateY(0); opacity: 1; }
         }
         .header h1 {
-            font-size: 42px;
+            font-size: 36px;
             font-weight: 900;
-            margin-bottom: 12px;
-            letter-spacing: -2px;
+            margin-bottom: 8px;
+            letter-spacing: -1.5px;
         }
         .gradient-text {
             background: linear-gradient(135deg, #6366F1 0%, #A855F7 50%, #EC4899 100%);
@@ -159,17 +159,24 @@
             100% { background-position: 0% 50%; }
         }
         .header p {
-            font-size: 16px;
+            font-size: 15px;
             color: rgba(255, 255, 255, 0.6);
+        }
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 40px;
+            animation: fadeInUp 1s ease 0.3s backwards;
+        }
+        .left-section {
+            
         }
         .form-card {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 24px;
-            padding: 45px;
-            margin-bottom: 50px;
+            border-radius: 20px;
+            padding: 35px;
             backdrop-filter: blur(20px);
-            animation: fadeInUp 1s ease 0.3s backwards;
             transition: all 0.4s;
         }
         .form-card:hover {
@@ -178,30 +185,30 @@
             box-shadow: 0 20px 60px rgba(99, 102, 241, 0.2);
         }
         .form-group {
-            margin-bottom: 30px;
+            margin-bottom: 24px;
         }
         .form-group label {
             display: block;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             font-weight: 600;
             color: rgba(255, 255, 255, 0.9);
-            font-size: 14px;
+            font-size: 13px;
         }
         .form-group textarea,
         .form-group input {
             width: 100%;
-            padding: 16px;
+            padding: 14px;
             background: rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            font-size: 15px;
+            border-radius: 10px;
+            font-size: 14px;
             color: #FFFFFF;
             font-family: inherit;
             transition: all 0.3s;
         }
         .form-group textarea {
             resize: vertical;
-            min-height: 140px;
+            min-height: 120px;
         }
         .form-group textarea:focus,
         .form-group input:focus {
@@ -215,77 +222,71 @@
             color: rgba(255, 255, 255, 0.3);
         }
         .helper-text {
-            font-size: 13px;
+            font-size: 12px;
             color: rgba(255, 255, 255, 0.5);
-            margin-top: 8px;
+            margin-top: 6px;
         }
         .btn-submit {
             width: 100%;
             background: linear-gradient(135deg, #6366F1 0%, #A855F7 100%);
             color: white;
-            padding: 16px;
+            padding: 14px;
             border: none;
-            border-radius: 12px;
-            font-size: 16px;
+            border-radius: 10px;
+            font-size: 15px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s;
         }
         .btn-submit:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(99, 102, 241, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(99, 102, 241, 0.4);
         }
         .btn-submit:disabled {
             opacity: 0.7;
             cursor: not-allowed;
             transform: none;
         }
-        .two-column-section {
-            display: grid;
-            grid-template-columns: 400px 1fr;
-            gap: 40px;
-            animation: fadeInUp 1s ease 0.6s backwards;
-        }
-        .left-column {
+        .right-section {
             display: flex;
             flex-direction: column;
-            gap: 28px;
+            gap: 24px;
         }
         .stat-card {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 24px;
-            padding: 35px;
+            border-radius: 20px;
+            padding: 28px;
             backdrop-filter: blur(20px);
             transition: all 0.4s;
         }
         .stat-card:hover {
             background: rgba(255, 255, 255, 0.05);
             border-color: rgba(99, 102, 241, 0.3);
-            transform: translateY(-8px);
-            box-shadow: 0 20px 60px rgba(99, 102, 241, 0.2);
+            transform: translateY(-4px);
+            box-shadow: 0 15px 40px rgba(99, 102, 241, 0.2);
         }
         .stat-card h3 {
-            font-size: 12px;
+            font-size: 11px;
             color: rgba(255, 255, 255, 0.6);
-            margin-bottom: 14px;
+            margin-bottom: 12px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
         .stat-card .value {
-            font-size: 40px;
+            font-size: 36px;
             font-weight: 900;
             background: linear-gradient(135deg, #6366F1 0%, #EC4899 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
         .stat-card p {
-            font-size: 14px;
+            font-size: 13px;
             color: rgba(255, 255, 255, 0.5);
-            line-height: 1.6;
+            line-height: 1.5;
         }
         .stat-card ul {
             list-style: none;
@@ -293,38 +294,38 @@
             margin: 0;
         }
         .stat-card ul li {
-            font-size: 14px;
+            font-size: 13px;
             color: rgba(255, 255, 255, 0.7);
-            padding: 10px 0;
-            padding-left: 24px;
+            padding: 8px 0;
+            padding-left: 20px;
             position: relative;
-            line-height: 1.5;
+            line-height: 1.4;
         }
         .stat-card ul li::before {
             content: "→";
             position: absolute;
             left: 0;
             color: #6366F1;
-            font-size: 16px;
+            font-size: 14px;
         }
-        .right-column {
+        .validations-section {
             
         }
         .section-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 24px;
+            margin-bottom: 16px;
         }
         .section-title {
-            font-size: 24px;
+            font-size: 18px;
             font-weight: 800;
             color: rgba(255, 255, 255, 0.95);
         }
         .view-all-link {
             color: #6366F1;
             text-decoration: none;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             transition: all 0.3s;
         }
@@ -334,39 +335,34 @@
         .validation-item {
             background: rgba(255, 255, 255, 0.04);
             border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 20px;
-            padding: 28px;
-            margin-bottom: 20px;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
             backdrop-filter: blur(20px);
             transition: all 0.4s;
         }
         .validation-item:hover {
             background: rgba(255, 255, 255, 0.06);
             border-color: rgba(99, 102, 241, 0.4);
-            transform: translateY(-4px);
-            box-shadow: 0 20px 60px rgba(99, 102, 241, 0.25);
-        }
-        .validation-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-            margin-bottom: 14px;
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(99, 102, 241, 0.25);
         }
         .validation-title {
-            font-size: 18px;
+            font-size: 15px;
             font-weight: 700;
             color: #FFFFFF;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
         .validation-date {
-            font-size: 12px;
+            font-size: 11px;
             color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 10px;
         }
         .validation-idea {
-            font-size: 14px;
+            font-size: 13px;
             color: rgba(255, 255, 255, 0.8);
-            line-height: 1.6;
-            margin-bottom: 20px;
+            line-height: 1.5;
+            margin-bottom: 14px;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
@@ -374,13 +370,13 @@
         }
         .validation-actions {
             display: flex;
-            gap: 12px;
+            gap: 10px;
         }
         .btn-small {
-            padding: 12px 20px;
+            padding: 10px 16px;
             border: none;
-            border-radius: 10px;
-            font-size: 13px;
+            border-radius: 8px;
+            font-size: 12px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
@@ -393,7 +389,7 @@
         }
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 12px 30px rgba(99, 102, 241, 0.5);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.5);
         }
         .btn-secondary {
             background: rgba(255, 255, 255, 0.08);
@@ -402,51 +398,36 @@
         }
         .btn-secondary:hover {
             background: rgba(255, 255, 255, 0.12);
-            border-color: rgba(255, 255, 255, 0.3);
         }
         .empty-state {
             text-align: center;
-            padding: 60px 20px;
+            padding: 40px 20px;
             color: rgba(255, 255, 255, 0.5);
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
+            border-radius: 16px;
         }
         .empty-state-icon {
-            font-size: 48px;
-            margin-bottom: 16px;
+            font-size: 40px;
+            margin-bottom: 12px;
         }
         @media (max-width: 1200px) {
-            .two-column-section {
+            .main-grid {
                 grid-template-columns: 1fr;
-            }
-            .left-column {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
             }
         }
         @media (max-width: 768px) {
             nav {
-                padding: 20px 24px;
+                padding: 16px 24px;
             }
             .container {
-                padding: 100px 24px 60px;
+                padding: 80px 24px 30px;
             }
             .header h1 {
-                font-size: 32px;
+                font-size: 28px;
             }
             .form-card {
-                padding: 28px;
-            }
-            .left-column {
-                grid-template-columns: 1fr;
-            }
-            .validation-actions {
-                flex-direction: column;
-            }
-            .btn-small {
-                width: 100%;
-                text-align: center;
+                padding: 24px;
             }
         }
     </style>
@@ -461,7 +442,7 @@
         <div class="logo">Intelix</div>
         <div class="nav-right">
             {% if is_developer %}
-            <span class="developer-badge">🔓 Developer</span>
+            <span class="developer-badge">🔓 Dev</span>
             {% endif %}
             <a href="/settings">Settings</a>
             <a href="/logout">Logout</a>
@@ -469,97 +450,86 @@
     </nav>
     <div class="container">
         <div class="header">
-            <h1>Welcome back, <span class="gradient-text">{{ username }}</span>! 👋</h1>
-            <p>Validate your next big idea with AI</p>
+            <h1>Welcome, <span class="gradient-text">{{ username }}</span>! 👋</h1>
+            <p>Validate your business ideas with AI</p>
         </div>
         
-        <form action="/analyze" method="POST">
-            <div class="form-card">
-                <div class="form-group">
-                    <label for="idea">Describe Your Business Idea *</label>
-                    <textarea 
-                        id="idea" 
-                        name="idea" 
-                        required
-                        placeholder="e.g., AI-powered project management tool that automatically assigns tasks based on team member skills and workload..."
-                    ></textarea>
-                    <p class="helper-text">Be specific about what problem you're solving and who it's for</p>
-                </div>
-                <div class="form-group">
-                    <label for="business_name">Business/Product Name (Optional)</label>
-                    <input 
-                        type="text" 
-                        id="business_name" 
-                        name="business_name" 
-                        placeholder="e.g., TechFlow, CloudSync, MarketIQ, FitTrack"
-                    >
-                    <p class="helper-text">Give your idea a name to personalize the analysis</p>
-                </div>
-                <button type="submit" class="btn-submit">
-                    Validate My Idea 🚀
-                </button>
+        <div class="main-grid">
+            <div class="left-section">
+                <form action="/analyze" method="POST">
+                    <div class="form-card">
+                        <div class="form-group">
+                            <label for="idea">Business Idea *</label>
+                            <textarea 
+                                id="idea" 
+                                name="idea" 
+                                required
+                                placeholder="Describe your business idea..."
+                            ></textarea>
+                            <p class="helper-text">Be specific about the problem and solution</p>
+                        </div>
+                        <div class="form-group">
+                            <label for="business_name">Business Name (Optional)</label>
+                            <input 
+                                type="text" 
+                                id="business_name" 
+                                name="business_name" 
+                                placeholder="e.g., TechFlow, MarketIQ"
+                            >
+                        </div>
+                        <button type="submit" class="btn-submit">
+                            Validate My Idea 🚀
+                        </button>
+                    </div>
+                </form>
             </div>
-        </form>
 
-        <div class="two-column-section">
-            <div class="left-column">
+            <div class="right-section">
                 <div class="stat-card">
-                    <h3>Validations This Month</h3>
+                    <h3>This Month</h3>
                     {% if is_developer %}
                     <div class="value">∞</div>
                     <p>🔓 Unlimited validations!</p>
                     {% else %}
                     <div class="value">{{ validation_count }}/7</div>
-                    <p>{{ validations_remaining }} remaining. Resets on 1st!</p>
+                    <p>{{ validations_remaining }} validations remaining</p>
                     {% endif %}
                 </div>
-                <div class="stat-card">
-                    <h3>Pro Tips</h3>
-                    <ul>
-                        <li>Be specific about your target audience</li>
-                        <li>Describe the problem clearly</li>
-                        <li>Mention your unique approach</li>
-                    </ul>
-                </div>
-            </div>
 
-            <div class="right-column">
-                {% if recent_validations %}
-                <div class="section-header">
-                    <h2 class="section-title">🎯 Recent Validations</h2>
-                    <a href="/validations" class="view-all-link">View All →</a>
-                </div>
-                {% for validation in recent_validations %}
-                <div class="validation-item">
-                    <div class="validation-header">
-                        <div>
-                            {% if validation.business_name %}
-                            <div class="validation-title">{{ validation.business_name }}</div>
-                            {% endif %}
-                            <div class="validation-date">{{ validation.created_at.strftime('%B %d, %Y') }}</div>
+                <div class="validations-section">
+                    <div class="section-header">
+                        <h3 class="section-title">🎯 Recent</h3>
+                        <a href="/validations" class="view-all-link">View All →</a>
+                    </div>
+                    {% if recent_validations %}
+                    {% for validation in recent_validations %}
+                    <div class="validation-item">
+                        {% if validation.business_name %}
+                        <div class="validation-title">{{ validation.business_name }}</div>
+                        {% endif %}
+                        <div class="validation-date">{{ validation.created_at.strftime('%B %d, %Y') }}</div>
+                        <div class="validation-idea">{{ validation.idea }}</div>
+                        <div class="validation-actions">
+                            <form action="/marketing" method="POST" style="display: inline;">
+                                <input type="hidden" name="idea" value="{{ validation.idea }}">
+                                <input type="hidden" name="business_name" value="{{ validation.business_name or '' }}">
+                                <button type="submit" class="btn-small btn-primary">
+                                    ✨ Posts
+                                </button>
+                            </form>
+                            <a href="/validation/{{ validation.id }}" class="btn-small btn-secondary">
+                                📄 View
+                            </a>
                         </div>
                     </div>
-                    <div class="validation-idea">{{ validation.idea }}</div>
-                    <div class="validation-actions">
-                        <form action="/marketing" method="POST" style="display: inline;">
-                            <input type="hidden" name="idea" value="{{ validation.idea }}">
-                            <input type="hidden" name="business_name" value="{{ validation.business_name or '' }}">
-                            <button type="submit" class="btn-small btn-primary">
-                                ✨ Generate Posts
-                            </button>
-                        </form>
-                        <a href="/validation/{{ validation.id }}" class="btn-small btn-secondary">
-                            📄 View Analysis
-                        </a>
+                    {% endfor %}
+                    {% else %}
+                    <div class="empty-state">
+                        <div class="empty-state-icon">💡</div>
+                        <p>No validations yet!</p>
                     </div>
+                    {% endif %}
                 </div>
-                {% endfor %}
-                {% else %}
-                <div class="empty-state">
-                    <div class="empty-state-icon">💡</div>
-                    <p>No validations yet. Start by validating your first idea above!</p>
-                </div>
-                {% endif %}
             </div>
         </div>
     </div>
