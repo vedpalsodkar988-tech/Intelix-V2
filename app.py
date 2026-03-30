@@ -27,6 +27,9 @@ LINKEDIN_CLIENT_ID = os.getenv('LINKEDIN_CLIENT_ID')
 LINKEDIN_CLIENT_SECRET = os.getenv('LINKEDIN_CLIENT_SECRET')
 LINKEDIN_REDIRECT_URI = 'https://intelix.dev/linkedin/callback'
 
+# DEVELOPER MODE - UNLIMITED VALIDATIONS
+DEVELOPER_USERS = ['ved@intelix.com']  # Add more usernames here if needed
+
 # Database Models
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -84,6 +87,10 @@ def get_next_reset_date():
         return datetime(now.year + 1, 1, 1)
     else:
         return datetime(now.year, now.month + 1, 1)
+
+def is_developer(user):
+    """Check if user is a developer with unlimited validations"""
+    return user.username in DEVELOPER_USERS
 
 # Database Setup Routes
 @app.route('/create-tables-now')
@@ -241,8 +248,15 @@ def dashboard():
             session.clear()
             return redirect(url_for('login'))
         
-        # Check and reset monthly limit if needed
-        validations_used = check_and_reset_monthly_limit(user)
+        # Check if user is developer
+        if is_developer(user):
+            validations_used = 0
+            validations_remaining = 999  # Show unlimited
+            print(f"🔓 Developer mode active for {user.username}")
+        else:
+            # Check and reset monthly limit if needed
+            validations_used = check_and_reset_monthly_limit(user)
+            validations_remaining = 7 - validations_used
         
         # Reset validation depth when visiting dashboard
         session['validation_depth'] = 0
@@ -251,7 +265,8 @@ def dashboard():
         return render_template('dashboard.html', 
                              username=user.username, 
                              validation_count=validations_used,
-                             validations_remaining=7 - validations_used)
+                             validations_remaining=validations_remaining,
+                             is_developer=is_developer(user))
     except Exception as e:
         print(f"Dashboard error: {e}")
         session.clear()
@@ -269,14 +284,20 @@ def analyze():
             session.clear()
             return redirect(url_for('login'))
         
-        # Check and reset monthly limit if needed
-        validations_used = check_and_reset_monthly_limit(user)
+        # DEVELOPER MODE - UNLIMITED VALIDATIONS
+        developer_mode = is_developer(user)
         
-        # Check if user has reached monthly limit (7 validations)
-        if validations_used >= 7:
-            return render_template('limit_reached.html', 
-                                 validations_used=validations_used,
-                                 reset_date=get_next_reset_date())
+        if not developer_mode:
+            # Check and reset monthly limit if needed
+            validations_used = check_and_reset_monthly_limit(user)
+            
+            # Check if user has reached monthly limit (7 validations)
+            if validations_used >= 7:
+                return render_template('limit_reached.html', 
+                                     validations_used=validations_used,
+                                     reset_date=get_next_reset_date())
+        else:
+            print(f"🔓 Developer mode: Unlimited validations for {user.username}")
         
         idea = request.form.get('idea')
         business_name = request.form.get('business_name', '')
@@ -305,8 +326,9 @@ def analyze():
         )
         db.session.add(validation)
         
-        # Increment monthly validation counter
-        user.validations_this_month += 1
+        # Increment monthly validation counter (skip for developers)
+        if not developer_mode:
+            user.validations_this_month += 1
         
         db.session.commit()
         
@@ -331,7 +353,8 @@ def analyze():
                              error='An error occurred. Please try again.',
                              username=user.username if 'user' in locals() else '',
                              validation_count=0,
-                             validations_remaining=7)
+                             validations_remaining=7,
+                             is_developer=False)
 
 @app.route('/validation/<int:validation_id>')
 def view_validation(validation_id):
@@ -414,14 +437,21 @@ def settings():
     try:
         user = User.query.get(session['user_id'])
         
-        # Check and reset monthly limit
-        validations_used = check_and_reset_monthly_limit(user)
+        # Check if developer
+        if is_developer(user):
+            validations_used = 0
+            validations_remaining = 999
+        else:
+            # Check and reset monthly limit
+            validations_used = check_and_reset_monthly_limit(user)
+            validations_remaining = 7 - validations_used
         
         return render_template('settings.html', 
                              user=user,
                              validations_used=validations_used,
-                             validations_remaining=7 - validations_used,
-                             reset_date=get_next_reset_date())
+                             validations_remaining=validations_remaining,
+                             reset_date=get_next_reset_date(),
+                             is_developer=is_developer(user))
     except Exception as e:
         print(f"Settings error: {e}")
         return redirect(url_for('dashboard'))
