@@ -28,7 +28,7 @@ LINKEDIN_CLIENT_SECRET = os.getenv('LINKEDIN_CLIENT_SECRET')
 LINKEDIN_REDIRECT_URI = 'https://intelix.dev/linkedin/callback'
 
 # DEVELOPER MODE - UNLIMITED VALIDATIONS
-DEVELOPER_USERS = ['ved@intelix.com']  # Add more usernames here if needed
+DEVELOPER_USERS = ['ved@intelix.com']
 
 # Database Models
 class User(db.Model):
@@ -57,7 +57,6 @@ class Validation(db.Model):
 def check_and_reset_monthly_limit(user):
     """Check if it's a new month and reset validation counter"""
     try:
-        # Fix user if missing columns
         if user.validations_this_month is None:
             user.validations_this_month = 0
         if user.last_reset_date is None:
@@ -68,7 +67,6 @@ def check_and_reset_monthly_limit(user):
         now = datetime.utcnow()
         last_reset = user.last_reset_date
         
-        # Check if we're in a new month
         if last_reset.month != now.month or last_reset.year != now.year:
             user.validations_this_month = 0
             user.last_reset_date = now
@@ -110,7 +108,6 @@ def migrate_db():
         from sqlalchemy import text
         
         with db.engine.connect() as conn:
-            # Add validations_this_month column
             try:
                 conn.execute(text('ALTER TABLE "user" ADD COLUMN validations_this_month INTEGER DEFAULT 0'))
                 conn.commit()
@@ -118,7 +115,6 @@ def migrate_db():
             except Exception as e:
                 result1 = f"ℹ️ validations_this_month: {str(e)}"
             
-            # Add last_reset_date column
             try:
                 conn.execute(text("ALTER TABLE \"user\" ADD COLUMN last_reset_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP"))
                 conn.commit()
@@ -137,7 +133,6 @@ def fix_old_users():
         from sqlalchemy import text
         
         with db.engine.connect() as conn:
-            # Update all users to have default values for new columns
             try:
                 conn.execute(text("UPDATE \"user\" SET validations_this_month = 0 WHERE validations_this_month IS NULL"))
                 conn.execute(text("UPDATE \"user\" SET last_reset_date = CURRENT_TIMESTAMP WHERE last_reset_date IS NULL"))
@@ -208,10 +203,8 @@ def login():
             if user and check_password_hash(user.password, password):
                 print(f"Password verified for user: {username}")
                 
-                # Set session FIRST
                 session['user_id'] = user.id
                 
-                # Fix user columns if needed
                 try:
                     if user.validations_this_month is None:
                         user.validations_this_month = 0
@@ -248,21 +241,17 @@ def dashboard():
             session.clear()
             return redirect(url_for('login'))
         
-        # Check if user is developer
         if is_developer(user):
             validations_used = 0
-            validations_remaining = 999  # Show unlimited
+            validations_remaining = 999
             print(f"🔓 Developer mode active for {user.username}")
         else:
-            # Check and reset monthly limit if needed
             validations_used = check_and_reset_monthly_limit(user)
             validations_remaining = 7 - validations_used
         
-        # Reset validation depth when visiting dashboard
         session['validation_depth'] = 0
         session.pop('original_validation_id', None)
         
-        # Get recent validations (last 3)
         recent_validations = Validation.query.filter_by(user_id=user.id).order_by(Validation.created_at.desc()).limit(3).all()
         
         return render_template('dashboard.html', 
@@ -288,14 +277,11 @@ def analyze():
             session.clear()
             return redirect(url_for('login'))
         
-        # DEVELOPER MODE - UNLIMITED VALIDATIONS
         developer_mode = is_developer(user)
         
         if not developer_mode:
-            # Check and reset monthly limit if needed
             validations_used = check_and_reset_monthly_limit(user)
             
-            # Check if user has reached monthly limit (7 validations)
             if validations_used >= 7:
                 return render_template('limit_reached.html', 
                                      validations_used=validations_used,
@@ -306,21 +292,17 @@ def analyze():
         idea = request.form.get('idea')
         business_name = request.form.get('business_name', '')
         
-        # Track validation depth
         validation_depth = session.get('validation_depth', 0) + 1
         session['validation_depth'] = validation_depth
         
         print(f"Analyzing idea (depth: {validation_depth}): {idea[:50]}...")
         
-        # Get AI analysis
         analysis = analyze_business_idea(idea)
         
-        # Generate similar idea only for first validation
         similar_idea = None
         if validation_depth == 1:
             similar_idea = generate_similar_idea(idea, analysis)
         
-        # Save validation to database
         validation = Validation(
             user_id=user.id,
             idea=idea,
@@ -330,13 +312,11 @@ def analyze():
         )
         db.session.add(validation)
         
-        # Increment monthly validation counter (skip for developers)
         if not developer_mode:
             user.validations_this_month += 1
         
         db.session.commit()
         
-        # Store original validation ID for back button
         if validation_depth == 1:
             session['original_validation_id'] = validation.id
         
@@ -396,11 +376,12 @@ def marketing():
     try:
         user = User.query.get(session['user_id'])
         
-        idea = request.form.get('idea', session.get('current_idea', ''))
-        business_name = request.form.get('business_name', session.get('current_business_name', ''))
+        idea = request.form.get('idea', '')
+        business_name = request.form.get('business_name', '')
         
-        session['current_idea'] = idea
-        session['current_business_name'] = business_name
+        if not idea:
+            print("ERROR: No idea provided in marketing route!")
+            return "<h1>❌ Error: No idea provided</h1><p><a href='/dashboard'>Back to Dashboard</a></p>"
         
         print(f"Generating marketing posts for: {idea[:50]}...")
         
@@ -417,8 +398,10 @@ def marketing():
                              posts=posts)
     except Exception as e:
         print(f"Marketing error: {e}")
+        import traceback
+        traceback.print_exc()
         db.session.rollback()
-        return redirect(url_for('dashboard'))
+        return f"<h1>❌ Error generating marketing posts:</h1><p>{str(e)}</p><p><a href='/dashboard'>Back to Dashboard</a></p>"
 
 @app.route('/validations')
 def validations():
@@ -442,12 +425,10 @@ def settings():
     try:
         user = User.query.get(session['user_id'])
         
-        # Check if developer
         if is_developer(user):
             validations_used = 0
             validations_remaining = 999
         else:
-            # Check and reset monthly limit
             validations_used = check_and_reset_monthly_limit(user)
             validations_remaining = 7 - validations_used
         
