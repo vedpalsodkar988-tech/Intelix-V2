@@ -529,8 +529,8 @@
                         <div class="validation-idea">{{ validation.idea }}</div>
                         <div class="validation-actions">
                             <form action="/marketing" method="POST" style="display: inline;">
-                                <input type="hidden" name="idea" value="{{ validation.idea }}">
-                                <input type="hidden" name="business_name" value="{{ validation.business_name or '' }}">
+                                <textarea name="idea" style="display: none;">{{ validation.idea }}</textarea>
+                                <textarea name="business_name" style="display: none;">{{ validation.business_name or '' }}</textarea>
                                 <button type="submit" class="btn-small btn-primary">
                                     ✨ Posts
                                 </button>
