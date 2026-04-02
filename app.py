@@ -25,7 +25,7 @@ db = SQLAlchemy(app)
 # LinkedIn OAuth Configuration
 LINKEDIN_CLIENT_ID = os.getenv('LINKEDIN_CLIENT_ID')
 LINKEDIN_CLIENT_SECRET = os.getenv('LINKEDIN_CLIENT_SECRET')
-LINKEDIN_REDIRECT_URI = 'https://intelix.dev/linkedin/callback'
+LINKEDIN_REDIRECT_URI = os.getenv('LINKEDIN_REDIRECT_URI', 'https://intelix.dev/linkedin/callback')
 
 # DEVELOPER MODE - UNLIMITED VALIDATIONS
 DEVELOPER_USERS = ['ved@intelix.com']
@@ -45,17 +45,16 @@ class User(db.Model):
 
 class Validation(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)  # Now nullable
     idea = db.Column(db.Text, nullable=False)
     business_name = db.Column(db.String(200))
     analysis = db.Column(db.Text)
     similar_idea = db.Column(db.Text)
     marketing_posts = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    session_id = db.Column(db.String(100))  # For non-logged-in users
 
-# Helper function to check and reset monthly validations
 def check_and_reset_monthly_limit(user):
-    """Check if it's a new month and reset validation counter"""
     try:
         if user.validations_this_month is None:
             user.validations_this_month = 0
@@ -79,7 +78,6 @@ def check_and_reset_monthly_limit(user):
         return 0
 
 def get_next_reset_date():
-    """Get the date of next month's 1st"""
     now = datetime.utcnow()
     if now.month == 12:
         return datetime(now.year + 1, 1, 1)
@@ -87,13 +85,21 @@ def get_next_reset_date():
         return datetime(now.year, now.month + 1, 1)
 
 def is_developer(user):
-    """Check if user is a developer with unlimited validations"""
     return user.username in DEVELOPER_USERS
+
+def get_free_validation_count():
+    """Get number of free validations used in this session"""
+    return session.get('free_validations', 0)
+
+def increment_free_validation():
+    """Increment free validation counter"""
+    count = session.get('free_validations', 0)
+    session['free_validations'] = count + 1
+    return session['free_validations']
 
 # Database Setup Routes
 @app.route('/create-tables-now')
 def create_tables():
-    """Create all database tables"""
     try:
         with app.app_context():
             db.create_all()
@@ -103,7 +109,6 @@ def create_tables():
 
 @app.route('/migrate-db-now')
 def migrate_db():
-    """One-time migration to add new columns"""
     try:
         from sqlalchemy import text
         
@@ -128,7 +133,6 @@ def migrate_db():
 
 @app.route('/fix-old-users-now')
 def fix_old_users():
-    """Add missing columns data to existing users"""
     try:
         from sqlalchemy import text
         
@@ -176,6 +180,13 @@ def signup():
             db.session.commit()
             
             session['user_id'] = new_user.id
+            
+            # Transfer session validations to user
+            session_id = session.get('session_id')
+            if session_id:
+                Validation.query.filter_by(session_id=session_id).update({'user_id': new_user.id})
+                db.session.commit()
+            
             return redirect(url_for('dashboard'))
         except Exception as e:
             print(f"Signup error: {e}")
@@ -267,27 +278,32 @@ def dashboard():
 
 @app.route('/analyze', methods=['POST'])
 def analyze():
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
-    
     try:
-        user = User.query.get(session['user_id'])
+        # Check if user is logged in
+        user = None
+        if 'user_id' in session:
+            user = User.query.get(session['user_id'])
         
+        # If not logged in, check free validation limit
         if not user:
-            session.clear()
-            return redirect(url_for('login'))
+            free_count = get_free_validation_count()
+            if free_count >= 2:
+                # Redirect to signup after 2 free validations
+                return render_template('signup_required.html')
         
-        developer_mode = is_developer(user)
-        
-        if not developer_mode:
-            validations_used = check_and_reset_monthly_limit(user)
+        # Check developer mode or monthly limit
+        if user:
+            developer_mode = is_developer(user)
             
-            if validations_used >= 7:
-                return render_template('limit_reached.html', 
-                                     validations_used=validations_used,
-                                     reset_date=get_next_reset_date())
-        else:
-            print(f"🔓 Developer mode: Unlimited validations for {user.username}")
+            if not developer_mode:
+                validations_used = check_and_reset_monthly_limit(user)
+                
+                if validations_used >= 7:
+                    return render_template('limit_reached.html', 
+                                         validations_used=validations_used,
+                                         reset_date=get_next_reset_date())
+            else:
+                print(f"🔓 Developer mode: Unlimited validations for {user.username}")
         
         idea = request.form.get('idea')
         business_name = request.form.get('business_name', '')
@@ -297,14 +313,26 @@ def analyze():
         
         print(f"Analyzing idea (depth: {validation_depth}): {idea[:50]}...")
         
+        # Get AI analysis
         analysis = analyze_business_idea(idea)
         
+        # Generate similar idea only for first validation
         similar_idea = None
         if validation_depth == 1:
             similar_idea = generate_similar_idea(idea, analysis)
         
+        # Generate session ID if not logged in
+        if not user:
+            if 'session_id' not in session:
+                session['session_id'] = os.urandom(16).hex()
+            session_id = session['session_id']
+        else:
+            session_id = None
+        
+        # Save validation to database
         validation = Validation(
-            user_id=user.id,
+            user_id=user.id if user else None,
+            session_id=session_id,
             idea=idea,
             business_name=business_name,
             analysis=json.dumps(analysis),
@@ -312,8 +340,11 @@ def analyze():
         )
         db.session.add(validation)
         
-        if not developer_mode:
+        # Increment counters
+        if user and not is_developer(user):
             user.validations_this_month += 1
+        elif not user:
+            increment_free_validation()
         
         db.session.commit()
         
@@ -328,18 +359,14 @@ def analyze():
                              analysis=analysis,
                              similar_idea=similar_idea,
                              validation_depth=validation_depth,
-                             original_validation_id=original_validation_id)
+                             original_validation_id=original_validation_id,
+                             is_logged_in='user_id' in session)
     
     except Exception as e:
         print(f"Analyze error: {e}")
         db.session.rollback()
-        return render_template('dashboard.html', 
-                             error='An error occurred. Please try again.',
-                             username=user.username if 'user' in locals() else '',
-                             validation_count=0,
-                             validations_remaining=7,
-                             is_developer=False,
-                             recent_validations=[])
+        return render_template('index.html', 
+                             error='An error occurred. Please try again.')
 
 @app.route('/validation/<int:validation_id>')
 def view_validation(validation_id):
@@ -363,45 +390,49 @@ def view_validation(validation_id):
                              similar_idea=similar_idea,
                              marketing_posts=marketing_posts,
                              validation_depth=1,
-                             from_history=True)
+                             from_history=True,
+                             is_logged_in=True)
     except Exception as e:
         print(f"View validation error: {e}")
         return redirect(url_for('dashboard'))
 
 @app.route('/marketing', methods=['POST'])
 def marketing():
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
-    
     try:
-        user = User.query.get(session['user_id'])
-        
         idea = request.form.get('idea', '')
         business_name = request.form.get('business_name', '')
         
         if not idea:
             print("ERROR: No idea provided in marketing route!")
-            return "<h1>❌ Error: No idea provided</h1><p><a href='/dashboard'>Back to Dashboard</a></p>"
+            return "<h1>❌ Error: No idea provided</h1><p><a href='/'>Back to Home</a></p>"
         
         print(f"Generating marketing posts for: {idea[:50]}...")
         
         posts = generate_linkedin_posts(idea, business_name)
         
-        last_validation = Validation.query.filter_by(user_id=user.id).order_by(Validation.created_at.desc()).first()
-        if last_validation:
-            last_validation.marketing_posts = json.dumps(posts)
-            db.session.commit()
+        # Check if user is logged in
+        is_logged_in = 'user_id' in session
+        
+        # Save to database if logged in
+        if is_logged_in:
+            user = User.query.get(session['user_id'])
+            last_validation = Validation.query.filter_by(user_id=user.id).order_by(Validation.created_at.desc()).first()
+            if last_validation:
+                last_validation.marketing_posts = json.dumps(posts)
+                db.session.commit()
         
         return render_template('marketing.html', 
                              idea=idea,
                              business_name=business_name,
-                             posts=posts)
+                             posts=posts,
+                             is_logged_in=is_logged_in,
+                             show_signup_popup=not is_logged_in)
     except Exception as e:
         print(f"Marketing error: {e}")
         import traceback
         traceback.print_exc()
         db.session.rollback()
-        return f"<h1>❌ Error generating marketing posts:</h1><p>{str(e)}</p><p><a href='/dashboard'>Back to Dashboard</a></p>"
+        return f"<h1>❌ Error generating marketing posts:</h1><p>{str(e)}</p><p><a href='/'>Back to Home</a></p>"
 
 @app.route('/validations')
 def validations():
