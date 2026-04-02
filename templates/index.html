@@ -11,22 +11,19 @@
   gtag('config', 'G-7B8EWD6CEG');
 </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Intelix - AI Marketing on Autopilot</title>
+    <title>Intelix - Validate & Market Your Business Ideas with AI</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Arial, sans-serif;
             background: #0F0F0F;
             color: #FFFFFF;
             overflow-x: hidden;
         }
-
-        /* Animated Background */
         .animated-bg {
             position: fixed;
             top: 0;
@@ -36,7 +33,6 @@
             z-index: 0;
             overflow: hidden;
         }
-
         .gradient-orb {
             position: absolute;
             border-radius: 50%;
@@ -44,7 +40,6 @@
             opacity: 0.3;
             animation: float 20s infinite ease-in-out;
         }
-
         .orb-1 {
             width: 500px;
             height: 500px;
@@ -53,7 +48,6 @@
             left: -100px;
             animation-delay: 0s;
         }
-
         .orb-2 {
             width: 400px;
             height: 400px;
@@ -62,7 +56,6 @@
             right: -100px;
             animation-delay: 5s;
         }
-
         .orb-3 {
             width: 300px;
             height: 300px;
@@ -71,14 +64,11 @@
             left: 50%;
             animation-delay: 10s;
         }
-
         @keyframes float {
             0%, 100% { transform: translate(0, 0) scale(1); }
             33% { transform: translate(100px, -50px) scale(1.1); }
             66% { transform: translate(-50px, 100px) scale(0.9); }
         }
-
-        /* Navigation */
         nav {
             position: fixed;
             top: 0;
@@ -91,394 +81,241 @@
             backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             z-index: 1000;
-            animation: slideDown 0.8s ease;
         }
-
-        @keyframes slideDown {
-            from { transform: translateY(-100px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
         .logo {
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 800;
             background: linear-gradient(135deg, #6366F1 0%, #EC4899 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-
-        .nav-links {
-            display: flex;
-            gap: 48px;
-            align-items: center;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            color: rgba(255, 255, 255, 0.7);
-            font-weight: 500;
-            font-size: 15px;
-            transition: all 0.3s;
-        }
-
-        .nav-links a:hover {
-            color: #FFFFFF;
-        }
-
-        .btn-nav {
-            background: linear-gradient(135deg, #6366F1 0%, #A855F7 100%);
-            color: #FFFFFF;
-            padding: 12px 28px;
-            border-radius: 10px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 15px;
-            transition: all 0.3s;
-        }
-
-        .btn-nav:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
-        }
-
-        /* Hero Section */
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 140px 40px 100px;
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 140px 60px 100px;
             position: relative;
             z-index: 1;
         }
-
-        .hero-content {
-            max-width: 1000px;
-            animation: fadeInUp 1s ease;
+        .hero {
+            text-align: center;
+            margin-bottom: 80px;
         }
-
-        @keyframes fadeInUp {
-            from { transform: translateY(50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
         .hero h1 {
-            font-size: 80px;
+            font-size: 64px;
             font-weight: 900;
+            margin-bottom: 24px;
+            letter-spacing: -2px;
             line-height: 1.1;
-            margin-bottom: 28px;
-            letter-spacing: -3px;
         }
-
         .gradient-text {
             background: linear-gradient(135deg, #6366F1 0%, #A855F7 50%, #EC4899 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            animation: shimmer 3s infinite linear;
-            background-size: 200% 200%;
         }
-
-        @keyframes shimmer {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
         .hero p {
-            font-size: 24px;
+            font-size: 22px;
             color: rgba(255, 255, 255, 0.7);
             margin-bottom: 48px;
-            line-height: 1.7;
-            animation: fadeInUp 1s ease 0.3s backwards;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
         }
-
-        .cta-buttons {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
-            animation: fadeInUp 1s ease 0.6s backwards;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #6366F1 0%, #A855F7 100%);
-            color: #FFFFFF;
-            padding: 20px 48px;
-            border-radius: 12px;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 18px;
-            transition: all 0.3s;
-            border: none;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.4);
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.05);
-            color: #FFFFFF;
-            padding: 20px 48px;
-            border-radius: 12px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 18px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s;
-            display: inline-block;
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.2);
-        }
-
-        /* Features Section */
-        .features {
-            padding: 120px 80px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .section-header {
-            text-align: center;
+        .form-section {
             max-width: 700px;
-            margin: 0 auto 100px;
+            margin: 0 auto 60px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 48px;
+            backdrop-filter: blur(20px);
         }
-
-        .section-header h2 {
-            font-size: 56px;
-            font-weight: 900;
-            margin-bottom: 20px;
-            letter-spacing: -2px;
+        .form-group {
+            margin-bottom: 28px;
         }
-
-        .section-header p {
-            font-size: 20px;
-            color: rgba(255, 255, 255, 0.6);
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 15px;
         }
-
-        .feature-grid {
+        .form-group textarea,
+        .form-group input {
+            width: 100%;
+            padding: 16px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            font-size: 16px;
+            color: #FFFFFF;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 140px;
+        }
+        .form-group textarea:focus,
+        .form-group input:focus {
+            outline: none;
+            border-color: #6366F1;
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+        .form-group textarea::placeholder,
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+        .helper-text {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 8px;
+        }
+        .btn-submit {
+            width: 100%;
+            background: linear-gradient(135deg, #6366F1 0%, #A855F7 100%);
+            color: white;
+            padding: 18px;
+            border: none;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(99, 102, 241, 0.4);
+        }
+        .features {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 40px;
-            max-width: 1200px;
-            margin: 0 auto;
+            gap: 32px;
+            margin-top: 80px;
         }
-
-        .feature-card {
+        .feature {
             background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px;
-            padding: 40px;
-            transition: all 0.4s;
-            animation: fadeInUp 1s ease backwards;
+            padding: 36px;
+            transition: all 0.3s;
         }
-
-        .feature-card:nth-child(1) { animation-delay: 0.1s; }
-        .feature-card:nth-child(2) { animation-delay: 0.2s; }
-        .feature-card:nth-child(3) { animation-delay: 0.3s; }
-        .feature-card:nth-child(4) { animation-delay: 0.4s; }
-        .feature-card:nth-child(5) { animation-delay: 0.5s; }
-        .feature-card:nth-child(6) { animation-delay: 0.6s; }
-
-        .feature-card:hover {
+        .feature:hover {
             background: rgba(255, 255, 255, 0.05);
             border-color: rgba(99, 102, 241, 0.3);
             transform: translateY(-8px);
-            box-shadow: 0 20px 60px rgba(99, 102, 241, 0.2);
         }
-
         .feature-icon {
-            font-size: 56px;
-            margin-bottom: 24px;
-            display: block;
+            font-size: 42px;
+            margin-bottom: 20px;
         }
-
-        .feature-card h3 {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 16px;
+        .feature h3 {
+            font-size: 20px;
+            margin-bottom: 12px;
+            color: #FFFFFF;
         }
-
-        .feature-card p {
+        .feature p {
             color: rgba(255, 255, 255, 0.6);
-            line-height: 1.7;
-            font-size: 16px;
+            line-height: 1.6;
+            font-size: 15px;
         }
-
-        /* CTA Section */
-        .final-cta {
-            padding: 150px 80px;
-            text-align: center;
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
-            position: relative;
-            overflow: hidden;
-            z-index: 1;
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
-
-        .final-cta h2 {
-            font-size: 64px;
-            font-weight: 900;
-            margin-bottom: 24px;
-            letter-spacing: -2px;
-        }
-
-        .final-cta p {
-            font-size: 22px;
-            margin-bottom: 40px;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        /* Footer */
-        footer {
-            padding: 60px 80px;
-            text-align: center;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            background: #0A0A0A;
-            position: relative;
-            z-index: 1;
-        }
-
-        footer p {
-            color: rgba(255, 255, 255, 0.4);
-            font-size: 14px;
-        }
-
         @media (max-width: 768px) {
             nav {
                 padding: 20px 24px;
             }
-
-            .nav-links {
-                gap: 20px;
+            .container {
+                padding: 100px 24px 60px;
             }
-
             .hero h1 {
-                font-size: 48px;
+                font-size: 42px;
             }
-
             .hero p {
                 font-size: 18px;
             }
-
-            .feature-grid {
+            .form-section {
+                padding: 32px 24px;
+            }
+            .features {
                 grid-template-columns: 1fr;
-            }
-
-            .features, .final-cta, footer {
-                padding: 80px 24px;
-            }
-
-            .final-cta h2 {
-                font-size: 40px;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Animated Background -->
     <div class="animated-bg">
         <div class="gradient-orb orb-1"></div>
         <div class="gradient-orb orb-2"></div>
         <div class="gradient-orb orb-3"></div>
     </div>
-
-    <!-- Navigation -->
     <nav>
         <div class="logo">Intelix</div>
-        <div class="nav-links">
-            <a href="#features">Features</a>
-            <a href="/login">Login</a>
-            <a href="/signup" class="btn-nav">Get Started →</a>
-        </div>
     </nav>
-
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-content">
-            <h1>
-                AI That Runs Your Startup's<br>
-                <span class="gradient-text">Marketing on Autopilot</span>
-            </h1>
-            <p>
-                Stop spending hours creating content. Our AI analyzes your business, 
-                generates professional posts, and handles your marketing automatically.
-            </p>
-            <div class="cta-buttons">
-                <a href="/signup" class="btn-primary">
-                    Generate My First Post 🚀
-                </a>
-                <a href="#features" class="btn-secondary">See How It Works</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Features Section -->
-    <section class="features" id="features">
-        <div class="section-header">
-            <h2>Everything you need to automate marketing</h2>
-            <p>From idea to content to distribution - all automated by AI</p>
+    <div class="container">
+        <div class="hero">
+            <h1>Validate & Market Your <br><span class="gradient-text">Business Ideas</span> with AI</h1>
+            <p>Get instant AI validation + ready-to-post LinkedIn content for your startup idea. Stop guessing. Start validating and marketing.</p>
         </div>
         
-        <div class="feature-grid">
-            <div class="feature-card">
-                <span class="feature-icon">🧠</span>
-                <h3>AI Market Analysis</h3>
-                <p>Get detailed insights on market size, competition, target audience, and revenue potential in minutes.</p>
+        <form action="/analyze" method="POST" class="form-section">
+            <div class="form-group">
+                <label for="idea">Describe Your Business Idea *</label>
+                <textarea 
+                    id="idea" 
+                    name="idea" 
+                    required
+                    placeholder="e.g., AI-powered project management tool that automatically assigns tasks based on team member skills and workload..."
+                ></textarea>
+                <p class="helper-text">Be specific about what problem you're solving and who it's for</p>
             </div>
-
-            <div class="feature-card">
-                <span class="feature-icon">✍️</span>
-                <h3>Auto Content Generation</h3>
-                <p>AI creates professional LinkedIn posts, reel scripts, and marketing content automatically.</p>
+            <div class="form-group">
+                <label for="business_name">Business/Product Name (Optional)</label>
+                <input 
+                    type="text" 
+                    id="business_name" 
+                    name="business_name" 
+                    placeholder="e.g., TechFlow, CloudSync, MarketIQ, FitTrack"
+                >
+                <p class="helper-text">Give your idea a name to personalize the analysis</p>
             </div>
+            <button type="submit" class="btn-submit">
+                Validate My Idea 🚀
+            </button>
+        </form>
 
-            <div class="feature-card">
-                <span class="feature-icon">🎤</span>
-                <h3>AI Voiceovers</h3>
-                <p>Generate professional voiceovers for your video content with realistic AI voices.</p>
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">⚡</div>
+                <h3>Instant AI Validation</h3>
+                <p>Get detailed analysis on market size, competition, revenue potential, and key risks in 60 seconds.</p>
             </div>
-
-            <div class="feature-card">
-                <span class="feature-icon">⚡</span>
-                <h3>One-Click Posting</h3>
-                <p>Publish directly to LinkedIn with a single click. No copy-pasting, no manual work.</p>
+            <div class="feature">
+                <div class="feature-icon">✨</div>
+                <h3>AI-Generated Marketing Posts</h3>
+                <p>Receive professional LinkedIn posts tailored to YOUR specific business idea.</p>
             </div>
-
-            <div class="feature-card">
-                <span class="feature-icon">🎯</span>
-                <h3>Smart Suggestions</h3>
-                <p>Get related business ideas and content recommendations based on AI analysis.</p>
-            </div>
-
-            <div class="feature-card">
-                <span class="feature-icon">💰</span>
-                <h3>Save Time & Money</h3>
-                <p>No marketing team needed. AI handles everything from content creation to distribution.</p>
+            <div class="feature">
+                <div class="feature-icon">🚀</div>
+                <h3>One-Click LinkedIn Posting</h3>
+                <p>Connect your LinkedIn and post AI-generated content directly with a single click.</p>
             </div>
         </div>
-    </section>
-
-    <!-- Final CTA -->
-    <section class="final-cta">
-        <h2>Ready to automate your marketing?</h2>
-        <p>Join founders who stopped wasting time on content creation</p>
-        <a href="/signup" class="btn-primary">Generate My First Post 🚀</a>
-    </section>
-
-    <!-- Footer -->
-    <footer>
-        <p>&copy; 2026 Intelix. AI-powered marketing automation.</p>
-    </footer>
+    </div>
+    
+    <script>
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const btn = document.querySelector('.btn-submit');
+            btn.disabled = true;
+            btn.innerHTML = `
+                <span style="display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 8px; vertical-align: middle;"></span>
+                Validating...
+            `;
+        });
+    </script>
 </body>
 </html>
