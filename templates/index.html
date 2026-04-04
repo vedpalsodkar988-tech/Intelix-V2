@@ -18,14 +18,12 @@
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Arial, sans-serif;
             background: #0F0F0F;
             color: #FFFFFF;
             overflow-x: hidden;
         }
-
         /* Animated Background */
         .animated-bg {
             position: fixed;
@@ -36,7 +34,6 @@
             z-index: 0;
             overflow: hidden;
         }
-
         .gradient-orb {
             position: absolute;
             border-radius: 50%;
@@ -44,7 +41,6 @@
             opacity: 0.3;
             animation: float 20s infinite ease-in-out;
         }
-
         .orb-1 {
             width: 500px;
             height: 500px;
@@ -53,7 +49,6 @@
             left: -100px;
             animation-delay: 0s;
         }
-
         .orb-2 {
             width: 400px;
             height: 400px;
@@ -62,7 +57,6 @@
             right: -100px;
             animation-delay: 5s;
         }
-
         .orb-3 {
             width: 300px;
             height: 300px;
@@ -71,13 +65,11 @@
             left: 50%;
             animation-delay: 10s;
         }
-
         @keyframes float {
             0%, 100% { transform: translate(0, 0) scale(1); }
             33% { transform: translate(100px, -50px) scale(1.1); }
             66% { transform: translate(-50px, 100px) scale(0.9); }
         }
-
         /* Navigation */
         nav {
             position: fixed;
@@ -93,12 +85,10 @@
             z-index: 1000;
             animation: slideDown 0.8s ease;
         }
-
         @keyframes slideDown {
             from { transform: translateY(-100px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
-
         .logo {
             font-size: 28px;
             font-weight: 800;
@@ -107,13 +97,11 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-
         .nav-links {
             display: flex;
             gap: 48px;
             align-items: center;
         }
-
         .nav-links a {
             text-decoration: none;
             color: rgba(255, 255, 255, 0.7);
@@ -121,11 +109,9 @@
             font-size: 15px;
             transition: all 0.3s;
         }
-
         .nav-links a:hover {
             color: #FFFFFF;
         }
-
         .btn-nav {
             background: linear-gradient(135deg, #6366F1 0%, #A855F7 100%);
             color: #FFFFFF;
@@ -136,12 +122,10 @@
             font-size: 15px;
             transition: all 0.3s;
         }
-
         .btn-nav:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
         }
-
         /* Hero Section */
         .hero {
             min-height: 100vh;
@@ -153,17 +137,14 @@
             position: relative;
             z-index: 1;
         }
-
         .hero-content {
             max-width: 1000px;
             animation: fadeInUp 1s ease;
         }
-
         @keyframes fadeInUp {
             from { transform: translateY(50px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
-
         .hero h1 {
             font-size: 80px;
             font-weight: 900;
@@ -171,7 +152,6 @@
             margin-bottom: 28px;
             letter-spacing: -3px;
         }
-
         .gradient-text {
             background: linear-gradient(135deg, #6366F1 0%, #A855F7 50%, #EC4899 100%);
             -webkit-background-clip: text;
@@ -180,13 +160,11 @@
             animation: shimmer 3s infinite linear;
             background-size: 200% 200%;
         }
-
         @keyframes shimmer {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
-
         .hero p {
             font-size: 24px;
             color: rgba(255, 255, 255, 0.7);
@@ -194,7 +172,6 @@
             line-height: 1.7;
             animation: fadeInUp 1s ease 0.3s backwards;
         }
-
         .cta-buttons {
             display: flex;
             gap: 20px;
@@ -202,7 +179,6 @@
             flex-wrap: wrap;
             animation: fadeInUp 1s ease 0.6s backwards;
         }
-
         .btn-primary {
             background: linear-gradient(135deg, #6366F1 0%, #A855F7 100%);
             color: #FFFFFF;
@@ -218,12 +194,10 @@
             align-items: center;
             gap: 10px;
         }
-
         .btn-primary:hover {
             transform: translateY(-4px);
             box-shadow: 0 20px 40px rgba(99, 102, 241, 0.4);
         }
-
         .btn-secondary {
             background: rgba(255, 255, 255, 0.05);
             color: #FFFFFF;
@@ -236,37 +210,31 @@
             transition: all 0.3s;
             display: inline-block;
         }
-
         .btn-secondary:hover {
             background: rgba(255, 255, 255, 0.1);
             border-color: rgba(255, 255, 255, 0.2);
         }
-
         /* Features Section */
         .features {
             padding: 120px 80px;
             position: relative;
             z-index: 1;
         }
-
         .section-header {
             text-align: center;
             max-width: 700px;
             margin: 0 auto 100px;
         }
-
         .section-header h2 {
             font-size: 56px;
             font-weight: 900;
             margin-bottom: 20px;
             letter-spacing: -2px;
         }
-
         .section-header p {
             font-size: 20px;
             color: rgba(255, 255, 255, 0.6);
         }
-
         .feature-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -274,7 +242,6 @@
             max-width: 1200px;
             margin: 0 auto;
         }
-
         .feature-card {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -283,39 +250,33 @@
             transition: all 0.4s;
             animation: fadeInUp 1s ease backwards;
         }
-
         .feature-card:nth-child(1) { animation-delay: 0.1s; }
         .feature-card:nth-child(2) { animation-delay: 0.2s; }
         .feature-card:nth-child(3) { animation-delay: 0.3s; }
         .feature-card:nth-child(4) { animation-delay: 0.4s; }
         .feature-card:nth-child(5) { animation-delay: 0.5s; }
         .feature-card:nth-child(6) { animation-delay: 0.6s; }
-
         .feature-card:hover {
             background: rgba(255, 255, 255, 0.05);
             border-color: rgba(99, 102, 241, 0.3);
             transform: translateY(-8px);
             box-shadow: 0 20px 60px rgba(99, 102, 241, 0.2);
         }
-
         .feature-icon {
             font-size: 56px;
             margin-bottom: 24px;
             display: block;
         }
-
         .feature-card h3 {
             font-size: 24px;
             font-weight: 700;
             margin-bottom: 16px;
         }
-
         .feature-card p {
             color: rgba(255, 255, 255, 0.6);
             line-height: 1.7;
             font-size: 16px;
         }
-
         /* CTA Section */
         .final-cta {
             padding: 150px 80px;
@@ -325,20 +286,17 @@
             overflow: hidden;
             z-index: 1;
         }
-
         .final-cta h2 {
             font-size: 64px;
             font-weight: 900;
             margin-bottom: 24px;
             letter-spacing: -2px;
         }
-
         .final-cta p {
             font-size: 22px;
             margin-bottom: 40px;
             color: rgba(255, 255, 255, 0.7);
         }
-
         /* Footer */
         footer {
             padding: 60px 80px;
@@ -348,37 +306,29 @@
             position: relative;
             z-index: 1;
         }
-
         footer p {
             color: rgba(255, 255, 255, 0.4);
             font-size: 14px;
         }
-
         @media (max-width: 768px) {
             nav {
                 padding: 20px 24px;
             }
-
             .nav-links {
                 gap: 20px;
             }
-
             .hero h1 {
                 font-size: 48px;
             }
-
             .hero p {
                 font-size: 18px;
             }
-
             .feature-grid {
                 grid-template-columns: 1fr;
             }
-
             .features, .final-cta, footer {
                 padding: 80px 24px;
             }
-
             .final-cta h2 {
                 font-size: 40px;
             }
@@ -392,17 +342,14 @@
         <div class="gradient-orb orb-2"></div>
         <div class="gradient-orb orb-3"></div>
     </div>
-
     <!-- Navigation -->
     <nav>
         <div class="logo">Intelix</div>
         <div class="nav-links">
             <a href="#features">Features</a>
-            <a href="/login">Login</a>
-            <a href="/signup" class="btn-nav">Get Started →</a>
+            <a href="#validation-form" class="btn-nav">Get Started →</a>
         </div>
     </nav>
-
     <!-- Hero Section -->
     <section class="hero">
         <div class="hero-content">
@@ -415,14 +362,52 @@
                 generates professional posts, and handles your marketing automatically.
             </p>
             <div class="cta-buttons">
-                <a href="/signup" class="btn-primary">
+                <a href="#validation-form" class="btn-primary">
                     Generate My First Post 🚀
                 </a>
                 <a href="#features" class="btn-secondary">See How It Works</a>
             </div>
         </div>
     </section>
-
+    
+    <!-- Validation Form Section -->
+    <section id="validation-form" style="padding: 120px 80px; position: relative; z-index: 1;">
+        <div style="max-width: 800px; margin: 0 auto;">
+            <div style="text-align: center; margin-bottom: 60px;">
+                <h2 style="font-size: 48px; font-weight: 900; margin-bottom: 16px; letter-spacing: -2px;">Start Your Free Validation</h2>
+                <p style="font-size: 20px; color: rgba(255, 255, 255, 0.6);">Describe your business idea and get instant AI-powered insights</p>
+            </div>
+            
+            <form action="/analyze" method="POST" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 48px; backdrop-filter: blur(20px);">
+                <div style="margin-bottom: 28px;">
+                    <label for="idea" style="display: block; margin-bottom: 10px; font-weight: 600; color: rgba(255, 255, 255, 0.9); font-size: 15px;">Describe Your Business Idea *</label>
+                    <textarea 
+                        id="idea" 
+                        name="idea" 
+                        required
+                        placeholder="e.g., AI-powered project management tool that automatically assigns tasks based on team member skills and workload..."
+                        style="width: 100%; padding: 16px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; font-size: 16px; color: #FFFFFF; font-family: inherit; min-height: 140px; resize: vertical;"
+                    ></textarea>
+                    <p style="font-size: 13px; color: rgba(255, 255, 255, 0.5); margin-top: 8px;">Be specific about what problem you're solving and who it's for</p>
+                </div>
+                <div style="margin-bottom: 28px;">
+                    <label for="business_name" style="display: block; margin-bottom: 10px; font-weight: 600; color: rgba(255, 255, 255, 0.9); font-size: 15px;">Business/Product Name (Optional)</label>
+                    <input 
+                        type="text" 
+                        id="business_name" 
+                        name="business_name" 
+                        placeholder="e.g., TechFlow, CloudSync, MarketIQ"
+                        style="width: 100%; padding: 16px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; font-size: 16px; color: #FFFFFF; font-family: inherit;"
+                    >
+                    <p style="font-size: 13px; color: rgba(255, 255, 255, 0.5); margin-top: 8px;">Give your idea a name to personalize the analysis</p>
+                </div>
+                <button type="submit" style="width: 100%; background: linear-gradient(135deg, #6366F1 0%, #A855F7 100%); color: white; padding: 18px; border: none; border-radius: 12px; font-size: 17px; font-weight: 700; cursor: pointer; transition: all 0.3s;">
+                    Validate My Idea 🚀
+                </button>
+            </form>
+        </div>
+    </section>
+    
     <!-- Features Section -->
     <section class="features" id="features">
         <div class="section-header">
@@ -436,31 +421,26 @@
                 <h3>AI Market Analysis</h3>
                 <p>Get detailed insights on market size, competition, target audience, and revenue potential in minutes.</p>
             </div>
-
             <div class="feature-card">
                 <span class="feature-icon">✍️</span>
                 <h3>Auto Content Generation</h3>
                 <p>AI creates professional LinkedIn posts, reel scripts, and marketing content automatically.</p>
             </div>
-
             <div class="feature-card">
                 <span class="feature-icon">🎤</span>
                 <h3>AI Voiceovers</h3>
                 <p>Generate professional voiceovers for your video content with realistic AI voices.</p>
             </div>
-
             <div class="feature-card">
                 <span class="feature-icon">⚡</span>
                 <h3>One-Click Posting</h3>
                 <p>Publish directly to LinkedIn with a single click. No copy-pasting, no manual work.</p>
             </div>
-
             <div class="feature-card">
                 <span class="feature-icon">🎯</span>
                 <h3>Smart Suggestions</h3>
                 <p>Get related business ideas and content recommendations based on AI analysis.</p>
             </div>
-
             <div class="feature-card">
                 <span class="feature-icon">💰</span>
                 <h3>Save Time & Money</h3>
@@ -468,17 +448,30 @@
             </div>
         </div>
     </section>
-
     <!-- Final CTA -->
     <section class="final-cta">
         <h2>Ready to automate your marketing?</h2>
         <p>Join founders who stopped wasting time on content creation</p>
-        <a href="/signup" class="btn-primary">Generate My First Post 🚀</a>
+        <a href="#validation-form" class="btn-primary">Generate My First Post 🚀</a>
     </section>
-
     <!-- Footer -->
     <footer>
         <p>&copy; 2026 Intelix. AI-powered marketing automation.</p>
     </footer>
+    
+    <script>
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const btn = this.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.innerHTML = `
+                <span style="display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 8px; vertical-align: middle;"></span>
+                Validating...
+            `;
+        });
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </script>
 </body>
 </html>
