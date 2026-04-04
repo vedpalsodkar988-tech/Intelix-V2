@@ -347,7 +347,7 @@
         <div class="logo">Intelix</div>
         <div class="nav-links">
             <a href="#features">Features</a>
-            <a href="#validation-form" class="btn-nav">Get Started →</a>
+            <a href="/home" class="btn-nav">Get Started →</a>
         </div>
     </nav>
     <!-- Hero Section -->
@@ -362,52 +362,13 @@
                 generates professional posts, and handles your marketing automatically.
             </p>
             <div class="cta-buttons">
-                <a href="#validation-form" class="btn-primary">
+                <a href="/home" class="btn-primary">
                     Generate My First Post 🚀
                 </a>
                 <a href="#features" class="btn-secondary">See How It Works</a>
             </div>
         </div>
     </section>
-    
-    <!-- Validation Form Section -->
-    <section id="validation-form" style="padding: 120px 80px; position: relative; z-index: 1;">
-        <div style="max-width: 800px; margin: 0 auto;">
-            <div style="text-align: center; margin-bottom: 60px;">
-                <h2 style="font-size: 48px; font-weight: 900; margin-bottom: 16px; letter-spacing: -2px;">Start Your Free Validation</h2>
-                <p style="font-size: 20px; color: rgba(255, 255, 255, 0.6);">Describe your business idea and get instant AI-powered insights</p>
-            </div>
-            
-            <form action="/analyze" method="POST" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 48px; backdrop-filter: blur(20px);">
-                <div style="margin-bottom: 28px;">
-                    <label for="idea" style="display: block; margin-bottom: 10px; font-weight: 600; color: rgba(255, 255, 255, 0.9); font-size: 15px;">Describe Your Business Idea *</label>
-                    <textarea 
-                        id="idea" 
-                        name="idea" 
-                        required
-                        placeholder="e.g., AI-powered project management tool that automatically assigns tasks based on team member skills and workload..."
-                        style="width: 100%; padding: 16px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; font-size: 16px; color: #FFFFFF; font-family: inherit; min-height: 140px; resize: vertical;"
-                    ></textarea>
-                    <p style="font-size: 13px; color: rgba(255, 255, 255, 0.5); margin-top: 8px;">Be specific about what problem you're solving and who it's for</p>
-                </div>
-                <div style="margin-bottom: 28px;">
-                    <label for="business_name" style="display: block; margin-bottom: 10px; font-weight: 600; color: rgba(255, 255, 255, 0.9); font-size: 15px;">Business/Product Name (Optional)</label>
-                    <input 
-                        type="text" 
-                        id="business_name" 
-                        name="business_name" 
-                        placeholder="e.g., TechFlow, CloudSync, MarketIQ"
-                        style="width: 100%; padding: 16px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; font-size: 16px; color: #FFFFFF; font-family: inherit;"
-                    >
-                    <p style="font-size: 13px; color: rgba(255, 255, 255, 0.5); margin-top: 8px;">Give your idea a name to personalize the analysis</p>
-                </div>
-                <button type="submit" style="width: 100%; background: linear-gradient(135deg, #6366F1 0%, #A855F7 100%); color: white; padding: 18px; border: none; border-radius: 12px; font-size: 17px; font-weight: 700; cursor: pointer; transition: all 0.3s;">
-                    Validate My Idea 🚀
-                </button>
-            </form>
-        </div>
-    </section>
-    
     <!-- Features Section -->
     <section class="features" id="features">
         <div class="section-header">
@@ -452,26 +413,11 @@
     <section class="final-cta">
         <h2>Ready to automate your marketing?</h2>
         <p>Join founders who stopped wasting time on content creation</p>
-        <a href="#validation-form" class="btn-primary">Generate My First Post 🚀</a>
+        <a href="/home" class="btn-primary">Generate My First Post 🚀</a>
     </section>
     <!-- Footer -->
     <footer>
         <p>&copy; 2026 Intelix. AI-powered marketing automation.</p>
     </footer>
-    
-    <script>
-        document.querySelector('form').addEventListener('submit', function(e) {
-            const btn = this.querySelector('button[type="submit"]');
-            btn.disabled = true;
-            btn.innerHTML = `
-                <span style="display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 8px; vertical-align: middle;"></span>
-                Validating...
-            `;
-        });
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-    </script>
 </body>
 </html>
