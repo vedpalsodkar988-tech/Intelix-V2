@@ -93,6 +93,32 @@
             position: relative;
             z-index: 1;
         }
+        .welcome-banner {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 16px;
+            padding: 24px 32px;
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .welcome-text h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .welcome-text p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 15px;
+        }
+        .validation-badge {
+            background: linear-gradient(135deg, #6366F1 0%, #A855F7 100%);
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 16px;
+        }
         .header {
             text-align: center;
             margin-bottom: 60px;
@@ -194,6 +220,11 @@
             .container {
                 padding: 100px 24px 60px;
             }
+            .welcome-banner {
+                flex-direction: column;
+                gap: 16px;
+                text-align: center;
+            }
             .header h1 {
                 font-size: 36px;
             }
@@ -213,6 +244,16 @@
         <div class="logo">Intelix</div>
     </nav>
     <div class="container">
+        <div class="welcome-banner">
+            <div class="welcome-text">
+                <h2>👋 Welcome!</h2>
+                <p>Start validating your business ideas with AI</p>
+            </div>
+            <div class="validation-badge">
+                0/2 Free Validations
+            </div>
+        </div>
+        
         <div class="header">
             <h1>Validate Your <span class="gradient-text">Business Idea</span></h1>
             <p>Get instant AI validation + ready-to-post LinkedIn content</p>
