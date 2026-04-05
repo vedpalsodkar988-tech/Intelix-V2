@@ -45,14 +45,14 @@ class User(db.Model):
 
 class Validation(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)  # Now nullable for non-logged users
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     idea = db.Column(db.Text, nullable=False)
     business_name = db.Column(db.String(200))
     analysis = db.Column(db.Text)
     similar_idea = db.Column(db.Text)
     marketing_posts = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    session_id = db.Column(db.String(100))  # For non-logged-in users
+    session_id = db.Column(db.String(100))
 
 def check_and_reset_monthly_limit(user):
     try:
@@ -134,7 +134,7 @@ def migrate_db():
             except Exception as e:
                 result3 = f"ℹ️ session_id: {str(e)}"
         
-        return f"<h1>Migration Results:</h1><p>{result1}</p><p>{result2}</p><p>{result3}</p><p><a href='/dashboard'>Go to Dashboard</a></p>"
+        return f"<h1>Migration Results:</h1><p>{result1}</p><p>{result2}</p><p>{result3}</p><p><a href='/home'>Go to Home</a></p>"
     except Exception as e:
         return f"<h1>Migration Error:</h1><p>{str(e)}</p>"
 
@@ -162,7 +162,9 @@ def index():
 
 @app.route('/home')
 def home():
-    return render_template('home.html')
+    # Get current validation count
+    free_count = get_free_validation_count()
+    return render_template('home.html', validation_count=free_count)
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -295,12 +297,12 @@ def analyze():
         if 'user_id' in session:
             user = User.query.get(session['user_id'])
         
-        # If not logged in, check free validation limit
+        # If not logged in, check free validation limit (7 FREE VALIDATIONS)
         if not user:
             free_count = get_free_validation_count()
-            if free_count >= 2:
-                # Redirect to signup after 2 free validations
-                return render_template('signup_required.html')
+            # NO LIMIT - ALLOW UNLIMITED FREE VALIDATIONS FOR NOW
+            # if free_count >= 7:
+            #     return render_template('signup_required.html')
         
         # Check developer mode or monthly limit
         if user:
