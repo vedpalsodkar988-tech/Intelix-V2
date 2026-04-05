@@ -72,6 +72,7 @@
             background: white;
             border-radius: 20px;
             padding: 40px;
+            margin-bottom: 30px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
         .form-title {
@@ -155,11 +156,193 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+        
+        /* Previous Validations Section */
+        .previous-validations {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .section-title {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .section-subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 15px;
+        }
+        .validation-card {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .validation-card:hover {
+            border-color: #667eea;
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.1);
+        }
+        .validation-card h4 {
+            color: #333;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+        .validation-card p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+        .validation-card .meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            color: #9ca3af;
+        }
+        .btn-view {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+        .btn-view:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(102, 126, 234, 0.3);
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #9ca3af;
+        }
+        .empty-state .emoji {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+        
+        /* LinkedIn Popup */
+        .linkedin-popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+        }
+        .linkedin-popup-overlay.active {
+            display: flex;
+        }
+        .linkedin-popup {
+            background: white;
+            border-radius: 20px;
+            padding: 48px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+            animation: popupSlideIn 0.3s ease;
+        }
+        @keyframes popupSlideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .linkedin-popup .emoji {
+            font-size: 64px;
+            margin-bottom: 24px;
+        }
+        .linkedin-popup h2 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 16px;
+        }
+        .linkedin-popup p {
+            color: #666;
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+        .linkedin-popup .benefits {
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 24px 0;
+            text-align: left;
+        }
+        .linkedin-popup .benefits ul {
+            list-style: none;
+            padding: 0;
+        }
+        .linkedin-popup .benefits li {
+            padding: 8px 0;
+            color: #555;
+            font-size: 14px;
+        }
+        .linkedin-popup .benefits li:before {
+            content: "✓";
+            color: #10b981;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .linkedin-popup .buttons {
+            display: flex;
+            gap: 12px;
+        }
+        .btn-connect-linkedin {
+            flex: 1;
+            background: #0077B5;
+            color: white;
+            padding: 16px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        .btn-connect-linkedin:hover {
+            background: #005885;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 119, 181, 0.3);
+        }
+        .btn-skip {
+            flex: 1;
+            background: #f3f4f6;
+            color: #666;
+            padding: 16px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-skip:hover {
+            background: #e5e7eb;
+        }
+        
         @media (max-width: 768px) {
             body {
                 padding: 20px 15px;
             }
-            .header, .validation-form {
+            .header, .validation-form, .previous-validations {
                 padding: 25px 20px;
             }
             .header h1 {
@@ -168,10 +351,36 @@
             .stats {
                 flex-direction: column;
             }
+            .linkedin-popup {
+                padding: 32px 24px;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- LinkedIn Popup -->
+    <div class="linkedin-popup-overlay" id="linkedinPopup">
+        <div class="linkedin-popup">
+            <div class="emoji">🚀</div>
+            <h2>Connect Your LinkedIn!</h2>
+            <p>Post your marketing content to LinkedIn with just 1 click.</p>
+            
+            <div class="benefits">
+                <ul>
+                    <li>Auto-post AI-generated content</li>
+                    <li>No copy-pasting needed</li>
+                    <li>Instant publishing</li>
+                    <li>Save hours every week</li>
+                </ul>
+            </div>
+            
+            <div class="buttons">
+                <a href="/linkedin/auth" class="btn-connect-linkedin">Connect LinkedIn</a>
+                <button class="btn-skip" onclick="closeLinkedInPopup()">Skip for Now</button>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <div class="header">
             <h1>👋 Welcome to Intelix!</h1>
@@ -179,7 +388,7 @@
             <div class="stats">
                 <div class="stat-card">
                     <h3>Validations This Month</h3>
-                    <div class="number">0/7</div>
+                    <div class="number">{{ validation_count }}/7</div>
                 </div>
                 <div class="stat-card">
                     <h3>Status</h3>
@@ -220,13 +429,56 @@
                 </button>
             </form>
         </div>
+
+        <!-- Previous Validations Section -->
+        <div class="previous-validations">
+            <h2 class="section-title">Your Previous Validations</h2>
+            <p class="section-subtitle">View and regenerate marketing posts for your past ideas</p>
+            
+            {% if recent_validations and recent_validations|length > 0 %}
+                {% for validation in recent_validations %}
+                <div class="validation-card">
+                    <h4>{{ validation.business_name if validation.business_name else 'Unnamed Idea' }}</h4>
+                    <p>{{ validation.idea[:150] }}{% if validation.idea|length > 150 %}...{% endif %}</p>
+                    <div class="meta">
+                        <span>{{ validation.created_at.strftime('%B %d, %Y') }}</span>
+                        <a href="/validation/{{ validation.id }}" class="btn-view">View & Generate Fresh Posts →</a>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="emoji">💡</div>
+                    <p>No validations yet. Start by validating your first idea above!</p>
+                </div>
+            {% endif %}
+        </div>
     </div>
     
     <script>
+        // Form submit loading
         document.querySelector('form').addEventListener('submit', function(e) {
             const btn = document.getElementById('submitBtn');
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner"></span>Validating Your Idea...';
+        });
+
+        // LinkedIn Popup Logic
+        function showLinkedInPopup() {
+            document.getElementById('linkedinPopup').classList.add('active');
+        }
+
+        function closeLinkedInPopup() {
+            document.getElementById('linkedinPopup').classList.remove('active');
+            localStorage.setItem('linkedInPopupShown', 'true');
+        }
+
+        // Show popup on first visit
+        window.addEventListener('load', function() {
+            const popupShown = localStorage.getItem('linkedInPopupShown');
+            if (!popupShown) {
+                setTimeout(showLinkedInPopup, 2000); // Show after 2 seconds
+            }
         });
     </script>
 </body>
