@@ -45,7 +45,7 @@ class User(db.Model):
 
 class Validation(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)  # Now nullable
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)  # Now nullable for non-logged users
     idea = db.Column(db.Text, nullable=False)
     business_name = db.Column(db.String(200))
     analysis = db.Column(db.Text)
@@ -126,8 +126,15 @@ def migrate_db():
                 result2 = "✅ Added last_reset_date column"
             except Exception as e:
                 result2 = f"ℹ️ last_reset_date: {str(e)}"
+            
+            try:
+                conn.execute(text('ALTER TABLE "validation" ADD COLUMN session_id VARCHAR(100)'))
+                conn.commit()
+                result3 = "✅ Added session_id column to validation"
+            except Exception as e:
+                result3 = f"ℹ️ session_id: {str(e)}"
         
-        return f"<h1>Migration Results:</h1><p>{result1}</p><p>{result2}</p><p><a href='/dashboard'>Go to Dashboard</a></p>"
+        return f"<h1>Migration Results:</h1><p>{result1}</p><p>{result2}</p><p>{result3}</p><p><a href='/dashboard'>Go to Dashboard</a></p>"
     except Exception as e:
         return f"<h1>Migration Error:</h1><p>{str(e)}</p>"
 
@@ -152,6 +159,10 @@ def fix_old_users():
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/home')
+def home():
+    return render_template('home.html')
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -184,7 +195,7 @@ def signup():
             # Transfer session validations to user
             session_id = session.get('session_id')
             if session_id:
-                Validation.query.filter_by(session_id=session_id).update({'user_id': new_user.id})
+                Validation.query.filter_by(session_id=session_id).update({'user_id': new_user.id, 'session_id': None})
                 db.session.commit()
             
             return redirect(url_for('dashboard'))
@@ -365,7 +376,7 @@ def analyze():
     except Exception as e:
         print(f"Analyze error: {e}")
         db.session.rollback()
-        return render_template('index.html', 
+        return render_template('home.html', 
                              error='An error occurred. Please try again.')
 
 @app.route('/validation/<int:validation_id>')
