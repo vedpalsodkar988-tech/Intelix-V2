@@ -103,7 +103,7 @@ def create_tables():
     try:
         with app.app_context():
             db.create_all()
-        return "<h1>✅ All tables created successfully!</h1><p><a href='/dashboard'>Go to Dashboard</a></p><p><a href='/'>Go to Home</a></p>"
+        return "<h1>✅ All tables created successfully!</h1><p><a href='/home'>Go to Home</a></p>"
     except Exception as e:
         return f"<h1>❌ Error creating tables:</h1><p>{str(e)}</p>"
 
@@ -138,23 +138,6 @@ def migrate_db():
     except Exception as e:
         return f"<h1>Migration Error:</h1><p>{str(e)}</p>"
 
-@app.route('/fix-old-users-now')
-def fix_old_users():
-    try:
-        from sqlalchemy import text
-        
-        with db.engine.connect() as conn:
-            try:
-                conn.execute(text("UPDATE \"user\" SET validations_this_month = 0 WHERE validations_this_month IS NULL"))
-                conn.execute(text("UPDATE \"user\" SET last_reset_date = CURRENT_TIMESTAMP WHERE last_reset_date IS NULL"))
-                conn.commit()
-                return "<h1>✅ All old users fixed!</h1><p>You can login now!</p><p><a href='/login'>Go to Login</a></p>"
-            except Exception as e:
-                conn.rollback()
-                return f"<h1>❌ Error:</h1><p>{str(e)}</p>"
-    except Exception as e:
-        return f"<h1>❌ Error:</h1><p>{str(e)}</p>"
-
 # Routes
 @app.route('/')
 def index():
@@ -164,7 +147,15 @@ def index():
 def home():
     # Get current validation count
     free_count = get_free_validation_count()
-    return render_template('home.html', validation_count=free_count)
+    
+    # Get recent validations from session
+    session_id = session.get('session_id')
+    recent_validations = []
+    
+    if session_id:
+        recent_validations = Validation.query.filter_by(session_id=session_id).order_by(Validation.created_at.desc()).limit(3).all()
+    
+    return render_template('home.html', validation_count=free_count, recent_validations=recent_validations)
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -200,7 +191,8 @@ def signup():
                 Validation.query.filter_by(session_id=session_id).update({'user_id': new_user.id, 'session_id': None})
                 db.session.commit()
             
-            return redirect(url_for('dashboard'))
+            # Redirect to LinkedIn auth
+            return redirect(url_for('linkedin_auth'))
         except Exception as e:
             print(f"Signup error: {e}")
             db.session.rollback()
@@ -240,8 +232,8 @@ def login():
                     print(f"Error fixing user columns: {e}")
                     db.session.rollback()
                 
-                print(f"Redirecting to dashboard for user: {username}")
-                return redirect(url_for('dashboard'))
+                print(f"Redirecting to home for user: {username}")
+                return redirect(url_for('home'))
             else:
                 print(f"Invalid credentials for username: {username}")
                 return render_template('login.html', error='Invalid username or password')
@@ -253,42 +245,6 @@ def login():
     
     return render_template('login.html')
 
-@app.route('/dashboard')
-def dashboard():
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
-    
-    try:
-        user = User.query.get(session['user_id'])
-        
-        if not user:
-            session.clear()
-            return redirect(url_for('login'))
-        
-        if is_developer(user):
-            validations_used = 0
-            validations_remaining = 999
-            print(f"🔓 Developer mode active for {user.username}")
-        else:
-            validations_used = check_and_reset_monthly_limit(user)
-            validations_remaining = 7 - validations_used
-        
-        session['validation_depth'] = 0
-        session.pop('original_validation_id', None)
-        
-        recent_validations = Validation.query.filter_by(user_id=user.id).order_by(Validation.created_at.desc()).limit(3).all()
-        
-        return render_template('dashboard.html', 
-                             username=user.username, 
-                             validation_count=validations_used,
-                             validations_remaining=validations_remaining,
-                             is_developer=is_developer(user),
-                             recent_validations=recent_validations)
-    except Exception as e:
-        print(f"Dashboard error: {e}")
-        session.clear()
-        return redirect(url_for('login'))
-
 @app.route('/analyze', methods=['POST'])
 def analyze():
     try:
@@ -297,14 +253,12 @@ def analyze():
         if 'user_id' in session:
             user = User.query.get(session['user_id'])
         
-        # If not logged in, check free validation limit (7 FREE VALIDATIONS)
+        # If not logged in, unlimited validations for now
         if not user:
             free_count = get_free_validation_count()
-            # NO LIMIT - ALLOW UNLIMITED FREE VALIDATIONS FOR NOW
-            # if free_count >= 7:
-            #     return render_template('signup_required.html')
+            # No limit enforced - allow unlimited free validations
         
-        # Check developer mode or monthly limit
+        # Check developer mode or monthly limit for logged-in users
         if user:
             developer_mode = is_developer(user)
             
@@ -383,14 +337,19 @@ def analyze():
 
 @app.route('/validation/<int:validation_id>')
 def view_validation(validation_id):
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
-    
     try:
         validation = Validation.query.get_or_404(validation_id)
         
-        if validation.user_id != session['user_id']:
-            return "Unauthorized", 403
+        # Check if user owns this validation (either logged in or session matches)
+        user_id = session.get('user_id')
+        session_id = session.get('session_id')
+        
+        if validation.user_id:
+            if not user_id or validation.user_id != user_id:
+                return "Unauthorized", 403
+        elif validation.session_id:
+            if validation.session_id != session_id:
+                return "Unauthorized", 403
         
         analysis = json.loads(validation.analysis)
         similar_idea = json.loads(validation.similar_idea) if validation.similar_idea else None
@@ -404,10 +363,10 @@ def view_validation(validation_id):
                              marketing_posts=marketing_posts,
                              validation_depth=1,
                              from_history=True,
-                             is_logged_in=True)
+                             is_logged_in='user_id' in session)
     except Exception as e:
         print(f"View validation error: {e}")
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('home'))
 
 @app.route('/marketing', methods=['POST'])
 def marketing():
@@ -417,7 +376,7 @@ def marketing():
         
         if not idea:
             print("ERROR: No idea provided in marketing route!")
-            return "<h1>❌ Error: No idea provided</h1><p><a href='/'>Back to Home</a></p>"
+            return "<h1>❌ Error: No idea provided</h1><p><a href='/home'>Back to Home</a></p>"
         
         print(f"Generating marketing posts for: {idea[:50]}...")
         
@@ -426,13 +385,21 @@ def marketing():
         # Check if user is logged in
         is_logged_in = 'user_id' in session
         
-        # Save to database if logged in
+        # Save to database
         if is_logged_in:
             user = User.query.get(session['user_id'])
             last_validation = Validation.query.filter_by(user_id=user.id).order_by(Validation.created_at.desc()).first()
             if last_validation:
                 last_validation.marketing_posts = json.dumps(posts)
                 db.session.commit()
+        else:
+            # Save to session-based validation
+            session_id = session.get('session_id')
+            if session_id:
+                last_validation = Validation.query.filter_by(session_id=session_id).order_by(Validation.created_at.desc()).first()
+                if last_validation:
+                    last_validation.marketing_posts = json.dumps(posts)
+                    db.session.commit()
         
         return render_template('marketing.html', 
                              idea=idea,
@@ -445,46 +412,7 @@ def marketing():
         import traceback
         traceback.print_exc()
         db.session.rollback()
-        return f"<h1>❌ Error generating marketing posts:</h1><p>{str(e)}</p><p><a href='/'>Back to Home</a></p>"
-
-@app.route('/validations')
-def validations():
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
-    
-    try:
-        user = User.query.get(session['user_id'])
-        user_validations = Validation.query.filter_by(user_id=user.id).order_by(Validation.created_at.desc()).all()
-        
-        return render_template('validations.html', validations=user_validations)
-    except Exception as e:
-        print(f"Validations error: {e}")
-        return redirect(url_for('dashboard'))
-
-@app.route('/settings')
-def settings():
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
-    
-    try:
-        user = User.query.get(session['user_id'])
-        
-        if is_developer(user):
-            validations_used = 0
-            validations_remaining = 999
-        else:
-            validations_used = check_and_reset_monthly_limit(user)
-            validations_remaining = 7 - validations_used
-        
-        return render_template('settings.html', 
-                             user=user,
-                             validations_used=validations_used,
-                             validations_remaining=validations_remaining,
-                             reset_date=get_next_reset_date(),
-                             is_developer=is_developer(user))
-    except Exception as e:
-        print(f"Settings error: {e}")
-        return redirect(url_for('dashboard'))
+        return f"<h1>❌ Error generating marketing posts:</h1><p>{str(e)}</p><p><a href='/home'>Back to Home</a></p>"
 
 @app.route('/logout')
 def logout():
@@ -495,7 +423,7 @@ def logout():
 @app.route('/linkedin/auth')
 def linkedin_auth():
     if 'user_id' not in session:
-        return redirect(url_for('login'))
+        return redirect(url_for('signup'))
     
     auth_url = f"https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id={LINKEDIN_CLIENT_ID}&redirect_uri={LINKEDIN_REDIRECT_URI}&scope=openid%20profile%20w_member_social"
     
@@ -504,13 +432,13 @@ def linkedin_auth():
 @app.route('/linkedin/callback')
 def linkedin_callback():
     if 'user_id' not in session:
-        return redirect(url_for('login'))
+        return redirect(url_for('signup'))
     
     try:
         code = request.args.get('code')
         
         if not code:
-            return "LinkedIn authentication failed", 400
+            return redirect(url_for('home'))
         
         token_url = "https://www.linkedin.com/oauth/v2/accessToken"
         token_data = {
@@ -536,13 +464,13 @@ def linkedin_callback():
             
             db.session.commit()
             
-            return redirect(url_for('settings'))
+            return redirect(url_for('home'))
         
-        return "Failed to get access token", 400
+        return redirect(url_for('home'))
     except Exception as e:
         print(f"LinkedIn callback error: {e}")
         db.session.rollback()
-        return redirect(url_for('settings'))
+        return redirect(url_for('home'))
 
 @app.route('/post/linkedin', methods=['POST'])
 def post_linkedin():
