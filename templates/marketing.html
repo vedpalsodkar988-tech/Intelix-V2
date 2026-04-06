@@ -11,749 +11,361 @@
   gtag('config', 'G-7B8EWD6CEG');
 </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marketing Content - Intelix</title>
+    <title>Marketing Posts - Intelix</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Arial, sans-serif;
-            background: #0F0F0F;
-            color: #FFFFFF;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            padding: 40px 20px;
         }
-
-        nav {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            padding: 24px 80px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(15, 15, 15, 0.9);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            z-index: 1000;
-        }
-
-        .logo {
-            font-size: 28px;
-            font-weight: 800;
-            color: #FFFFFF;
-            letter-spacing: -1px;
-        }
-
-        .nav-right {
-            display: flex;
-            gap: 32px;
-            align-items: center;
-        }
-
-        .nav-right a {
-            color: rgba(255, 255, 255, 0.7);
-            text-decoration: none;
-            font-size: 15px;
-            transition: color 0.3s;
-        }
-
-        .nav-right a:hover {
-            color: #FFFFFF;
-        }
-
         .container {
-            max-width: 1200px;
+            max-width: 900px;
             margin: 0 auto;
-            padding: 120px 40px 80px;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
-
         .header {
             text-align: center;
-            margin-bottom: 60px;
+            margin-bottom: 40px;
         }
-
         .header h1 {
-            font-size: 48px;
-            font-weight: 900;
-            margin-bottom: 12px;
-            letter-spacing: -2px;
-        }
-
-        .gradient-text {
-            background: linear-gradient(135deg, #6366F1 0%, #A855F7 50%, #EC4899 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .header p {
-            font-size: 18px;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .idea-summary {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 28px;
-            margin-bottom: 50px;
-        }
-
-        .idea-summary h3 {
-            font-size: 16px;
-            color: rgba(255, 255, 255, 0.6);
-            margin-bottom: 12px;
-            font-weight: 600;
-        }
-
-        .idea-summary p {
-            font-size: 17px;
-            line-height: 1.6;
-            color: rgba(255, 255, 255, 0.9);
-        }
-
-        .section-header {
-            text-align: center;
-            margin: 60px 0 40px;
-        }
-
-        .section-header h2 {
-            font-size: 36px;
-            font-weight: 900;
-            margin-bottom: 8px;
-        }
-
-        .section-header p {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 16px;
-        }
-
-        /* Toast Notification */
-        .toast {
-            position: fixed;
-            top: 100px;
-            right: 30px;
-            background: white;
+            font-size: 32px;
             color: #333;
-            padding: 16px 24px;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-            display: none;
-            align-items: center;
-            gap: 12px;
-            z-index: 10000;
-            animation: slideIn 0.3s ease;
-            min-width: 300px;
+            margin-bottom: 12px;
         }
-
-        .toast.show {
-            display: flex;
-        }
-
-        .toast.success {
-            border-left: 4px solid #10b981;
-        }
-
-        .toast.error {
-            border-left: 4px solid #ef4444;
-        }
-
-        .toast-icon {
-            font-size: 24px;
-        }
-
-        .toast-message {
-            flex: 1;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        @keyframes slideOut {
-            from {
-                transform: translateX(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-        }
-
-        /* LinkedIn Posts */
-        .posts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 28px;
-            margin-bottom: 80px;
-        }
-
-        .post-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 32px;
-            transition: all 0.3s;
-        }
-
-        .post-card:hover {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(99, 102, 241, 0.3);
-            transform: translateY(-4px);
-        }
-
-        .post-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .post-title {
+        .header p {
+            color: #666;
             font-size: 16px;
-            font-weight: 700;
-            color: #6366F1;
         }
-
-        .post-badge {
-            background: rgba(99, 102, 241, 0.2);
-            color: #A855F7;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .post-content {
-            background: rgba(0, 0, 0, 0.3);
+        .post-card {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
             border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            line-height: 1.7;
-            font-size: 15px;
-            color: rgba(255, 255, 255, 0.9);
-            white-space: pre-wrap;
+            padding: 24px;
+            margin-bottom: 24px;
         }
-
+        .post-card h3 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .post-content {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            white-space: pre-wrap;
+            line-height: 1.7;
+            color: #333;
+            font-size: 15px;
+        }
         .post-actions {
             display: flex;
             gap: 12px;
         }
-
         .btn-copy {
             flex: 1;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #FFFFFF;
+            background: #f3f4f6;
+            color: #333;
             padding: 12px;
+            border: 2px solid #e5e7eb;
             border-radius: 8px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
         }
-
         .btn-copy:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: #e5e7eb;
         }
-
-        .btn-post-linkedin {
+        .btn-copy.copied {
+            background: #10b981;
+            color: white;
+            border-color: #10b981;
+        }
+        .btn-linkedin {
             flex: 1;
-            background: #0A66C2;
-            border: none;
-            color: #FFFFFF;
+            background: #0077B5;
+            color: white;
             padding: 12px;
+            border: none;
             border-radius: 8px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
         }
-
-        .btn-post-linkedin:hover {
-            background: #004182;
+        .btn-linkedin:hover {
+            background: #005885;
             transform: translateY(-2px);
         }
-
-        .btn-post-linkedin:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* Voiceover Generator - REDESIGNED */
-        .voiceover-generator {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
-            border: 2px solid rgba(99, 102, 241, 0.3);
-            border-radius: 16px;
-            padding: 40px;
-            margin-bottom: 50px;
-        }
-
-        .voiceover-generator h2 {
-            font-size: 28px;
-            font-weight: 900;
-            margin-bottom: 12px;
-            text-align: center;
-            background: linear-gradient(135deg, #6366F1 0%, #A855F7 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .voiceover-generator .subtitle {
-            text-align: center;
-            color: rgba(255, 255, 255, 0.6);
-            margin-bottom: 30px;
-        }
-
-        .voiceover-form {
-            max-width: 700px;
-            margin: 0 auto;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 14px;
-        }
-
-        .form-group textarea {
+        .btn-back {
             width: 100%;
-            padding: 16px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(99, 102, 241, 0.2);
-            border-radius: 12px;
-            font-size: 15px;
-            color: #FFFFFF;
-            font-family: inherit;
-            resize: vertical;
-            min-height: 120px;
-            transition: all 0.3s;
-        }
-
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #6366F1;
-            background: rgba(0, 0, 0, 0.4);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-        }
-
-        .form-group textarea::placeholder {
-            color: rgba(255, 255, 255, 0.3);
-        }
-
-        .btn-generate-voice {
-            width: 100%;
-            background: linear-gradient(135deg, #6366F1 0%, #A855F7 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 16px;
             border: none;
-            border-radius: 12px;
+            border-radius: 10px;
             font-size: 16px;
             font-weight: 700;
             cursor: pointer;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+            margin-top: 24px;
             transition: all 0.3s;
-            display: flex;
+        }
+        .btn-back:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        /* Signup Popup */
+        .signup-popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 10000;
             align-items: center;
             justify-content: center;
-            gap: 8px;
         }
-
-        .btn-generate-voice:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+        .signup-popup-overlay.active {
+            display: flex;
         }
-
-        .btn-generate-voice:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
+        .signup-popup {
+            background: white;
+            border-radius: 20px;
+            padding: 48px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+            animation: popupSlideIn 0.3s ease;
         }
-
-        .voiceover-result {
-            margin-top: 30px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(99, 102, 241, 0.2);
+        @keyframes popupSlideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .signup-popup .emoji {
+            font-size: 64px;
+            margin-bottom: 24px;
+        }
+        .signup-popup h2 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 16px;
+        }
+        .signup-popup p {
+            color: #666;
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+        .signup-popup .benefits {
+            background: #f9fafb;
             border-radius: 12px;
             padding: 20px;
-            display: none;
+            margin: 24px 0;
+            text-align: left;
         }
-
-        .voiceover-result.active {
-            display: block;
+        .signup-popup .benefits ul {
+            list-style: none;
+            padding: 0;
         }
-
-        .voiceover-result h4 {
+        .signup-popup .benefits li {
+            padding: 8px 0;
+            color: #555;
             font-size: 14px;
-            color: #A855F7;
-            margin-bottom: 12px;
-            text-transform: uppercase;
-            font-weight: 600;
         }
-
-        .audio-player {
-            width: 100%;
-            margin-bottom: 12px;
-            height: 40px;
-            border-radius: 8px;
+        .signup-popup .benefits li:before {
+            content: "✓";
+            color: #10b981;
+            font-weight: bold;
+            margin-right: 10px;
         }
-
-        .download-audio {
-            display: inline-block;
-            background: linear-gradient(135deg, #6366F1 0%, #A855F7 100%);
-            border: none;
+        .signup-popup .buttons {
+            display: flex;
+            gap: 12px;
+        }
+        .btn-signup-now {
+            flex: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
+            padding: 16px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
             text-decoration: none;
+            display: block;
+            text-align: center;
             transition: all 0.3s;
         }
-
-        .download-audio:hover {
+        .btn-signup-now:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
         }
-
-        .hidden-textarea {
-            position: absolute;
-            left: -9999px;
+        .btn-skip {
+            flex: 1;
+            background: #f3f4f6;
+            color: #666;
+            padding: 16px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
         }
-
-        .spinner {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+        .btn-skip:hover {
+            background: #e5e7eb;
         }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .back-link {
-            text-align: center;
-            margin-top: 40px;
-        }
-
-        .back-link a {
-            color: rgba(255, 255, 255, 0.6);
-            text-decoration: none;
-            font-size: 15px;
-        }
-
-        .back-link a:hover {
-            color: #FFFFFF;
-        }
-
+        
         @media (max-width: 768px) {
-            nav {
-                padding: 20px 24px;
-            }
-
             .container {
-                padding: 100px 24px 60px;
+                padding: 25px 20px;
             }
-
             .header h1 {
-                font-size: 36px;
+                font-size: 24px;
             }
-
-            .posts-grid {
-                grid-template-columns: 1fr;
+            .post-actions {
+                flex-direction: column;
             }
-
-            .toast {
-                right: 20px;
-                left: 20px;
-                min-width: auto;
+            .signup-popup {
+                padding: 32px 24px;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Toast Notification -->
-    <div class="toast" id="toast">
-        <span class="toast-icon" id="toastIcon"></span>
-        <span class="toast-message" id="toastMessage"></span>
-    </div>
-
-    <nav>
-        <div class="logo">Intelix</div>
-        <div class="nav-right">
-            <a href="/dashboard">Dashboard</a>
-            <a href="/logout">Logout</a>
+    <!-- Signup Popup -->
+    {% if show_signup_popup %}
+    <div class="signup-popup-overlay active" id="signupPopup">
+        <div class="signup-popup">
+            <div class="emoji">🚀</div>
+            <h2>Want to Post This to LinkedIn?</h2>
+            <p>Sign up to connect LinkedIn and post with 1 click!</p>
+            
+            <div class="benefits">
+                <ul>
+                    <li>Save this analysis forever</li>
+                    <li>Post to LinkedIn automatically</li>
+                    <li>Access your validation history</li>
+                    <li>Generate unlimited marketing posts</li>
+                </ul>
+            </div>
+            
+            <div class="buttons">
+                <a href="/signup" class="btn-signup-now">Sign Up Free - 10 Seconds! 🚀</a>
+                <button class="btn-skip" onclick="closeSignupPopup()">Skip for Now</button>
+            </div>
         </div>
-    </nav>
+    </div>
+    {% endif %}
 
     <div class="container">
         <div class="header">
-            <h1>Your <span class="gradient-text">Marketing Content</span></h1>
-            <p>AI-generated posts and voiceovers ready to launch</p>
+            <h1>📱 Your Marketing Posts</h1>
+            <p>AI-generated LinkedIn content ready to post</p>
         </div>
 
-        {% if idea %}
-        <div class="idea-summary">
-            <h3>FOR YOUR IDEA:</h3>
-            <p>{{ idea }}</p>
-        </div>
-        {% endif %}
-
-        {% if posts %}
-        <!-- LinkedIn Posts Section -->
-        <div class="section-header">
-            <h2>📱 LinkedIn Posts</h2>
-            <p>Ready-to-post content for your audience</p>
-        </div>
-
-        <div class="posts-grid">
-            <div class="post-card">
-                <div class="post-header">
-                    <span class="post-title">{{ posts.post1.title }}</span>
-                    <span class="post-badge">LinkedIn</span>
-                </div>
-                <div class="post-content">{{ posts.post1.content }}</div>
-                <div class="post-actions">
-                    <button class="btn-copy" onclick="copyToClipboard('post1')">
-                        📋 Copy
-                    </button>
-                    <button class="btn-post-linkedin" onclick="postToLinkedIn('post1', this)">
-                        💼 Post to LinkedIn
-                    </button>
-                    <textarea id="post1" class="hidden-textarea">{{ posts.post1.content }}</textarea>
-                </div>
-            </div>
-
-            <div class="post-card">
-                <div class="post-header">
-                    <span class="post-title">{{ posts.post2.title }}</span>
-                    <span class="post-badge">LinkedIn</span>
-                </div>
-                <div class="post-content">{{ posts.post2.content }}</div>
-                <div class="post-actions">
-                    <button class="btn-copy" onclick="copyToClipboard('post2')">
-                        📋 Copy
-                    </button>
-                    <button class="btn-post-linkedin" onclick="postToLinkedIn('post2', this)">
-                        💼 Post to LinkedIn
-                    </button>
-                    <textarea id="post2" class="hidden-textarea">{{ posts.post2.content }}</textarea>
-                </div>
-            </div>
-
-            <div class="post-card">
-                <div class="post-header">
-                    <span class="post-title">{{ posts.post3.title }}</span>
-                    <span class="post-badge">LinkedIn</span>
-                </div>
-                <div class="post-content">{{ posts.post3.content }}</div>
-                <div class="post-actions">
-                    <button class="btn-copy" onclick="copyToClipboard('post3')">
-                        📋 Copy
-                    </button>
-                    <button class="btn-post-linkedin" onclick="postToLinkedIn('post3', this)">
-                        💼 Post to LinkedIn
-                    </button>
-                    <textarea id="post3" class="hidden-textarea">{{ posts.post3.content }}</textarea>
-                </div>
-            </div>
-        </div>
-        {% endif %}
-
-        <!-- AI Voiceover Generator - REDESIGNED -->
-        <div class="section-header">
-            <h2>🎤 AI Voiceover Generator</h2>
-            <p>Professional voiceovers for your video content</p>
-        </div>
-
-        <div class="voiceover-generator">
-            <h2>Generate AI Voiceover</h2>
-            <p class="subtitle">Enter your script and get a professional voiceover instantly</p>
-            
-            <div class="voiceover-form">
-                <div class="form-group">
-                    <label for="voiceover-script">Your Script</label>
-                    <textarea 
-                        id="voiceover-script" 
-                        placeholder="Enter your video script here... (e.g., 'Are you tired of spending hours on marketing? Here's how AI can automate everything...')"
-                    ></textarea>
-                </div>
-
-                <button class="btn-generate-voice" id="generateVoiceBtn" onclick="generateVoiceover()">
-                    <span id="voiceText">Generate Voiceover</span>
-                    <span id="voiceIcon">🎤</span>
+        {% for post in posts %}
+        <div class="post-card">
+            <h3>📝 Post {{ loop.index }}</h3>
+            <div class="post-content">{{ post }}</div>
+            <div class="post-actions">
+                <button class="btn-copy" onclick="copyPost(this, {{ loop.index }})">
+                    📋 Copy Post
                 </button>
-
-                <div class="voiceover-result" id="voiceoverResult">
-                    <h4>🎤 Your AI Voiceover</h4>
-                    <audio controls class="audio-player" id="audioPlayer">
-                        <source id="audioSource" type="audio/mpeg">
-                        Your browser does not support audio playback.
-                    </audio>
-                    <a href="#" id="downloadLink" download="voiceover.mp3" class="download-audio">
-                        ⬇️ Download Audio
-                    </a>
-                </div>
+                {% if is_logged_in %}
+                <button class="btn-linkedin" onclick="postToLinkedIn({{ loop.index }})">
+                    Post to LinkedIn
+                </button>
+                {% else %}
+                <button class="btn-linkedin" onclick="showSignupPopup()">
+                    Post to LinkedIn
+                </button>
+                {% endif %}
             </div>
         </div>
+        {% endfor %}
 
-        <div class="back-link">
-            <a href="/dashboard">← Back to Dashboard</a>
-        </div>
+        <a href="/home" class="btn-back">← Back to Home</a>
     </div>
 
     <script>
-        // Toast Notification Function
-        function showToast(message, type = 'success') {
-            const toast = document.getElementById('toast');
-            const toastIcon = document.getElementById('toastIcon');
-            const toastMessage = document.getElementById('toastMessage');
-            
-            // Set icon and class
-            if (type === 'success') {
-                toastIcon.textContent = '✅';
-                toast.className = 'toast success show';
-            } else {
-                toastIcon.textContent = '❌';
-                toast.className = 'toast error show';
-            }
-            
-            toastMessage.textContent = message;
-            
-            // Auto hide after 4 seconds
-            setTimeout(() => {
-                toast.style.animation = 'slideOut 0.3s ease';
+        const posts = {{ posts|tojson }};
+
+        function copyPost(btn, index) {
+            const text = posts[index - 1];
+            navigator.clipboard.writeText(text).then(() => {
+                btn.textContent = '✅ Copied!';
+                btn.classList.add('copied');
                 setTimeout(() => {
-                    toast.classList.remove('show');
-                    toast.style.animation = '';
-                }, 300);
-            }, 4000);
+                    btn.textContent = '📋 Copy Post';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
         }
 
-        function copyToClipboard(elementId) {
-            var copyText = document.getElementById(elementId);
-            copyText.select();
-            copyText.setSelectionRange(0, 99999);
-            document.execCommand("copy");
-            showToast('Copied to clipboard!', 'success');
-        }
+        function postToLinkedIn(index) {
+            const content = posts[index - 1];
+            const formData = new FormData();
+            formData.append('content', content);
 
-        async function postToLinkedIn(elementId, button) {
-            const content = document.getElementById(elementId).value;
-            
-            // Disable button
-            button.disabled = true;
-            const originalText = button.innerHTML;
-            button.innerHTML = '<span class="spinner"></span> Posting...';
-
-            try {
-                const response = await fetch('/post/linkedin', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: 'content=' + encodeURIComponent(content)
-                });
-
-                const data = await response.json();
-
+            fetch('/post/linkedin', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
                 if (data.success) {
-                    showToast('Posted to LinkedIn successfully!', 'success');
-                    button.innerHTML = '✅ Posted!';
+                    alert('✅ Posted to LinkedIn successfully!');
                 } else {
-                    showToast('Error: ' + data.error, 'error');
-                    button.disabled = false;
-                    button.innerHTML = originalText;
+                    alert('❌ Error: ' + data.error);
                 }
-            } catch (error) {
-                showToast('Error posting. Please try again.', 'error');
-                button.disabled = false;
-                button.innerHTML = originalText;
-            }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('❌ Failed to post to LinkedIn');
+            });
         }
 
-        async function generateVoiceover() {
-            const script = document.getElementById('voiceover-script').value.trim();
-            
-            if (!script) {
-                showToast('Please enter a script first!', 'error');
-                return;
-            }
-
-            const btn = document.getElementById('generateVoiceBtn');
-            const btnText = document.getElementById('voiceText');
-            const btnIcon = document.getElementById('voiceIcon');
-            
-            // Disable button
-            btn.disabled = true;
-            btnText.textContent = 'Generating';
-            btnIcon.innerHTML = '<span class="spinner"></span>';
-
-            try {
-                const response = await fetch('/generate-voiceover', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ script: script })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    // Show result
-                    const resultDiv = document.getElementById('voiceoverResult');
-                    const audioSource = document.getElementById('audioSource');
-                    const audioPlayer = document.getElementById('audioPlayer');
-                    const downloadLink = document.getElementById('downloadLink');
-
-                    audioSource.src = 'data:audio/mpeg;base64,' + data.audio;
-                    audioPlayer.load();
-                    downloadLink.href = 'data:audio/mpeg;base64,' + data.audio;
-                    
-                    resultDiv.classList.add('active');
-
-                    showToast('Voiceover generated successfully!', 'success');
-
-                    // Scroll to result
-                    resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                } else {
-                    showToast(data.error, 'error');
-                }
-            } catch (error) {
-                showToast('Error generating voiceover. Please try again.', 'error');
-                console.error(error);
-            }
-
-            // Re-enable button
-            btn.disabled = false;
-            btnText.textContent = 'Generate Voiceover';
-            btnIcon.textContent = '🎤';
+        function showSignupPopup() {
+            document.getElementById('signupPopup').classList.add('active');
         }
+
+        function closeSignupPopup() {
+            document.getElementById('signupPopup').classList.remove('active');
+            localStorage.setItem('signupPopupShown', 'true');
+        }
+
+        // Auto-show popup if user is not logged in (first time)
+        {% if show_signup_popup %}
+        window.addEventListener('load', function() {
+            const popupShown = localStorage.getItem('signupPopupShown');
+            if (!popupShown) {
+                setTimeout(showSignupPopup, 1000);
+            }
+        });
+        {% endif %}
     </script>
 </body>
 </html>
