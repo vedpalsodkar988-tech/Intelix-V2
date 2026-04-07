@@ -113,28 +113,52 @@ def migrate_db():
         from sqlalchemy import text
         
         with db.engine.connect() as conn:
+            # Check and add session_id column
             try:
-                conn.execute(text('ALTER TABLE "user" ADD COLUMN validations_this_month INTEGER DEFAULT 0'))
-                conn.commit()
-                result1 = "✅ Added validations_this_month column"
+                result = conn.execute(text("SELECT column_name FROM information_schema.columns WHERE table_name='validation' AND column_name='session_id'"))
+                exists = result.fetchone()
+                
+                if not exists:
+                    conn.execute(text('ALTER TABLE validation ADD COLUMN session_id VARCHAR(100)'))
+                    conn.commit()
+                    result3 = "✅ Added session_id column to validation"
+                else:
+                    result3 = "ℹ️ session_id column already exists"
             except Exception as e:
-                result1 = f"ℹ️ validations_this_month: {str(e)}"
+                conn.rollback()
+                result3 = f"❌ Error with session_id: {str(e)}"
             
+            # Check and add validations_this_month column
             try:
-                conn.execute(text("ALTER TABLE \"user\" ADD COLUMN last_reset_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP"))
-                conn.commit()
-                result2 = "✅ Added last_reset_date column"
+                result = conn.execute(text("SELECT column_name FROM information_schema.columns WHERE table_name='user' AND column_name='validations_this_month'"))
+                exists = result.fetchone()
+                
+                if not exists:
+                    conn.execute(text('ALTER TABLE "user" ADD COLUMN validations_this_month INTEGER DEFAULT 0'))
+                    conn.commit()
+                    result1 = "✅ Added validations_this_month column"
+                else:
+                    result1 = "ℹ️ validations_this_month already exists"
             except Exception as e:
-                result2 = f"ℹ️ last_reset_date: {str(e)}"
+                conn.rollback()
+                result1 = f"❌ Error: {str(e)}"
             
+            # Check and add last_reset_date column
             try:
-                conn.execute(text('ALTER TABLE "validation" ADD COLUMN session_id VARCHAR(100)'))
-                conn.commit()
-                result3 = "✅ Added session_id column to validation"
+                result = conn.execute(text("SELECT column_name FROM information_schema.columns WHERE table_name='user' AND column_name='last_reset_date'"))
+                exists = result.fetchone()
+                
+                if not exists:
+                    conn.execute(text("ALTER TABLE \"user\" ADD COLUMN last_reset_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP"))
+                    conn.commit()
+                    result2 = "✅ Added last_reset_date column"
+                else:
+                    result2 = "ℹ️ last_reset_date already exists"
             except Exception as e:
-                result3 = f"ℹ️ session_id: {str(e)}"
+                conn.rollback()
+                result2 = f"❌ Error: {str(e)}"
         
-        return f"<h1>Migration Results:</h1><p>{result1}</p><p>{result2}</p><p>{result3}</p><p><a href='/home'>Go to Home</a></p>"
+        return f"<h1>Migration Results:</h1><p>{result1}</p><p>{result2}</p><p>{result3}</p><br><p><a href='/home' style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 16px 32px; text-decoration: none; border-radius: 10px; font-weight: 700; display: inline-block; margin-top: 20px;'>Go to Home →</a></p>"
     except Exception as e:
         return f"<h1>Migration Error:</h1><p>{str(e)}</p>"
 
@@ -331,9 +355,13 @@ def analyze():
     
     except Exception as e:
         print(f"Analyze error: {e}")
+        import traceback
+        traceback.print_exc()
         db.session.rollback()
         return render_template('home.html', 
-                             error='An error occurred. Please try again.')
+                             error='An error occurred. Please try again.',
+                             validation_count=get_free_validation_count(),
+                             recent_validations=[])
 
 @app.route('/validation/<int:validation_id>')
 def view_validation(validation_id):
