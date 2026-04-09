@@ -64,12 +64,13 @@
             background: white;
             border: 1px solid #e5e7eb;
             border-radius: 8px;
-            padding: 16px;
+            padding: 20px;
             margin-bottom: 16px;
             white-space: pre-wrap;
-            line-height: 1.7;
+            line-height: 1.8;
             color: #333;
             font-size: 15px;
+            min-height: 100px;
         }
         .post-actions {
             display: flex;
@@ -257,7 +258,7 @@
 <body>
     <!-- Signup Popup -->
     {% if show_signup_popup %}
-    <div class="signup-popup-overlay active" id="signupPopup">
+    <div class="signup-popup-overlay" id="signupPopup">
         <div class="signup-popup">
             <div class="emoji">🚀</div>
             <h2>Want to Post This to LinkedIn?</h2>
@@ -286,32 +287,36 @@
             <p>AI-generated LinkedIn content ready to post</p>
         </div>
 
-        {% for post in posts %}
-        <div class="post-card">
-            <h3>📝 Post {{ loop.index }}</h3>
-            <div class="post-content">{{ post }}</div>
-            <div class="post-actions">
-                <button class="btn-copy" onclick="copyPost(this, {{ loop.index }})">
-                    📋 Copy Post
-                </button>
-                {% if is_logged_in %}
-                <button class="btn-linkedin" onclick="postToLinkedIn({{ loop.index }})">
-                    Post to LinkedIn
-                </button>
-                {% else %}
-                <button class="btn-linkedin" onclick="showSignupPopup()">
-                    Post to LinkedIn
-                </button>
-                {% endif %}
+        {% if posts %}
+            {% for post in posts %}
+            <div class="post-card">
+                <h3>📝 LinkedIn Post {{ loop.index }}</h3>
+                <div class="post-content">{{ post }}</div>
+                <div class="post-actions">
+                    <button class="btn-copy" onclick="copyPost(this, {{ loop.index }})">
+                        📋 Copy Post
+                    </button>
+                    {% if is_logged_in %}
+                    <button class="btn-linkedin" onclick="postToLinkedIn({{ loop.index }})">
+                        Post to LinkedIn
+                    </button>
+                    {% else %}
+                    <button class="btn-linkedin" onclick="showSignupPopup()">
+                        Post to LinkedIn
+                    </button>
+                    {% endif %}
+                </div>
             </div>
-        </div>
-        {% endfor %}
+            {% endfor %}
+        {% else %}
+            <p style="text-align: center; color: #666; padding: 40px;">No posts generated. Please try again.</p>
+        {% endif %}
 
         <a href="/home" class="btn-back">← Back to Home</a>
     </div>
 
     <script>
-        const posts = {{ posts|tojson }};
+        const posts = {{ posts|tojson|safe }};
 
         function copyPost(btn, index) {
             const text = posts[index - 1];
