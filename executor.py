@@ -120,21 +120,21 @@ class Executor:
                 req_file = os.path.join(workspace, 'requirements.txt')
                 if os.path.exists(req_file):
                     result = subprocess.run(
-                        'py -m pip install -r requirements.txt',
+                        'pip3 install -r requirements.txt',
                         cwd=workspace,
                         capture_output=True, text=True, timeout=180,
                         shell=True
                     )
                 elif os.path.exists(os.path.join(workspace, 'pyproject.toml')):
                     result = subprocess.run(
-                        'py -m pip install -e ".[dev,test]" || py -m pip install -e .',
+                        'pip3 install -e ".[dev,test]" || pip3 install -e .',
                         cwd=workspace,
                         capture_output=True, text=True, timeout=180,
                         shell=True
                     )
                 elif os.path.exists(os.path.join(workspace, 'setup.py')):
                     result = subprocess.run(
-                        'py -m pip install -e .',
+                        'pip3 install -e .',
                         cwd=workspace,
                         capture_output=True, text=True, timeout=180,
                         shell=True
@@ -159,14 +159,14 @@ class Executor:
                 if language == 'node':
                     cmd = 'npm test'
                 elif language == 'python':
-                    cmd = 'py -m pip install pytest pytest-cov && py -m pytest --cache-clear'
+                    cmd = 'pip3 install pytest pytest-cov && python3 -m pytest --cache-clear'
                 else:
                     cmd = 'echo No test command found'
             elif task_type == 'build':
                 if language == 'node':
                     cmd = 'npm run build'
                 elif language == 'python':
-                    cmd = 'py setup.py build'
+                    cmd = 'python3 setup.py build'
                 else:
                     cmd = 'echo No build command found'
             else:
