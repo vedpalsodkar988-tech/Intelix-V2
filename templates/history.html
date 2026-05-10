@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Intelix — History</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:radial-gradient(circle at 20% 30%,rgba(139,92,246,0.2),transparent 40%),radial-gradient(circle at 80% 70%,rgba(59,130,246,0.2),transparent 40%),#0B0F1A;min-height:100vh;font-family:'Inter',sans-serif;color:#fff}
+nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2.5rem;border-bottom:1px solid rgba(139,92,246,0.15);position:sticky;top:0;z-index:50;background:rgba(11,15,26,0.95);backdrop-filter:blur(12px)}
+.nav-logo{font-size:20px;font-weight:800;background:linear-gradient(135deg,#8B5CF6,#3B82F6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;cursor:pointer}
+.nav-right{display:flex;align-items:center;gap:6px}
+.nav-btn{background:none;border:none;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:rgba(255,255,255,0.45);cursor:pointer;padding:7px 14px;border-radius:8px;transition:all 0.2s}
+.nav-btn:hover{color:#fff;background:rgba(255,255,255,0.06)}
+.nav-btn.active{color:#a78bfa;background:rgba(139,92,246,0.1)}
+.main{max-width:900px;margin:0 auto;padding:2.5rem 2rem 4rem}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem}
+.page-title{font-size:22px;font-weight:800;color:#fff;letter-spacing:-0.02em}
+.filters{display:flex;gap:8px}
+.filter-btn{background:#151B2F;border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:6px 14px;font-size:12px;color:rgba(255,255,255,0.4);cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s}
+.filter-btn:hover{border-color:rgba(139,92,246,0.3);color:#a78bfa}
+.filter-btn.active{background:rgba(139,92,246,0.1);border-color:rgba(139,92,246,0.3);color:#a78bfa}
+.runs-list{display:flex;flex-direction:column;gap:10px}
+.run-item{background:#151B2F;border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:1rem 1.2rem;display:flex;align-items:center;gap:14px;transition:all 0.2s;cursor:pointer}
+.run-item:hover{border-color:rgba(139,92,246,0.25);background:rgba(139,92,246,0.03)}
+.run-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.dot-passed{background:#00ff96;box-shadow:0 0 6px rgba(0,255,150,0.5)}
+.dot-partially-passed{background:#f0a500;box-shadow:0 0 6px rgba(240,165,0,0.5)}
+.dot-failed{background:#ff5555;box-shadow:0 0 6px rgba(255,85,85,0.5)}
+.dot-running{background:#8B5CF6;box-shadow:0 0 6px rgba(139,92,246,0.8);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.run-info{flex:1;min-width:0}
+.run-repo{font-size:13px;color:rgba(255,255,255,0.85);font-weight:600;font-family:'JetBrains Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.run-meta{font-size:11px;color:rgba(255,255,255,0.25);margin-top:3px}
+.run-badge{font-size:10px;padding:2px 10px;border-radius:4px;font-weight:600;font-family:'JetBrains Mono',monospace;flex-shrink:0}
+.badge-passed{background:rgba(0,255,150,0.1);color:#00ff96;border:1px solid rgba(0,255,150,0.2)}
+.badge-partially-passed{background:rgba(240,165,0,0.1);color:#f0a500;border:1px solid rgba(240,165,0,0.2)}
+.badge-failed{background:rgba(255,85,85,0.1);color:#ff5555;border:1px solid rgba(255,85,85,0.2)}
+.badge-running{background:rgba(139,92,246,0.1);color:#8B5CF6;border:1px solid rgba(139,92,246,0.2)}
+.empty{text-align:center;padding:3rem;color:rgba(255,255,255,0.15);font-size:12px;font-family:'JetBrains Mono',monospace;background:#151B2F;border:1px solid rgba(255,255,255,0.04);border-radius:12px}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-logo" onclick="window.location='/'">Intelix</div>
+  <div class="nav-right">
+    <button class="nav-btn" onclick="window.location='/'">Current Tasks</button>
+    <button class="nav-btn active">History</button>
+    <button class="nav-btn" onclick="window.location='/settings'">Settings</button>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="page-header">
+    <div class="page-title">History</div>
+    <div class="filters">
+      <button class="filter-btn active" onclick="filterRuns('all',this)">All</button>
+      <button class="filter-btn" onclick="filterRuns('PASSED',this)">Passed</button>
+      <button class="filter-btn" onclick="filterRuns('PARTIALLY PASSED',this)">Partial</button>
+      <button class="filter-btn" onclick="filterRuns('FAILED',this)">Failed</button>
+    </div>
+  </div>
+  <div class="runs-list" id="runs-list">
+    <div class="empty">No runs yet.</div>
+  </div>
+</div>
+
+<script>
+let allRuns = [];
+let currentFilter = 'all';
+
+async function loadRuns(){
+  try{
+    const res = await fetch('/runs');
+    allRuns = await res.json();
+    renderRuns();
+  }catch(e){}
+}
+
+function filterRuns(status, btn){
+  currentFilter = status;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderRuns();
+}
+
+function renderRuns(){
+  const list = document.getElementById('runs-list');
+  let runs = [...allRuns].reverse();
+  if(currentFilter !== 'all'){
+    runs = runs.filter(r => r.report?.overall_status === currentFilter);
+  }
+  runs = runs.filter(r => r.status === 'completed');
+
+  if(runs.length === 0){
+    list.innerHTML='<div class="empty">No runs found.</div>';
+    return;
+  }
+
+  list.innerHTML = runs.map(r => {
+    const status = r.report?.overall_status || 'UNKNOWN';
+    const statusClass = status.toLowerCase().replace(' ','-');
+    const repoName = r.repo_url.split('/').slice(-2).join('/');
+    return `
+      <div class="run-item" onclick="window.location='/report/${r.id}'">
+        <div class="run-dot dot-${statusClass}"></div>
+        <div class="run-info">
+          <div class="run-repo">${repoName}</div>
+          <div class="run-meta">${r.task_type.toUpperCase()} · ${r.created_at} · Run #${r.report?.run_id || r.id}</div>
+        </div>
+        <div class="run-badge badge-${statusClass}">${status}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+loadRuns();
+</script>
+</body>
+</html>

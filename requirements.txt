@@ -1,0 +1,6 @@
+flask
+requests
+gitpython
+anthropic
+python-dotenv
+gunicorn

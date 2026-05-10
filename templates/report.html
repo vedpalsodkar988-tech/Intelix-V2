@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Intelix — Run Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:radial-gradient(circle at 20% 30%,rgba(139,92,246,0.2),transparent 40%),radial-gradient(circle at 80% 70%,rgba(59,130,246,0.2),transparent 40%),#0B0F1A;min-height:100vh;font-family:'Inter',sans-serif;color:#fff}
+nav{display:flex;align-items:center;justify-content:space-between;padding:1.2rem 2.5rem;border-bottom:1px solid rgba(139,92,246,0.15)}
+.nav-logo{font-size:22px;font-weight:800;background:linear-gradient(135deg,#8B5CF6,#3B82F6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;cursor:pointer}
+.nav-back{font-size:13px;color:rgba(255,255,255,0.4);cursor:pointer;background:none;border:none;font-family:'Inter',sans-serif;transition:color 0.2s}
+.nav-back:hover{color:#8B5CF6}
+.main{max-width:900px;margin:0 auto;padding:2.5rem 2rem 4rem}
+.report-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.5rem;gap:1rem;flex-wrap:wrap}
+.report-title{font-size:22px;font-weight:800;color:#fff;letter-spacing:-0.02em;margin-bottom:4px}
+.report-meta{font-size:12px;color:rgba(255,255,255,0.3);font-family:'JetBrains Mono',monospace}
+.header-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.overall-badge{padding:10px 20px;border-radius:12px;font-size:12px;font-weight:700;letter-spacing:0.05em}
+.badge-passed{background:rgba(0,255,150,0.1);color:#00ff96;border:1px solid rgba(0,255,150,0.3)}
+.badge-partially-passed{background:rgba(240,165,0,0.1);color:#f0a500;border:1px solid rgba(240,165,0,0.3)}
+.badge-failed{background:rgba(255,85,85,0.1);color:#ff5555;border:1px solid rgba(255,85,85,0.3)}
+.confidence-badge{padding:10px 16px;border-radius:12px;font-size:12px;font-weight:600;background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.3);color:#a78bfa;font-family:'JetBrains Mono',monospace}
+.verdict-card{border-radius:16px;padding:1.5rem;margin-bottom:1.2rem}
+.verdict-passed{background:rgba(0,255,150,0.05);border:1px solid rgba(0,255,150,0.2)}
+.verdict-partially-passed{background:rgba(240,165,0,0.05);border:1px solid rgba(240,165,0,0.2)}
+.verdict-failed{background:rgba(255,85,85,0.05);border:1px solid rgba(255,85,85,0.2)}
+.verdict-title{font-size:18px;font-weight:800;margin-bottom:6px}
+.verdict-passed .verdict-title{color:#00ff96}
+.verdict-partially-passed .verdict-title{color:#f0a500}
+.verdict-failed .verdict-title{color:#ff5555}
+.verdict-sub{font-size:13px;color:rgba(255,255,255,0.4);line-height:1.6}
+.root-cause-card{background:#151B2F;border:1px solid rgba(139,92,246,0.3);border-radius:16px;padding:1.5rem;margin-bottom:1.2rem;position:relative;overflow:hidden}
+.root-cause-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#8B5CF6,#3B82F6,transparent)}
+.rc-label{font-size:11px;font-weight:600;color:rgba(139,92,246,0.8);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:12px;font-family:'JetBrains Mono',monospace}
+.rc-title{font-size:16px;font-weight:700;color:#fff;margin-bottom:14px;line-height:1.4}
+.rc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rc-item{background:rgba(255,255,255,0.02);border-radius:10px;padding:12px 14px}
+.rc-item-label{font-size:11px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px}
+.rc-item-value{font-size:13px;color:rgba(255,255,255,0.75);line-height:1.5}
+.metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.2rem}
+.metric-box{background:#151B2F;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:1.2rem;text-align:center}
+.metric-value{font-size:32px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.metric-value.green{background:linear-gradient(135deg,#00ff96,#00cc78);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.metric-value.red{background:linear-gradient(135deg,#ff5555,#cc0000);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.metric-label{font-size:11px;color:rgba(255,255,255,0.3);margin-top:6px;text-transform:uppercase;letter-spacing:0.08em}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.card{background:#151B2F;border:1px solid rgba(139,92,246,0.15);border-radius:16px;padding:1.5rem}
+.card.full{grid-column:1/-1}
+.card-label{font-size:11px;font-weight:600;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:1rem;font-family:'JetBrains Mono',monospace}
+.steps-list{display:flex;flex-direction:column;gap:8px}
+.step-item{display:flex;align-items:flex-start;justify-content:space-between;padding:10px 12px;background:rgba(255,255,255,0.02);border-radius:8px;gap:10px}
+.step-name{font-size:13px;color:rgba(255,255,255,0.7);font-weight:500}
+.step-output{font-size:11px;color:rgba(255,255,255,0.25);margin-top:3px;font-family:'JetBrains Mono',monospace;word-break:break-all}
+.step-badge{font-size:10px;padding:2px 10px;border-radius:4px;font-weight:600;font-family:'JetBrains Mono',monospace;flex-shrink:0}
+.step-success{background:rgba(0,255,150,0.1);color:#00ff96;border:1px solid rgba(0,255,150,0.2)}
+.step-fail{background:rgba(255,85,85,0.1);color:#ff5555;border:1px solid rgba(255,85,85,0.2)}
+.commands-list{display:flex;flex-direction:column;gap:8px}
+.command-item{display:flex;align-items:center;gap:10px;background:#0F172A;border:1px solid rgba(139,92,246,0.2);border-radius:8px;padding:10px 14px}
+.command-text{font-size:13px;color:#a78bfa;font-family:'JetBrains Mono',monospace;flex:1;word-break:break-all}
+.copy-btn{font-size:11px;color:rgba(255,255,255,0.3);cursor:pointer;background:none;border:none;font-family:'Inter',sans-serif;white-space:nowrap;transition:color 0.2s}
+.copy-btn:hover{color:#8B5CF6}
+.no-commands{font-size:13px;color:rgba(255,255,255,0.2);font-family:'JetBrains Mono',monospace}
+.analysis-section{display:flex;flex-direction:column;gap:10px}
+.analysis-block{background:rgba(255,255,255,0.02);border-radius:12px;padding:14px 16px;border-left:3px solid rgba(139,92,246,0.4)}
+.analysis-block-title{font-size:12px;font-weight:700;color:#a78bfa;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px}
+.analysis-block-content{font-size:13px;color:rgba(255,255,255,0.75);line-height:1.7}
+.logs-box{background:#0F172A;border-radius:10px;padding:1rem;font-size:11px;color:rgba(255,255,255,0.4);font-family:'JetBrains Mono',monospace;line-height:1.6;max-height:250px;overflow-y:auto;white-space:pre-wrap;word-break:break-all}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.info-item{background:rgba(255,255,255,0.02);border-radius:8px;padding:10px 14px}
+.info-label{font-size:11px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px}
+.info-value{font-size:13px;color:rgba(255,255,255,0.7);font-family:'JetBrains Mono',monospace;word-break:break-all}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-logo" onclick="window.location='/'">Intelix</div>
+  <button class="nav-back" onclick="window.location='/'">← Back to Dashboard</button>
+</nav>
+
+<div class="main">
+{% if run and run.report %}
+{% set r = run.report %}
+{% set status_class = r.overall_status|lower|replace(' ', '-') %}
+
+<div class="report-header">
+  <div>
+    <div class="report-title">{{ r.repo_url.split('/')[-1] }} — Run Report</div>
+    <div class="report-meta">Run #{{ r.run_id }} · {{ r.language|upper }} · {{ r.task_type|upper }}</div>
+  </div>
+  <div class="header-right">
+    <div class="confidence-badge">AI Confidence: {{ r.confidence }}%</div>
+    <div class="overall-badge badge-{{ status_class }}">{{ r.overall_status }}</div>
+  </div>
+</div>
+
+<div class="verdict-card verdict-{{ status_class }}">
+  <div class="verdict-title">
+    {% if r.overall_status == 'PASSED' %}✅ All Tests Passed
+    {% elif r.overall_status == 'PARTIALLY PASSED' %}⚠️ Partially Passed — Some Issues Found
+    {% else %}❌ Build Failed{% endif %}
+  </div>
+  <div class="verdict-sub">
+    {% if r.overall_status == 'PASSED' %}All checks passed. Your code is ready.
+    {% elif r.overall_status == 'PARTIALLY PASSED' %}Most tests passed but some issues were detected. See root cause below for exact fixes.
+    {% else %}Issues detected. See root cause below for exact fixes.{% endif %}
+  </div>
+</div>
+
+<div class="root-cause-card">
+  <div class="rc-label">🔍 Root Cause</div>
+  <div class="rc-title">{{ r.root_cause }}</div>
+  <div class="rc-grid">
+    <div class="rc-item">
+      <div class="rc-item-label">Impact</div>
+      <div class="rc-item-value">{{ r.impact }}</div>
+    </div>
+    <div class="rc-item">
+      <div class="rc-item-label">Likely Fix</div>
+      <div class="rc-item-value">{{ r.likely_fix }}</div>
+    </div>
+  </div>
+</div>
+
+<div class="metrics-grid">
+  <div class="metric-box">
+    <div class="metric-value green" id="tests-passed-val">{{ r.tests_passed if r.tests_passed else '—' }}</div>
+    <div class="metric-label">Tests Passed</div>
+  </div>
+  <div class="metric-box">
+    <div class="metric-value red" id="tests-failed-val">{{ r.tests_failed if r.tests_failed else '—' }}</div>
+    <div class="metric-label">Tests Failed</div>
+  </div>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <div class="card-label">⚡ Execution Steps</div>
+    <div class="steps-list">
+      <div class="step-item">
+        <div>
+          <div class="step-name">Clone Repository</div>
+          <div class="step-output">{{ r.steps.clone.output[:80] }}</div>
+        </div>
+        <div class="step-badge step-{{ r.steps.clone.status }}">{{ r.steps.clone.status|upper }}</div>
+      </div>
+      <div class="step-item">
+        <div>
+          <div class="step-name">Install Dependencies</div>
+          <div class="step-output">{{ r.steps.install.output[:80] }}</div>
+        </div>
+        <div class="step-badge step-{{ r.steps.install.status }}">{{ r.steps.install.status|upper }}</div>
+      </div>
+      <div class="step-item">
+        <div>
+          <div class="step-name">{{ r.task_type|title }}</div>
+          <div class="step-output">Exit code: {{ r.steps.task.return_code }}</div>
+        </div>
+        <div class="step-badge step-{{ r.steps.task.status }}">{{ r.steps.task.status|upper }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">💻 Suggested Commands</div>
+    <div class="commands-list">
+      {% if r.suggested_commands %}
+        {% for cmd in r.suggested_commands %}
+        <div class="command-item">
+          <div class="command-text">{{ cmd }}</div>
+          <button class="copy-btn" onclick="copyCmd('{{ cmd }}', this)">Copy</button>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="no-commands">No commands suggested</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="card full">
+    <div class="card-label">🧠 AI Analysis</div>
+    <div class="analysis-section" id="analysis-section"></div>
+  </div>
+
+  <div class="card full">
+    <div class="card-label">📋 Raw Output</div>
+    <div class="logs-box" id="raw-output"></div>
+  </div>
+
+  <div class="card full">
+    <div class="card-label">ℹ️ Run Info</div>
+    <div class="info-grid">
+      <div class="info-item">
+        <div class="info-label">Repository</div>
+        <div class="info-value">{{ r.repo_url }}</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">Task</div>
+        <div class="info-value">{{ r.task_type }}</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">Language</div>
+        <div class="info-value">{{ r.language }}</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">Run ID</div>
+        <div class="info-value">#{{ r.run_id }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% else %}
+<div style="text-align:center;padding:4rem;color:rgba(255,255,255,0.3)">
+  <div style="font-size:48px;margin-bottom:1rem">⏳</div>
+  <div style="font-size:18px;font-weight:700;color:#fff;margin-bottom:8px">Run in progress...</div>
+  <div style="font-size:14px">Report will appear when execution is complete.</div>
+  <script>setTimeout(()=>location.reload(), 4000)</script>
+</div>
+{% endif %}
+</div>
+
+<script>
+// Fix encoding issues in raw output
+const rawOutputEl = document.getElementById('raw-output');
+if(rawOutputEl){
+  const rawText = {{ r.steps.task.output | tojson if run and run.report else '""' }};
+  rawOutputEl.textContent = rawText;
+}
+
+// Parse test counts from raw output for mocha
+const rawText = {{ r.steps.task.output | tojson if run and run.report else '""' }};
+const passingMatch = rawText.match(/(\d+) passing/);
+const failingMatch = rawText.match(/(\d+) failing/);
+const passedEl = document.getElementById('tests-passed-val');
+const failedEl = document.getElementById('tests-failed-val');
+
+if(passingMatch && passedEl && passedEl.textContent === '—'){
+  passedEl.textContent = passingMatch[1];
+}
+if(failingMatch && failedEl){
+  failedEl.textContent = failingMatch[1];
+} else if(failedEl && failedEl.textContent === '—' && passingMatch){
+  failedEl.textContent = '0';
+}
+
+// Render AI Analysis
+const analysisRaw = {{ r.ai_analysis | tojson if run and run.report else '""' }};
+
+function cleanText(text){
+  return text
+    .replace(/#{1,6}\s*/g, '')
+    .replace(/\*\*/g, '')
+    .replace(/\*/g, '')
+    .replace(/```[a-z]*/g, '')
+    .replace(/```/g, '')
+    .trim();
+}
+
+function renderAnalysis(raw){
+  const section = document.getElementById('analysis-section');
+  if(!section) return;
+  const lines = raw.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+  if(lines.length === 0){
+    section.innerHTML = '<div style="color:rgba(255,255,255,0.3);font-size:13px">Analysis unavailable</div>';
+    return;
+  }
+  section.innerHTML = lines.map(line => {
+    const clean = cleanText(line);
+    if(!clean) return '';
+    const colonIdx = clean.indexOf(':');
+    if(colonIdx > 0 && colonIdx < 25){
+      const label = clean.substring(0, colonIdx);
+      const value = clean.substring(colonIdx + 1).trim();
+      return `<div class="analysis-block">
+        <div class="analysis-block-title">${label}</div>
+        <div class="analysis-block-content">${value}</div>
+      </div>`;
+    }
+    return `<div class="analysis-block">
+      <div class="analysis-block-content">${clean}</div>
+    </div>`;
+  }).join('');
+}
+
+renderAnalysis(analysisRaw);
+
+function copyCmd(cmd, btn){
+  navigator.clipboard.writeText(cmd);
+  btn.textContent = 'Copied!';
+  setTimeout(()=>btn.textContent='Copy', 2000);
+}
+</script>
+</body>
+</html>

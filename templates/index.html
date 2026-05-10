@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Intelix — AI Build Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:radial-gradient(circle at 20% 30%,rgba(139,92,246,0.2),transparent 40%),radial-gradient(circle at 80% 70%,rgba(59,130,246,0.2),transparent 40%),#0B0F1A;min-height:100vh;font-family:'Inter',sans-serif;color:#fff}
+nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2.5rem;border-bottom:1px solid rgba(139,92,246,0.15);position:sticky;top:0;z-index:50;background:rgba(11,15,26,0.95);backdrop-filter:blur(12px)}
+.nav-logo{font-size:20px;font-weight:800;background:linear-gradient(135deg,#8B5CF6,#3B82F6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-0.02em;cursor:pointer}
+.nav-right{display:flex;align-items:center;gap:10px}
+.nav-btn{background:none;border:none;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:rgba(255,255,255,0.45);cursor:pointer;padding:7px 16px;border-radius:8px;transition:all 0.2s}
+.nav-btn:hover{color:#fff;background:rgba(255,255,255,0.06)}
+.nav-btn.active{color:#a78bfa;background:rgba(139,92,246,0.1)}
+
+.main{max-width:1060px;margin:0 auto;padding:1.8rem 2rem 4rem}
+
+.hero{text-align:center;padding:2rem 0 1.6rem}
+.hero-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.25);border-radius:100px;padding:4px 13px;font-size:11px;color:rgba(139,92,246,0.9);font-weight:600;margin-bottom:1rem;text-transform:uppercase;letter-spacing:0.05em}
+.badge-dot{width:5px;height:5px;border-radius:50%;background:#8B5CF6;animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.hero h1{font-size:38px;font-weight:800;color:#fff;letter-spacing:-0.03em;line-height:1.1;margin-bottom:10px}
+.hero h1 span{background:linear-gradient(135deg,#8B5CF6,#3B82F6);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{font-size:14px;color:rgba(255,255,255,0.4);max-width:460px;margin:0 auto}
+
+.stats-row{display:flex;align-items:center;justify-content:center;gap:2.5rem;margin:1.3rem auto 1.6rem;padding:0.9rem 2rem;background:#161C2E;border:1px solid rgba(139,92,246,0.15);border-radius:12px;width:fit-content}
+.stat-item{text-align:center}
+.stat-num{font-size:18px;font-weight:700;font-family:'JetBrains Mono',monospace;background:linear-gradient(135deg,#8B5CF6,#3B82F6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1}
+.stat-lbl{font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.08em;margin-top:4px}
+.stat-div{width:1px;height:28px;background:rgba(255,255,255,0.06)}
+
+.run-layout{display:grid;grid-template-columns:1fr 300px;gap:12px;margin-bottom:1.8rem}
+
+.run-card{background:#161C2E;border:1px solid rgba(139,92,246,0.2);border-radius:14px;padding:1.3rem}
+.card-lbl{font-size:10px;font-weight:600;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:1rem;font-family:'JetBrains Mono',monospace}
+.field{margin-bottom:0.8rem}
+.field-lbl{font-size:10px;font-weight:600;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:5px;display:block}
+.field-input{width:100%;background:#0D1424;border:1px solid rgba(139,92,246,0.2);border-radius:8px;padding:9px 13px;font-size:13px;font-family:'JetBrains Mono',monospace;color:rgba(255,255,255,0.85);outline:none;transition:all 0.2s}
+.field-input:focus{border-color:#8B5CF6;box-shadow:0 0 0 2px rgba(139,92,246,0.12)}
+.field-input::placeholder{color:rgba(255,255,255,0.18)}
+
+.lang-detect{display:none;align-items:center;gap:6px;margin-top:5px;font-size:11px;color:rgba(139,92,246,0.8);font-family:'JetBrains Mono',monospace}
+.lang-detect.show{display:flex}
+.lang-dot{width:6px;height:6px;border-radius:50%;background:#8B5CF6}
+
+.task-row{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:0.8rem}
+.task-opt{background:#0D1424;border:1px solid rgba(139,92,246,0.15);border-radius:8px;padding:9px 11px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:8px}
+.task-opt:hover{border-color:rgba(139,92,246,0.35)}
+.task-opt.selected{border-color:#8B5CF6;background:rgba(139,92,246,0.08)}
+.task-icon{font-size:15px}
+.task-name{font-size:12px;font-weight:600;color:#fff}
+.task-desc{font-size:10px;color:rgba(255,255,255,0.28);margin-top:1px}
+
+.run-btn{width:100%;background:linear-gradient(135deg,#8B5CF6,#3B82F6);border:none;border-radius:8px;padding:10px;font-size:13px;font-weight:700;color:#fff;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;box-shadow:0 4px 14px rgba(139,92,246,0.35);margin-top:3px}
+.run-btn:hover{opacity:0.9;transform:translateY(-1px);box-shadow:0 6px 18px rgba(139,92,246,0.45)}
+.run-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none}
+
+.preview-card{background:#161C2E;border:1px solid rgba(139,92,246,0.2);border-radius:14px;padding:1.3rem}
+.preview-lbl{font-size:10px;font-weight:600;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:1.2rem;font-family:'JetBrains Mono',monospace}
+.flow-steps{display:flex;flex-direction:column;gap:0}
+.flow-step{display:flex;align-items:center;gap:10px;padding:7px 0;position:relative}
+.flow-step:not(:last-child)::after{content:'';position:absolute;left:10px;top:27px;width:1px;height:14px;background:rgba(139,92,246,0.12)}
+.step-icon{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;font-weight:700;transition:all 0.3s}
+.step-done{background:rgba(0,255,150,0.15);border:1px solid rgba(0,255,150,0.3);color:#00ff96}
+.step-active{background:rgba(139,92,246,0.2);border:1px solid rgba(139,92,246,0.5);color:#a78bfa;animation:stepGlow 1.5s infinite}
+.step-pending{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);color:rgba(255,255,255,0.15)}
+@keyframes stepGlow{0%,100%{box-shadow:0 0 0 0 rgba(139,92,246,0.5)}50%{box-shadow:0 0 0 3px rgba(139,92,246,0.15)}}
+.step-spinner{width:8px;height:8px;border:1.5px solid rgba(139,92,246,0.3);border-top-color:#a78bfa;border-radius:50%;animation:spin 0.7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.step-txt{font-size:12px;color:rgba(255,255,255,0.3);transition:all 0.3s}
+.step-txt.done{color:rgba(255,255,255,0.65)}
+.step-txt.active{color:#a78bfa;font-weight:600}
+
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.9rem}
+.section-title{font-size:11px;font-weight:600;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.1em;font-family:'JetBrains Mono',monospace}
+.section-pill{font-size:10px;color:rgba(139,92,246,0.7);background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.18);border-radius:100px;padding:2px 8px;font-family:'JetBrains Mono',monospace}
+
+.tasks-list{display:flex;flex-direction:column;gap:9px}
+.task-card{background:#161C2E;border:1px solid rgba(255,255,255,0.05);border-radius:11px;padding:0.95rem 1.1rem;display:flex;align-items:center;gap:13px;transition:all 0.2s;cursor:pointer}
+.task-card:hover{border-color:rgba(139,92,246,0.22);background:rgba(139,92,246,0.025)}
+.task-card.running{border-color:rgba(139,92,246,0.32);box-shadow:0 0 14px rgba(139,92,246,0.07)}
+.tdot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.tdot-run{background:#8B5CF6;box-shadow:0 0 7px rgba(139,92,246,0.8);animation:blink 1s infinite}
+.t-info{flex:1;min-width:0}
+.t-repo{font-size:13px;color:rgba(255,255,255,0.85);font-weight:600;font-family:'JetBrains Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t-stage{font-size:11px;color:rgba(139,92,246,0.8);margin-top:2px;font-weight:500;display:flex;align-items:center;gap:5px}
+.t-meta{font-size:10px;color:rgba(255,255,255,0.18);margin-top:2px}
+.t-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+.t-badge{font-size:10px;padding:2px 9px;border-radius:4px;font-weight:600;font-family:'JetBrains Mono',monospace;background:rgba(139,92,246,0.1);color:#8B5CF6;border:1px solid rgba(139,92,246,0.22)}
+.t-elapsed{font-size:10px;color:rgba(255,255,255,0.22);font-family:'JetBrains Mono',monospace}
+.mini-spinner{width:7px;height:7px;border:1.5px solid rgba(139,92,246,0.3);border-top-color:#a78bfa;border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0}
+
+.empty-tasks{text-align:center;padding:2.2rem;color:rgba(255,255,255,0.12);font-size:12px;font-family:'JetBrains Mono',monospace;background:#161C2E;border:1px solid rgba(255,255,255,0.04);border-radius:11px}
+.btn-spinner{display:inline-block;width:11px;height:11px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;margin-right:6px;vertical-align:middle}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-logo">Intelix</div>
+  <div class="nav-right">
+    <button class="nav-btn active">Current Tasks</button>
+    <button class="nav-btn" onclick="window.location='/history'">History</button>
+    <button class="nav-btn" onclick="window.location='/settings'">Settings</button>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="hero">
+    <div class="hero-badge"><div class="badge-dot"></div>AI Build Intelligence</div>
+    <h1>Stop reading logs.<br><span>Know what broke instantly.</span></h1>
+    <p>Connect your GitHub repo. Intelix runs your build or tests and tells you exactly what failed.</p>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-item">
+      <div class="stat-num" id="stat-total">0</div>
+      <div class="stat-lbl">Runs Executed</div>
+    </div>
+    <div class="stat-div"></div>
+    <div class="stat-item">
+      <div class="stat-num" id="stat-success">—%</div>
+      <div class="stat-lbl">Success Rate</div>
+    </div>
+    <div class="stat-div"></div>
+    <div class="stat-item">
+      <div class="stat-num" id="stat-avg">—s</div>
+      <div class="stat-lbl">Avg Execution</div>
+    </div>
+  </div>
+
+  <div class="run-layout">
+    <div class="run-card">
+      <div class="card-lbl">Run a Build</div>
+      <div class="field">
+        <label class="field-lbl">GitHub Repo URL</label>
+        <input type="text" class="field-input" id="repo-url" placeholder="https://github.com/username/repo" oninput="detectLanguage(this.value)" />
+        <div class="lang-detect" id="lang-detect">
+          <div class="lang-dot"></div>
+          <span id="lang-text">Python detected</span>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-lbl">Task Type</label>
+        <div class="task-row">
+          <div class="task-opt selected" id="task-test" onclick="selectTask('test')">
+            <div class="task-icon">🧪</div>
+            <div><div class="task-name">Run Tests</div><div class="task-desc">npm test / pytest</div></div>
+          </div>
+          <div class="task-opt" id="task-build" onclick="selectTask('build')">
+            <div class="task-icon">🔨</div>
+            <div><div class="task-name">Build Project</div><div class="task-desc">npm run build</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-lbl">Custom Command (optional)</label>
+        <input type="text" class="field-input" id="custom-cmd" placeholder="e.g. npm run lint" />
+      </div>
+      <button class="run-btn" id="run-btn" onclick="startRun()">⚡ Run Now</button>
+    </div>
+
+    <div class="preview-card">
+      <div class="preview-lbl">Execution Flow</div>
+      <div class="flow-steps" id="flow-steps">
+        <div class="flow-step"><div class="step-icon step-pending">1</div><div class="step-txt">Clone repository</div></div>
+        <div class="flow-step"><div class="step-icon step-pending">2</div><div class="step-txt">Install dependencies</div></div>
+        <div class="flow-step"><div class="step-icon step-pending">3</div><div class="step-txt">Run tests / build</div></div>
+        <div class="flow-step"><div class="step-icon step-pending">4</div><div class="step-txt">Analyze logs</div></div>
+        <div class="flow-step"><div class="step-icon step-pending">5</div><div class="step-txt">Generate AI report</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-header">
+    <div class="section-title">Current Tasks</div>
+    <div class="section-pill" id="running-count">0 running</div>
+  </div>
+  <div class="tasks-list" id="tasks-list">
+    <div class="empty-tasks">No tasks running. Submit a repo above to get started.</div>
+  </div>
+</div>
+
+<script>
+let selectedTask='test';
+let activeTasks={};
+let elapsedTimers={};
+let stats={total:0,passed:0,totalTime:0};
+
+function selectTask(t){
+  selectedTask=t;
+  document.querySelectorAll('.task-opt').forEach(el=>el.classList.remove('selected'));
+  document.getElementById('task-'+t).classList.add('selected');
+}
+
+function detectLanguage(url){
+  const detect=document.getElementById('lang-detect');
+  const txt=document.getElementById('lang-text');
+  if(!url||!url.includes('github.com')){detect.classList.remove('show');return;}
+  const lower=url.toLowerCase();
+  if(lower.includes('flask')||lower.includes('django')||lower.includes('python')||lower.includes('fastapi')){
+    txt.textContent='Python detected';detect.classList.add('show');
+  } else if(lower.includes('express')||lower.includes('react')||lower.includes('node')||lower.includes('next')||lower.includes('vue')){
+    txt.textContent='Node.js detected';detect.classList.add('show');
+  } else if(url.length>30){
+    txt.textContent='Language will be auto-detected';detect.classList.add('show');
+  } else {
+    detect.classList.remove('show');
+  }
+}
+
+const STAGES=['Cloning repository...','Installing dependencies...','Running tests...','Analyzing logs...','Generating AI report...'];
+
+function updateFlowSteps(stage){
+  const labels=['Clone repository','Install dependencies','Run tests / build','Analyze logs','Generate AI report'];
+  document.getElementById('flow-steps').innerHTML=labels.map((label,i)=>{
+    let iconClass='step-pending',txtClass='',content=(i+1).toString();
+    if(i<stage){iconClass='step-done';content='✓';txtClass='done';}
+    else if(i===stage){iconClass='step-active';content='<div class="step-spinner"></div>';txtClass='active';}
+    return `<div class="flow-step"><div class="step-icon ${iconClass}">${content}</div><div class="step-txt ${txtClass}">${label}</div></div>`;
+  }).join('');
+}
+
+function startElapsed(runId){
+  const start=Date.now();
+  elapsedTimers[runId]=setInterval(()=>{
+    const el=document.getElementById(`elapsed-${runId}`);
+    if(el){const s=Math.floor((Date.now()-start)/1000);const m=Math.floor(s/60);el.textContent=m>0?`${m}m ${s%60}s`:`${s}s`;}
+  },1000);
+}
+
+function stopElapsed(runId){
+  if(elapsedTimers[runId]){clearInterval(elapsedTimers[runId]);delete elapsedTimers[runId];}
+}
+
+async function startRun(){
+  const repoUrl=document.getElementById('repo-url').value.trim();
+  const customCmd=document.getElementById('custom-cmd').value.trim();
+  if(!repoUrl){alert('Please enter a GitHub repo URL');return;}
+  const btn=document.getElementById('run-btn');
+  btn.innerHTML='<span class="btn-spinner"></span>Starting...';
+  btn.disabled=true;
+  updateFlowSteps(0);
+  try{
+    const res=await fetch('/run',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({repo_url:repoUrl,task_type:selectedTask,custom_command:customCmd})});
+    const data=await res.json();
+    if(data.run_id){
+      document.getElementById('repo-url').value='';
+      document.getElementById('custom-cmd').value='';
+      document.getElementById('lang-detect').classList.remove('show');
+      const repoName=repoUrl.split('/').slice(-2).join('/');
+      activeTasks[data.run_id]={repo:repoName,task:selectedTask,stage:0};
+      startElapsed(data.run_id);
+      renderTasks();
+      pollRun(data.run_id);
+      simulateStages(data.run_id);
+    }
+  }catch(e){alert('Error starting run');}
+  btn.innerHTML='⚡ Run Now';
+  btn.disabled=false;
+}
+
+function simulateStages(runId){
+  [4000,10000,18000,28000,38000].forEach((t,i)=>{
+    setTimeout(()=>{
+      if(activeTasks[runId]){activeTasks[runId].stage=i;updateFlowSteps(i);renderTasks();}
+    },t);
+  });
+}
+
+function renderTasks(){
+  const list=document.getElementById('tasks-list');
+  const keys=Object.keys(activeTasks);
+  document.getElementById('running-count').textContent=`${keys.length} running`;
+  if(keys.length===0){list.innerHTML='<div class="empty-tasks">No tasks running. Submit a repo above to get started.</div>';return;}
+  list.innerHTML=keys.map(runId=>{
+    const t=activeTasks[runId];
+    return `<div class="task-card running" onclick="window.location='/report/${runId}'">
+      <div class="tdot tdot-run"></div>
+      <div class="t-info">
+        <div class="t-repo">${t.repo}</div>
+        <div class="t-stage"><div class="mini-spinner"></div>${STAGES[t.stage]||'Processing...'}</div>
+        <div class="t-meta">${t.task.toUpperCase()}</div>
+      </div>
+      <div class="t-right">
+        <div class="t-badge">RUNNING</div>
+        <div class="t-elapsed" id="elapsed-${runId}">0s</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function pollRun(runId){
+  const interval=setInterval(async()=>{
+    try{
+      const res=await fetch(`/run/${runId}`);
+      const run=await res.json();
+      if(run.status==='completed'){
+        clearInterval(interval);
+        stopElapsed(runId);
+        delete activeTasks[runId];
+        stats.total++;
+        if(run.report?.overall_status==='PASSED')stats.passed++;
+        if(run.report?.execution_time)stats.totalTime+=run.report.execution_time;
+        updateStats();
+        renderTasks();
+        updateFlowSteps(5);
+        window.location.href=`/report/${runId}`;
+      }
+    }catch(e){clearInterval(interval);}
+  },3000);
+}
+
+function updateStats(){
+  document.getElementById('stat-total').textContent=stats.total;
+  document.getElementById('stat-success').textContent=stats.total>0?`${Math.round((stats.passed/stats.total)*100)}%`:'—%';
+  document.getElementById('stat-avg').textContent=stats.total>0?`${Math.round(stats.totalTime/stats.total)}s`:'—s';
+}
+
+async function loadStats(){
+  try{
+    const res=await fetch('/runs');
+    const runs=await res.json();
+    const done=runs.filter(r=>r.status==='completed');
+    stats.total=done.length;
+    stats.passed=done.filter(r=>r.report?.overall_status==='PASSED').length;
+    stats.totalTime=done.reduce((a,r)=>a+(r.report?.execution_time||0),0);
+    updateStats();
+  }catch(e){}
+}
+
+loadStats();
+</script>
+</body>
+</html>
