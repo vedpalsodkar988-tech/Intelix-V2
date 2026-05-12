@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Intelix — History</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<!-- Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-7B8EWD6CEG"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -74,15 +73,10 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2
   </div>
 </div>
 <script>
-let allRuns=[];
 let currentFilter='all';
 
-async function loadRuns(){
-  try{
-    const res=await fetch('/runs');
-    allRuns=await res.json();
-    renderRuns();
-  }catch(e){}
+function getLocalRuns(){
+  return JSON.parse(localStorage.getItem('intelix_runs')||'[]');
 }
 
 function filterRuns(status,btn){
@@ -94,9 +88,10 @@ function filterRuns(status,btn){
 
 function renderRuns(){
   const list=document.getElementById('runs-list');
-  let runs=[...allRuns].reverse();
-  if(currentFilter!=='all'){runs=runs.filter(r=>r.report?.overall_status===currentFilter);}
-  runs=runs.filter(r=>r.status==='completed');
+  let runs=getLocalRuns().filter(r=>r.status==='completed').reverse();
+  if(currentFilter!=='all'){
+    runs=runs.filter(r=>r.report?.overall_status===currentFilter);
+  }
   if(runs.length===0){list.innerHTML='<div class="empty">No runs found.</div>';return;}
   list.innerHTML=runs.map(r=>{
     const status=r.report?.overall_status||'UNKNOWN';
@@ -113,7 +108,7 @@ function renderRuns(){
   }).join('');
 }
 
-loadRuns();
+renderRuns();
 </script>
 </body>
 </html>
