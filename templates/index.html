@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Intelix — AI Build Intelligence</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<!-- Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-7B8EWD6CEG"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -170,10 +169,32 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2
   </div>
 </div>
 <script>
+// LocalStorage helpers
+function saveRun(run){
+  const runs = JSON.parse(localStorage.getItem('intelix_runs')||'[]');
+  const existing = runs.findIndex(r=>r.id===run.id);
+  if(existing>=0) runs[existing]=run;
+  else runs.push(run);
+  localStorage.setItem('intelix_runs', JSON.stringify(runs));
+}
+
+function getLocalRuns(){
+  return JSON.parse(localStorage.getItem('intelix_runs')||'[]');
+}
+
+function updateStats(){
+  const runs = getLocalRuns().filter(r=>r.status==='completed');
+  const total = runs.length;
+  const passed = runs.filter(r=>r.report?.overall_status==='PASSED').length;
+  const totalTime = runs.reduce((a,r)=>a+(r.report?.execution_time||0),0);
+  document.getElementById('stat-total').textContent=total;
+  document.getElementById('stat-success').textContent=total>0?`${Math.round((passed/total)*100)}%`:'—%';
+  document.getElementById('stat-avg').textContent=total>0?`${Math.round(totalTime/total)}s`:'—s';
+}
+
 let selectedTask='test';
 let activeTasks={};
 let elapsedTimers={};
-let stats={total:0,passed:0,totalTime:0};
 
 function selectTask(t){
   selectedTask=t;
@@ -235,6 +256,14 @@ async function startRun(){
       document.getElementById('custom-cmd').value='';
       document.getElementById('lang-detect').classList.remove('show');
       const repoName=repoUrl.split('/').slice(-2).join('/');
+      // Save to localStorage immediately
+      saveRun({
+        id: data.run_id,
+        repo_url: repoUrl,
+        task_type: selectedTask,
+        status: 'running',
+        created_at: new Date().toLocaleString()
+      });
       activeTasks[data.run_id]={repo:repoName,task:selectedTask,stage:0};
       startElapsed(data.run_id);
       renderTasks();
@@ -284,10 +313,9 @@ async function pollRun(runId){
       if(run.status==='completed'){
         clearInterval(interval);
         stopElapsed(runId);
+        // Save completed run to localStorage
+        saveRun(run);
         delete activeTasks[runId];
-        stats.total++;
-        if(run.report?.overall_status==='PASSED')stats.passed++;
-        if(run.report?.execution_time)stats.totalTime+=run.report.execution_time;
         updateStats();
         renderTasks();
         updateFlowSteps(5);
@@ -297,25 +325,7 @@ async function pollRun(runId){
   },3000);
 }
 
-function updateStats(){
-  document.getElementById('stat-total').textContent=stats.total;
-  document.getElementById('stat-success').textContent=stats.total>0?`${Math.round((stats.passed/stats.total)*100)}%`:'—%';
-  document.getElementById('stat-avg').textContent=stats.total>0?`${Math.round(stats.totalTime/stats.total)}s`:'—s';
-}
-
-async function loadStats(){
-  try{
-    const res=await fetch('/runs');
-    const runs=await res.json();
-    const done=runs.filter(r=>r.status==='completed');
-    stats.total=done.length;
-    stats.passed=done.filter(r=>r.report?.overall_status==='PASSED').length;
-    stats.totalTime=done.reduce((a,r)=>a+(r.report?.execution_time||0),0);
-    updateStats();
-  }catch(e){}
-}
-
-loadStats();
+updateStats();
 </script>
 </body>
 </html>
