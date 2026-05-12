@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Intelix — AI Build Intelligence</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-7B8EWD6CEG"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-7B8EWD6CEG');
+</script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:radial-gradient(circle at 20% 30%,rgba(139,92,246,0.2),transparent 40%),radial-gradient(circle at 80% 70%,rgba(59,130,246,0.2),transparent 40%),#0B0F1A;min-height:100vh;font-family:'Inter',sans-serif;color:#fff}
@@ -14,9 +22,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2
 .nav-btn{background:none;border:none;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:rgba(255,255,255,0.45);cursor:pointer;padding:7px 16px;border-radius:8px;transition:all 0.2s}
 .nav-btn:hover{color:#fff;background:rgba(255,255,255,0.06)}
 .nav-btn.active{color:#a78bfa;background:rgba(139,92,246,0.1)}
-
 .main{max-width:1060px;margin:0 auto;padding:1.8rem 2rem 4rem}
-
 .hero{text-align:center;padding:2rem 0 1.6rem}
 .hero-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.25);border-radius:100px;padding:4px 13px;font-size:11px;color:rgba(139,92,246,0.9);font-weight:600;margin-bottom:1rem;text-transform:uppercase;letter-spacing:0.05em}
 .badge-dot{width:5px;height:5px;border-radius:50%;background:#8B5CF6;animation:blink 2s infinite}
@@ -24,15 +30,12 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2
 .hero h1{font-size:38px;font-weight:800;color:#fff;letter-spacing:-0.03em;line-height:1.1;margin-bottom:10px}
 .hero h1 span{background:linear-gradient(135deg,#8B5CF6,#3B82F6);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .hero p{font-size:14px;color:rgba(255,255,255,0.4);max-width:460px;margin:0 auto}
-
 .stats-row{display:flex;align-items:center;justify-content:center;gap:2.5rem;margin:1.3rem auto 1.6rem;padding:0.9rem 2rem;background:#161C2E;border:1px solid rgba(139,92,246,0.15);border-radius:12px;width:fit-content}
 .stat-item{text-align:center}
 .stat-num{font-size:18px;font-weight:700;font-family:'JetBrains Mono',monospace;background:linear-gradient(135deg,#8B5CF6,#3B82F6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1}
 .stat-lbl{font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.08em;margin-top:4px}
 .stat-div{width:1px;height:28px;background:rgba(255,255,255,0.06)}
-
 .run-layout{display:grid;grid-template-columns:1fr 300px;gap:12px;margin-bottom:1.8rem}
-
 .run-card{background:#161C2E;border:1px solid rgba(139,92,246,0.2);border-radius:14px;padding:1.3rem}
 .card-lbl{font-size:10px;font-weight:600;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:1rem;font-family:'JetBrains Mono',monospace}
 .field{margin-bottom:0.8rem}
@@ -40,11 +43,9 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2
 .field-input{width:100%;background:#0D1424;border:1px solid rgba(139,92,246,0.2);border-radius:8px;padding:9px 13px;font-size:13px;font-family:'JetBrains Mono',monospace;color:rgba(255,255,255,0.85);outline:none;transition:all 0.2s}
 .field-input:focus{border-color:#8B5CF6;box-shadow:0 0 0 2px rgba(139,92,246,0.12)}
 .field-input::placeholder{color:rgba(255,255,255,0.18)}
-
 .lang-detect{display:none;align-items:center;gap:6px;margin-top:5px;font-size:11px;color:rgba(139,92,246,0.8);font-family:'JetBrains Mono',monospace}
 .lang-detect.show{display:flex}
 .lang-dot{width:6px;height:6px;border-radius:50%;background:#8B5CF6}
-
 .task-row{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:0.8rem}
 .task-opt{background:#0D1424;border:1px solid rgba(139,92,246,0.15);border-radius:8px;padding:9px 11px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:8px}
 .task-opt:hover{border-color:rgba(139,92,246,0.35)}
@@ -52,11 +53,9 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2
 .task-icon{font-size:15px}
 .task-name{font-size:12px;font-weight:600;color:#fff}
 .task-desc{font-size:10px;color:rgba(255,255,255,0.28);margin-top:1px}
-
 .run-btn{width:100%;background:linear-gradient(135deg,#8B5CF6,#3B82F6);border:none;border-radius:8px;padding:10px;font-size:13px;font-weight:700;color:#fff;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;box-shadow:0 4px 14px rgba(139,92,246,0.35);margin-top:3px}
 .run-btn:hover{opacity:0.9;transform:translateY(-1px);box-shadow:0 6px 18px rgba(139,92,246,0.45)}
 .run-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none}
-
 .preview-card{background:#161C2E;border:1px solid rgba(139,92,246,0.2);border-radius:14px;padding:1.3rem}
 .preview-lbl{font-size:10px;font-weight:600;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:1.2rem;font-family:'JetBrains Mono',monospace}
 .flow-steps{display:flex;flex-direction:column;gap:0}
@@ -72,11 +71,9 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2
 .step-txt{font-size:12px;color:rgba(255,255,255,0.3);transition:all 0.3s}
 .step-txt.done{color:rgba(255,255,255,0.65)}
 .step-txt.active{color:#a78bfa;font-weight:600}
-
 .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.9rem}
 .section-title{font-size:11px;font-weight:600;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.1em;font-family:'JetBrains Mono',monospace}
 .section-pill{font-size:10px;color:rgba(139,92,246,0.7);background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.18);border-radius:100px;padding:2px 8px;font-family:'JetBrains Mono',monospace}
-
 .tasks-list{display:flex;flex-direction:column;gap:9px}
 .task-card{background:#161C2E;border:1px solid rgba(255,255,255,0.05);border-radius:11px;padding:0.95rem 1.1rem;display:flex;align-items:center;gap:13px;transition:all 0.2s;cursor:pointer}
 .task-card:hover{border-color:rgba(139,92,246,0.22);background:rgba(139,92,246,0.025)}
@@ -91,7 +88,6 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2
 .t-badge{font-size:10px;padding:2px 9px;border-radius:4px;font-weight:600;font-family:'JetBrains Mono',monospace;background:rgba(139,92,246,0.1);color:#8B5CF6;border:1px solid rgba(139,92,246,0.22)}
 .t-elapsed{font-size:10px;color:rgba(255,255,255,0.22);font-family:'JetBrains Mono',monospace}
 .mini-spinner{width:7px;height:7px;border:1.5px solid rgba(139,92,246,0.3);border-top-color:#a78bfa;border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0}
-
 .empty-tasks{text-align:center;padding:2.2rem;color:rgba(255,255,255,0.12);font-size:12px;font-family:'JetBrains Mono',monospace;background:#161C2E;border:1px solid rgba(255,255,255,0.04);border-radius:11px}
 .btn-spinner{display:inline-block;width:11px;height:11px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;margin-right:6px;vertical-align:middle}
 </style>
@@ -105,14 +101,12 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2
     <button class="nav-btn" onclick="window.location='/settings'">Settings</button>
   </div>
 </nav>
-
 <div class="main">
   <div class="hero">
     <div class="hero-badge"><div class="badge-dot"></div>AI Build Intelligence</div>
     <h1>Stop reading logs.<br><span>Know what broke instantly.</span></h1>
     <p>Connect your GitHub repo. Intelix runs your build or tests and tells you exactly what failed.</p>
   </div>
-
   <div class="stats-row">
     <div class="stat-item">
       <div class="stat-num" id="stat-total">0</div>
@@ -129,17 +123,13 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2
       <div class="stat-lbl">Avg Execution</div>
     </div>
   </div>
-
   <div class="run-layout">
     <div class="run-card">
       <div class="card-lbl">Run a Build</div>
       <div class="field">
         <label class="field-lbl">GitHub Repo URL</label>
         <input type="text" class="field-input" id="repo-url" placeholder="https://github.com/username/repo" oninput="detectLanguage(this.value)" />
-        <div class="lang-detect" id="lang-detect">
-          <div class="lang-dot"></div>
-          <span id="lang-text">Python detected</span>
-        </div>
+        <div class="lang-detect" id="lang-detect"><div class="lang-dot"></div><span id="lang-text">Python detected</span></div>
       </div>
       <div class="field">
         <label class="field-lbl">Task Type</label>
@@ -160,7 +150,6 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2
       </div>
       <button class="run-btn" id="run-btn" onclick="startRun()">⚡ Run Now</button>
     </div>
-
     <div class="preview-card">
       <div class="preview-lbl">Execution Flow</div>
       <div class="flow-steps" id="flow-steps">
@@ -172,7 +161,6 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2
       </div>
     </div>
   </div>
-
   <div class="section-header">
     <div class="section-title">Current Tasks</div>
     <div class="section-pill" id="running-count">0 running</div>
@@ -181,7 +169,6 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2
     <div class="empty-tasks">No tasks running. Submit a repo above to get started.</div>
   </div>
 </div>
-
 <script>
 let selectedTask='test';
 let activeTasks={};
@@ -201,13 +188,11 @@ function detectLanguage(url){
   const lower=url.toLowerCase();
   if(lower.includes('flask')||lower.includes('django')||lower.includes('python')||lower.includes('fastapi')){
     txt.textContent='Python detected';detect.classList.add('show');
-  } else if(lower.includes('express')||lower.includes('react')||lower.includes('node')||lower.includes('next')||lower.includes('vue')){
+  }else if(lower.includes('express')||lower.includes('react')||lower.includes('node')||lower.includes('next')||lower.includes('vue')){
     txt.textContent='Node.js detected';detect.classList.add('show');
-  } else if(url.length>30){
+  }else if(url.length>30){
     txt.textContent='Language will be auto-detected';detect.classList.add('show');
-  } else {
-    detect.classList.remove('show');
-  }
+  }else{detect.classList.remove('show');}
 }
 
 const STAGES=['Cloning repository...','Installing dependencies...','Running tests...','Analyzing logs...','Generating AI report...'];
