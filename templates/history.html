@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Intelix — History</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-7B8EWD6CEG"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-FJBV3FPCY9"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-  gtag('config', 'G-7B8EWD6CEG');
+  gtag('config', 'G-FJBV3FPCY9');
 </script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -68,30 +68,21 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2
       <button class="filter-btn" onclick="filterRuns('FAILED',this)">Failed</button>
     </div>
   </div>
-  <div class="runs-list" id="runs-list">
-    <div class="empty">No runs yet.</div>
-  </div>
+  <div class="runs-list" id="runs-list"><div class="empty">No runs yet.</div></div>
 </div>
 <script>
 let currentFilter='all';
-
-function getLocalRuns(){
-  return JSON.parse(localStorage.getItem('intelix_runs')||'[]');
-}
-
+function getLocalRuns(){return JSON.parse(localStorage.getItem('intelix_runs')||'[]');}
 function filterRuns(status,btn){
   currentFilter=status;
   document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   renderRuns();
 }
-
 function renderRuns(){
   const list=document.getElementById('runs-list');
   let runs=getLocalRuns().filter(r=>r.status==='completed').reverse();
-  if(currentFilter!=='all'){
-    runs=runs.filter(r=>r.report?.overall_status===currentFilter);
-  }
+  if(currentFilter!=='all'){runs=runs.filter(r=>r.report?.overall_status===currentFilter);}
   if(runs.length===0){list.innerHTML='<div class="empty">No runs found.</div>';return;}
   list.innerHTML=runs.map(r=>{
     const status=r.report?.overall_status||'UNKNOWN';
@@ -107,7 +98,6 @@ function renderRuns(){
     </div>`;
   }).join('');
 }
-
 renderRuns();
 </script>
 </body>
