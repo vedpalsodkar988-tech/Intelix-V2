@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Intelix — AI Build Intelligence</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-7B8EWD6CEG"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-FJBV3FPCY9"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-  gtag('config', 'G-7B8EWD6CEG');
+  gtag('config', 'G-FJBV3FPCY9');
 </script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -107,20 +107,11 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2
     <p>Connect your GitHub repo. Intelix runs your build or tests and tells you exactly what failed.</p>
   </div>
   <div class="stats-row">
-    <div class="stat-item">
-      <div class="stat-num" id="stat-total">0</div>
-      <div class="stat-lbl">Runs Executed</div>
-    </div>
+    <div class="stat-item"><div class="stat-num" id="stat-total">0</div><div class="stat-lbl">Runs Executed</div></div>
     <div class="stat-div"></div>
-    <div class="stat-item">
-      <div class="stat-num" id="stat-success">—%</div>
-      <div class="stat-lbl">Success Rate</div>
-    </div>
+    <div class="stat-item"><div class="stat-num" id="stat-success">—%</div><div class="stat-lbl">Success Rate</div></div>
     <div class="stat-div"></div>
-    <div class="stat-item">
-      <div class="stat-num" id="stat-avg">—s</div>
-      <div class="stat-lbl">Avg Execution</div>
-    </div>
+    <div class="stat-item"><div class="stat-num" id="stat-avg">—s</div><div class="stat-lbl">Avg Execution</div></div>
   </div>
   <div class="run-layout">
     <div class="run-card">
@@ -169,55 +160,42 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2
   </div>
 </div>
 <script>
-// LocalStorage helpers
 function saveRun(run){
-  const runs = JSON.parse(localStorage.getItem('intelix_runs')||'[]');
-  const existing = runs.findIndex(r=>r.id===run.id);
-  if(existing>=0) runs[existing]=run;
+  const runs=JSON.parse(localStorage.getItem('intelix_runs')||'[]');
+  const existing=runs.findIndex(r=>r.id===run.id);
+  if(existing>=0)runs[existing]=run;
   else runs.push(run);
-  localStorage.setItem('intelix_runs', JSON.stringify(runs));
+  localStorage.setItem('intelix_runs',JSON.stringify(runs));
 }
-
-function getLocalRuns(){
-  return JSON.parse(localStorage.getItem('intelix_runs')||'[]');
-}
-
+function getLocalRuns(){return JSON.parse(localStorage.getItem('intelix_runs')||'[]');}
 function updateStats(){
-  const runs = getLocalRuns().filter(r=>r.status==='completed');
-  const total = runs.length;
-  const passed = runs.filter(r=>r.report?.overall_status==='PASSED').length;
-  const totalTime = runs.reduce((a,r)=>a+(r.report?.execution_time||0),0);
+  const runs=getLocalRuns().filter(r=>r.status==='completed');
+  const total=runs.length;
+  const passed=runs.filter(r=>r.report?.overall_status==='PASSED').length;
+  const totalTime=runs.reduce((a,r)=>a+(r.report?.execution_time||0),0);
   document.getElementById('stat-total').textContent=total;
   document.getElementById('stat-success').textContent=total>0?`${Math.round((passed/total)*100)}%`:'—%';
   document.getElementById('stat-avg').textContent=total>0?`${Math.round(totalTime/total)}s`:'—s';
 }
-
 let selectedTask='test';
 let activeTasks={};
 let elapsedTimers={};
-
 function selectTask(t){
   selectedTask=t;
   document.querySelectorAll('.task-opt').forEach(el=>el.classList.remove('selected'));
   document.getElementById('task-'+t).classList.add('selected');
 }
-
 function detectLanguage(url){
   const detect=document.getElementById('lang-detect');
   const txt=document.getElementById('lang-text');
   if(!url||!url.includes('github.com')){detect.classList.remove('show');return;}
   const lower=url.toLowerCase();
-  if(lower.includes('flask')||lower.includes('django')||lower.includes('python')||lower.includes('fastapi')){
-    txt.textContent='Python detected';detect.classList.add('show');
-  }else if(lower.includes('express')||lower.includes('react')||lower.includes('node')||lower.includes('next')||lower.includes('vue')){
-    txt.textContent='Node.js detected';detect.classList.add('show');
-  }else if(url.length>30){
-    txt.textContent='Language will be auto-detected';detect.classList.add('show');
-  }else{detect.classList.remove('show');}
+  if(lower.includes('flask')||lower.includes('django')||lower.includes('python')||lower.includes('fastapi')){txt.textContent='Python detected';detect.classList.add('show');}
+  else if(lower.includes('express')||lower.includes('react')||lower.includes('node')||lower.includes('next')||lower.includes('vue')){txt.textContent='Node.js detected';detect.classList.add('show');}
+  else if(url.length>30){txt.textContent='Language will be auto-detected';detect.classList.add('show');}
+  else{detect.classList.remove('show');}
 }
-
 const STAGES=['Cloning repository...','Installing dependencies...','Running tests...','Analyzing logs...','Generating AI report...'];
-
 function updateFlowSteps(stage){
   const labels=['Clone repository','Install dependencies','Run tests / build','Analyze logs','Generate AI report'];
   document.getElementById('flow-steps').innerHTML=labels.map((label,i)=>{
@@ -227,7 +205,6 @@ function updateFlowSteps(stage){
     return `<div class="flow-step"><div class="step-icon ${iconClass}">${content}</div><div class="step-txt ${txtClass}">${label}</div></div>`;
   }).join('');
 }
-
 function startElapsed(runId){
   const start=Date.now();
   elapsedTimers[runId]=setInterval(()=>{
@@ -235,11 +212,7 @@ function startElapsed(runId){
     if(el){const s=Math.floor((Date.now()-start)/1000);const m=Math.floor(s/60);el.textContent=m>0?`${m}m ${s%60}s`:`${s}s`;}
   },1000);
 }
-
-function stopElapsed(runId){
-  if(elapsedTimers[runId]){clearInterval(elapsedTimers[runId]);delete elapsedTimers[runId];}
-}
-
+function stopElapsed(runId){if(elapsedTimers[runId]){clearInterval(elapsedTimers[runId]);delete elapsedTimers[runId];}}
 async function startRun(){
   const repoUrl=document.getElementById('repo-url').value.trim();
   const customCmd=document.getElementById('custom-cmd').value.trim();
@@ -256,14 +229,7 @@ async function startRun(){
       document.getElementById('custom-cmd').value='';
       document.getElementById('lang-detect').classList.remove('show');
       const repoName=repoUrl.split('/').slice(-2).join('/');
-      // Save to localStorage immediately
-      saveRun({
-        id: data.run_id,
-        repo_url: repoUrl,
-        task_type: selectedTask,
-        status: 'running',
-        created_at: new Date().toLocaleString()
-      });
+      saveRun({id:data.run_id,repo_url:repoUrl,task_type:selectedTask,status:'running',created_at:new Date().toLocaleString()});
       activeTasks[data.run_id]={repo:repoName,task:selectedTask,stage:0};
       startElapsed(data.run_id);
       renderTasks();
@@ -274,15 +240,11 @@ async function startRun(){
   btn.innerHTML='⚡ Run Now';
   btn.disabled=false;
 }
-
 function simulateStages(runId){
   [4000,10000,18000,28000,38000].forEach((t,i)=>{
-    setTimeout(()=>{
-      if(activeTasks[runId]){activeTasks[runId].stage=i;updateFlowSteps(i);renderTasks();}
-    },t);
+    setTimeout(()=>{if(activeTasks[runId]){activeTasks[runId].stage=i;updateFlowSteps(i);renderTasks();}},t);
   });
 }
-
 function renderTasks(){
   const list=document.getElementById('tasks-list');
   const keys=Object.keys(activeTasks);
@@ -304,7 +266,6 @@ function renderTasks(){
     </div>`;
   }).join('');
 }
-
 async function pollRun(runId){
   const interval=setInterval(async()=>{
     try{
@@ -313,7 +274,6 @@ async function pollRun(runId){
       if(run.status==='completed'){
         clearInterval(interval);
         stopElapsed(runId);
-        // Save completed run to localStorage
         saveRun(run);
         delete activeTasks[runId];
         updateStats();
@@ -324,7 +284,6 @@ async function pollRun(runId){
     }catch(e){clearInterval(interval);}
   },3000);
 }
-
 updateStats();
 </script>
 </body>
