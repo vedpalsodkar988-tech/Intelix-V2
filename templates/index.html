@@ -29,26 +29,19 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2
 .hero h1{font-size:38px;font-weight:800;color:#fff;letter-spacing:-0.03em;line-height:1.1;margin-bottom:10px}
 .hero h1 span{background:linear-gradient(135deg,#8B5CF6,#3B82F6);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .hero p{font-size:14px;color:rgba(255,255,255,0.4);max-width:460px;margin:0 auto 1.4rem}
-
 .demo-section{display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:0.8rem}
 .demo-label{font-size:12px;color:rgba(255,255,255,0.35);letter-spacing:0.02em}
 .demo-btn{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,rgba(139,92,246,0.2),rgba(59,130,246,0.2));border:1px solid rgba(139,92,246,0.4);border-radius:100px;padding:10px 24px;font-size:13px;font-weight:700;color:#c4b5fd;cursor:pointer;transition:all 0.2s;font-family:'Inter',sans-serif;position:relative;overflow:hidden}
-.demo-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(139,92,246,0.1),rgba(59,130,246,0.1));opacity:0;transition:opacity 0.2s}
-.demo-btn:hover::before{opacity:1}
 .demo-btn:hover{border-color:rgba(139,92,246,0.7);transform:translateY(-1px);box-shadow:0 4px 20px rgba(139,92,246,0.25)}
 .demo-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none}
 .demo-pulse{width:7px;height:7px;border-radius:50%;background:#a78bfa;animation:blink 1s infinite}
-
 .trust-row{display:flex;align-items:center;justify-content:center;gap:1.5rem;margin-top:0.6rem;flex-wrap:wrap}
 .trust-item{display:flex;align-items:center;gap:5px;font-size:11px;color:rgba(255,255,255,0.25)}
-.trust-icon{font-size:11px}
-
 .stats-row{display:flex;align-items:center;justify-content:center;gap:2.5rem;margin:1.3rem auto 1.6rem;padding:0.9rem 2rem;background:#161C2E;border:1px solid rgba(139,92,246,0.15);border-radius:12px;width:fit-content}
 .stat-item{text-align:center}
 .stat-num{font-size:18px;font-weight:700;font-family:'JetBrains Mono',monospace;background:linear-gradient(135deg,#8B5CF6,#3B82F6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1}
 .stat-lbl{font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.08em;margin-top:4px}
 .stat-div{width:1px;height:28px;background:rgba(255,255,255,0.06)}
-
 .run-layout{display:grid;grid-template-columns:1fr 300px;gap:12px;margin-bottom:1.8rem}
 .run-card{background:#161C2E;border:1px solid rgba(139,92,246,0.2);border-radius:14px;padding:1.3rem}
 .card-lbl{font-size:10px;font-weight:600;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:1rem;font-family:'JetBrains Mono',monospace}
@@ -71,7 +64,6 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2
 .run-btn:hover{opacity:0.9;transform:translateY(-1px);box-shadow:0 6px 18px rgba(139,92,246,0.45)}
 .run-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none}
 .field-note{font-size:10px;color:rgba(255,255,255,0.18);margin-top:8px;display:flex;align-items:center;gap:4px}
-
 .preview-card{background:#161C2E;border:1px solid rgba(139,92,246,0.2);border-radius:14px;padding:1.3rem}
 .preview-lbl{font-size:10px;font-weight:600;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:1.2rem;font-family:'JetBrains Mono',monospace}
 .flow-steps{display:flex;flex-direction:column;gap:0}
@@ -87,7 +79,6 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2
 .step-txt{font-size:12px;color:rgba(255,255,255,0.3);transition:all 0.3s}
 .step-txt.done{color:rgba(255,255,255,0.65)}
 .step-txt.active{color:#a78bfa;font-weight:600}
-
 .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.9rem}
 .section-title{font-size:11px;font-weight:600;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.1em;font-family:'JetBrains Mono',monospace}
 .section-pill{font-size:10px;color:rgba(139,92,246,0.7);background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.18);border-radius:100px;padding:2px 8px;font-family:'JetBrains Mono',monospace}
@@ -118,13 +109,11 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2
     <button class="nav-btn" onclick="window.location='/settings'">Settings</button>
   </div>
 </nav>
-
 <div class="main">
   <div class="hero">
     <div class="hero-badge"><div class="badge-dot"></div>AI Build Intelligence</div>
     <h1>Stop reading logs.<br><span>Know what broke instantly.</span></h1>
     <p>Connect your GitHub repo. Intelix runs your build or tests and tells you exactly what failed.</p>
-
     <div class="demo-section">
       <div class="demo-label">See Intelix analyze a real CI run in 30 seconds</div>
       <button class="demo-btn" id="demo-btn" onclick="runDemo()">
@@ -132,11 +121,10 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2
         Try Demo Repository
       </button>
     </div>
-
     <div class="trust-row">
-      <div class="trust-item"><span class="trust-icon">🔒</span> Only public repositories</div>
-      <div class="trust-item"><span class="trust-icon">🗑️</span> No code stored permanently</div>
-      <div class="trust-item"><span class="trust-icon">⚡</span> Results in under 2 minutes</div>
+      <div class="trust-item">🔒 Only public repositories</div>
+      <div class="trust-item">🗑️ No code stored permanently</div>
+      <div class="trust-item">⚡ Results in under 2 minutes</div>
     </div>
   </div>
 
@@ -176,7 +164,6 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2
       <button class="run-btn" id="run-btn" onclick="startRun()">⚡ Analyze Repository</button>
       <div class="field-note">🔒 Only public repos · No code stored · Cloned temporarily for analysis only</div>
     </div>
-
     <div class="preview-card">
       <div class="preview-lbl">Execution Flow</div>
       <div class="flow-steps" id="flow-steps">
@@ -199,9 +186,8 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2
 </div>
 
 <script>
-// Demo repo — Flask has interesting partial failures (async deps)
-const DEMO_REPO = 'https://github.com/pallets/flask';
-const DEMO_TASK = 'test';
+const DEMO_REPO='https://github.com/vedpalsodkar988-tech/intelix-demo';
+const DEMO_TASK='test';
 
 function saveRun(run){
   const runs=JSON.parse(localStorage.getItem('intelix_runs')||'[]');
@@ -267,15 +253,12 @@ async function runDemo(){
   const demoBtn=document.getElementById('demo-btn');
   demoBtn.innerHTML='<span class="btn-spinner"></span>Starting demo...';
   demoBtn.disabled=true;
-
-  // Fill the form visually
   document.getElementById('repo-url').value=DEMO_REPO;
   selectTask(DEMO_TASK);
   document.getElementById('custom-cmd').value='';
   document.getElementById('lang-detect').classList.add('show');
   document.getElementById('lang-text').textContent='Python detected';
   updateFlowSteps(0);
-
   try{
     const res=await fetch('/run',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({repo_url:DEMO_REPO,task_type:DEMO_TASK,custom_command:''})});
     const data=await res.json();
@@ -283,14 +266,13 @@ async function runDemo(){
       document.getElementById('repo-url').value='';
       document.getElementById('lang-detect').classList.remove('show');
       saveRun({id:data.run_id,repo_url:DEMO_REPO,task_type:DEMO_TASK,status:'running',created_at:new Date().toLocaleString()});
-      activeTasks[data.run_id]={repo:'pallets/flask',task:DEMO_TASK,stage:0};
+      activeTasks[data.run_id]={repo:'vedpalsodkar988-tech/intelix-demo',task:DEMO_TASK,stage:0};
       startElapsed(data.run_id);
       renderTasks();
       pollRun(data.run_id);
       simulateStages(data.run_id);
     }
   }catch(e){alert('Error starting demo');}
-
   demoBtn.innerHTML='<div class="demo-pulse"></div>Try Demo Repository';
   demoBtn.disabled=false;
 }
