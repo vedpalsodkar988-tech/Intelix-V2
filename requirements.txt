@@ -4,3 +4,4 @@ gitpython
 anthropic
 python-dotenv
 gunicorn
+ddtrace
