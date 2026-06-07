@@ -1,3 +1,6 @@
+import ddtrace
+ddtrace.patch_all()
+
 from flask import Flask, render_template, request, jsonify
 import json
 import os
@@ -5,7 +8,6 @@ from datetime import datetime
 import threading
 
 app = Flask(__name__)
-
 RUNS_FILE = 'runs.json'
 
 def load_runs():
@@ -46,10 +48,8 @@ def run():
     repo_url = data.get('repo_url')
     task_type = data.get('task_type', 'test')
     custom_command = data.get('custom_command', '')
-
     if not repo_url:
         return jsonify({"status": "error", "message": "No repo URL provided"}), 400
-
     run_id = datetime.now().strftime('%Y%m%d%H%M%S')
     runs = load_runs()
     new_run = {
@@ -63,10 +63,8 @@ def run():
     }
     runs.append(new_run)
     save_runs(runs)
-
     thread = threading.Thread(target=execute_run, args=(run_id, repo_url, task_type, custom_command))
     thread.start()
-
     return jsonify({"status": "ok", "run_id": run_id})
 
 @app.route('/runs', methods=['GET'])
