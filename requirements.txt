@@ -5,3 +5,4 @@ anthropic
 python-dotenv
 gunicorn
 ddtrace
+python-json-logger
