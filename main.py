@@ -1,11 +1,39 @@
-import ddtrace
-ddtrace.patch_all()
-
+import logging
+import requests
+import os
+from dotenv import load_dotenv
 from flask import Flask, render_template, request, jsonify
 import json
-import os
 from datetime import datetime
 import threading
+
+load_dotenv()
+
+# Send logs directly to Datadog via HTTP
+class DatadogHandler(logging.Handler):
+    def emit(self, record):
+        try:
+            log_entry = self.format(record)
+            requests.post(
+                "https://http-intake.logs.us5.datadoghq.com/api/v2/logs",
+                headers={
+                    "DD-API-KEY": os.getenv("DATADOG_API_KEY"),
+                    "Content-Type": "application/json"
+                },
+                json=[{
+                    "message": log_entry,
+                    "service": "intelix",
+                    "env": "production",
+                    "level": record.levelname
+                }]
+            )
+        except Exception:
+            pass  # never crash the app if logging fails
+
+# Set up logger
+logger = logging.getLogger("intelix")
+logger.setLevel(logging.INFO)
+logger.addHandler(DatadogHandler())
 
 app = Flask(__name__)
 RUNS_FILE = 'runs.json'
@@ -32,14 +60,17 @@ def update_run(run_id, status, report=None):
 
 @app.route('/')
 def index():
+    logger.info("Home page visited")
     return render_template('index.html')
 
 @app.route('/history')
 def history():
+    logger.info("History page visited")
     return render_template('history.html')
 
 @app.route('/settings')
 def settings():
+    logger.info("Settings page visited")
     return render_template('settings.html')
 
 @app.route('/run', methods=['POST'])
@@ -49,6 +80,7 @@ def run():
     task_type = data.get('task_type', 'test')
     custom_command = data.get('custom_command', '')
     if not repo_url:
+        logger.error("Run failed - no repo URL provided")
         return jsonify({"status": "error", "message": "No repo URL provided"}), 400
     run_id = datetime.now().strftime('%Y%m%d%H%M%S')
     runs = load_runs()
@@ -63,6 +95,7 @@ def run():
     }
     runs.append(new_run)
     save_runs(runs)
+    logger.info(f"New run started: {run_id} for repo: {repo_url}")
     thread = threading.Thread(target=execute_run, args=(run_id, repo_url, task_type, custom_command))
     thread.start()
     return jsonify({"status": "ok", "run_id": run_id})
@@ -77,6 +110,7 @@ def get_run(run_id):
     runs = load_runs()
     run = next((r for r in runs if r['id'] == run_id), None)
     if not run:
+        logger.error(f"Run not found: {run_id}")
         return jsonify({"error": "Run not found"}), 404
     return jsonify(run)
 
