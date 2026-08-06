@@ -1,4 +1,4 @@
 # Checkout service configuration
-TIMEOUT = 45
+TIMEOUT = 60
 MAX_RETRIES = 3
 DEBUG = False
