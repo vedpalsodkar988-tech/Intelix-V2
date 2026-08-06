@@ -1,1 +1,1 @@
-Fix checkout service timeout config.
+TIMEOUT = 90
