@@ -1,2 +1,1 @@
-# Intelix V2
-AI incident responder
+Fix checkout service timeout config.
